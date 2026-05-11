@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>À propos · Lamo's Chocolate</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- ═══ PAGE COVER ═══ -->
+<div id="page-cover"></div>
+
+<!-- ═══ LOADER ═══ -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-crown">
+      <svg viewBox="0 0 100 80" fill="none">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28"
+        stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+      </svg>
+    </div>
+    <p class="loader-text">Lamo's Chocolate</p>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- ═══ CURSOR ═══ -->
+<div class="cursor-ring"></div>
+<div class="cursor-dot"></div>
+
+<!-- ═══ NAVIGATION ═══ -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 100 80" fill="none">
+      <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28"
+      stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+      <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+    </svg>
+    <div class="nav-logo-text">
+      <span class="nav-logo-name">LAMO'S</span>
+      <span class="nav-logo-sub">Chocolate · Since 2021</span>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="boutique.html">Boutique</a></li>
+    <li><a href="about.html" class="active">À Propos</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="boutique.html" class="nav-cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+      <span class="cart-count" style="display:none">0</span>
+    </a>
+    <a href="boutique.html" class="nav-cta"><span>Commander</span></a>
+  </div>
+
+  <div class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile nav -->
+<div class="nav-mobile">
+  <nav class="nav-mobile-links">
+    <a href="index.html">Accueil</a>
+    <a href="boutique.html">Boutique</a>
+    <a href="about.html">À Propos</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+<!-- ═══ HERO ABOUT ═══ -->
+<section id="about-hero">
+  <div class="container">
+    <span class="gold-line reveal"></span>
+    <p class="eyebrow reveal delay-1">Notre histoire</p>
+    <h1 class="h-display h-display-center reveal delay-2">
+      L'esprit de Dubaï,<br><em>la noblesse du chocolat suisse</em>
+    </h1>
+    <p class="reveal delay-3" style="max-width:720px;margin:auto;">
+      Une maison née entre deux mondes : le luxe oriental et l’excellence helvétique.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ STORY BLOCK ═══ -->
+<section id="story-tease">
+  <div class="container">
+    <div class="story-tease-grid">
+
+      <div class="story-visual-box reveal-left">
+        <div class="story-img-main">
+          <div class="story-img-placeholder ph-pistachio">
+            <svg class="ph-crown" viewBox="0 0 100 80" fill="none">
+              <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28"
+              stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+              <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+            </svg>
+            <span class="ph-text">Lamo's Chocolate</span>
+          </div>
+        </div>
+        <div class="story-img-frame"></div>
+        <div class="story-year-badge">
+          <span class="story-year-num">2021</span>
+          <span class="story-year-label">Fondation</span>
+        </div>
+      </div>
+
+      <div class="story-text-side reveal-right">
+        <span class="gold-line gold-line-left"></span>
+        <p class="eyebrow">L'ADN d'une maison extraordinaire</p>
+
+        <h2 class="h-display">Une histoire née<br><em>bien avant le chocolat</em></h2>
+
+        <blockquote class="story-quote">
+          « LAMOS n'est pas né du chocolat.<br>LAMOS est né de l'excellence. »
+        </blockquote>
+
+        <p class="story-body">
+          Avant LAMOS Chocolate, il y avait <strong>LAMOS Sweets</strong>, maison fondée à Dubaï et reconnue pour son exigence absolue dans la pâtisserie haut de gamme.
+        </p>
+
+        <p class="story-body">
+          En 2021, cette culture du détail rencontre le chocolat. Pas comme un produit de plus, mais comme l’aboutissement naturel d’un savoir-faire déjà salué par les hôtels 5 étoiles et maisons de luxe du Golfe.
+        </p>
+
+        <div class="story-badges">
+          <span class="badge">Fondé 2021</span>
+          <span class="badge">Dubai · Suisse</span>
+          <span class="badge">Manufacture Artisanale</span>
+          <span class="badge">Chefs Primés</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ INGREDIENTS ═══ -->
+<section id="ingredients-prev">
+  <div class="container">
+    <div class="section-header">
+      <span class="gold-line reveal"></span>
+      <p class="eyebrow reveal delay-1">Les ingrédients comme déclaration de foi</p>
+      <h2 class="h-display h-display-center reveal delay-2">
+        Dans le monde du chocolat premium,<br><em>les ingrédients sont l'histoire</em>
+      </h2>
+    </div>
+
+    <div class="ing-cards">
+      <div class="ing-card reveal">
+        <span class="ing-flag">🇨🇭 Suisse</span>
+        <div class="ing-icon-wrap">🍫</div>
+        <h3 class="ing-name">Chocolat Carma</h3>
+        <p class="ing-sub">La référence suisse absolue, choisie par les meilleurs chocolatiers du monde.</p>
+      </div>
+
+      <div class="ing-card reveal delay-2">
+        <span class="ing-flag">🇧🇪 Belgique</span>
+        <div class="ing-icon-wrap">🌿</div>
+        <h3 class="ing-name">Crème Callebaut</h3>
+        <p class="ing-sub">Une crème incomparable, prisée par les chefs pâtissiers internationaux.</p>
+      </div>
+
+      <div class="ing-card reveal delay-4">
+        <span class="ing-flag">🇮🇷 Iran</span>
+        <div class="ing-icon-wrap">🌰</div>
+        <h3 class="ing-name">Pistaches Rafsanjan</h3>
+        <p class="ing-sub">Les pistaches les plus recherchées au monde, d’un vert profond et d’une douceur rare.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section id="philosophy">
+  <div class="pattern-overlay"></div>
+  <div class="container">
+    <div class="phil-inner">
+      <span class="gold-line reveal"></span>
+
+      <blockquote class="phil-quote reveal">
+        « Il existe des maisons nées pour vendre,<br>
+        et des maisons nées pour <em>émouvoir</em>.<br>
+        LAMOS appartient à la seconde. »
+      </blockquote>
+
+      <p class="phil-attr reveal delay-2">— L'Esprit Lamo's Chocolate</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="footer">
+  <div class="container">
+    <!-- ton footer complet ici -->
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lamo's Chocolate · L'esprit de Dubaï, la noblesse du chocolat suisse</title>
+<meta name="description" content="LAMO'S CHOCOLATE — Manufacture artisanale fondée à Dubaï en 2021. Pistachio & Kunafa, Pecan Praline, Matcha. Dubai · Switzerland.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Cinzel:wght@400;500;600&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ═══ PAGE COVER (transitions) ═══ -->
+<div id="page-cover"></div>
+
+<!-- ═══ LOADER ═══ -->
+<div id="loader">
+  <div class="loader-inner">
+    <div class="loader-crown">
+      <svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+        <circle cx="50" cy="8" r="4" fill="#c9a84c"/>
+        <circle cx="12" cy="14" r="3.5" fill="#c9a84c"/>
+        <circle cx="88" cy="14" r="3.5" fill="#c9a84c"/>
+      </svg>
+    </div>
+    <p class="loader-text">Lamo's Chocolate</p>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- ═══ CURSOR ═══ -->
+<div class="cursor-ring"></div>
+<div class="cursor-dot"></div>
+
+<!-- ═══ CART TOAST ═══ -->
+<div id="cart-toast" class="cart-toast">
+  <div class="cart-toast-icon">✓</div>
+  <div class="cart-toast-text">
+    <div class="cart-toast-title"></div>
+    <div class="cart-toast-desc"></div>
+  </div>
+</div>
+
+<!-- ═══ NAV ═══ -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">
+    <svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+      <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+      <circle cx="50" cy="8" r="4" fill="#c9a84c"/>
+      <circle cx="12" cy="14" r="3.5" fill="#c9a84c"/>
+      <circle cx="88" cy="14" r="3.5" fill="#c9a84c"/>
+    </svg>
+    <div class="nav-logo-text">
+      <span class="nav-logo-name">LAMO'S</span>
+      <span class="nav-logo-sub">Chocolate · Since 2021</span>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="index.html" class="active">Accueil</a></li>
+    <li><a href="boutique.html">Boutique</a></li>
+    <li><a href="about.html">À Propos</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+
+  <div class="nav-right">
+    <a href="boutique.html" class="nav-cart">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" style="display:none">0</span>
+    </a>
+    <a href="boutique.html" class="nav-cta"><span>Commander</span></a>
+  </div>
+
+  <div class="nav-burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile nav -->
+<div class="nav-mobile">
+  <nav class="nav-mobile-links">
+    <a href="index.html">Accueil</a>
+    <a href="boutique.html">Boutique</a>
+    <a href="about.html">À Propos</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="pattern-overlay"></div>
+  <div class="hero-vignette"></div>
+  <canvas id="hero-canvas" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Dubai · Switzerland · Since 2021</p>
+
+    <div class="hero-crown-wrap">
+      <svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2" stroke-linejoin="round"/>
+        <polygon points="50,15 62,27 74,18 70,45 30,45 26,18 38,27" fill="none" stroke="#c9a84c" stroke-width="0.8" stroke-linejoin="round" opacity="0.35"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+        <rect x="12" y="62" width="76" height="3" fill="none" stroke="#c9a84c" stroke-width="1.2"/>
+        <circle cx="50" cy="8" r="4" fill="#c9a84c"/>
+        <circle cx="12" cy="14" r="3.5" fill="#c9a84c"/>
+        <circle cx="88" cy="14" r="3.5" fill="#c9a84c"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-title shimmer-text">LAMO'S</h1>
+    <span class="hero-subtitle">C · H · O · C · O · L · A · T · E</span>
+    <div class="hero-divider"></div>
+
+    <p class="hero-tagline">
+      L'esprit de Dubaï, la noblesse du chocolat suisse.<br>
+      Une manufacture artisanale née au carrefour de l'Orient et de l'Occident.
+    </p>
+
+    <div class="hero-actions">
+      <a href="boutique.html" class="btn btn-gold btn-lg"><span>Découvrir nos créations</span></a>
+      <a href="about.html" class="btn btn-outline btn-lg"><span>Notre histoire</span></a>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <span class="hero-scroll-text">Défiler</span>
+    <div class="hero-scroll-line"></div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MARQUEE
+═══════════════════════════════════════════════════════ -->
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="marquee-item">Pistachio & Kunafa</span>
+    <span class="marquee-item">Manufacture Artisanale</span>
+    <span class="marquee-item">Dubai Chocolate Original</span>
+    <span class="marquee-item">Chocolat Carma Suisse</span>
+    <span class="marquee-item">Pistaches Iraniennes Rafsanjan</span>
+    <span class="marquee-item">Crème Callebaut</span>
+    <span class="marquee-item">Chefs Primés</span>
+    <span class="marquee-item">100% Personnalisable</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     INTRO STRIP
+═══════════════════════════════════════════════════════ -->
+<section id="intro" class="section-sm">
+  <div class="container">
+    <div class="intro-grid">
+      <div class="intro-block reveal">
+        <div class="intro-icon">🌍</div>
+        <div class="intro-label">Origine</div>
+        <div class="intro-value">Fondé à Dubaï, arrivé en Suisse</div>
+      </div>
+      <div class="intro-sep"></div>
+      <div class="intro-block reveal delay-2">
+        <div class="intro-icon">✦</div>
+        <div class="intro-label">Philosophie</div>
+        <div class="intro-value">L'original, non l'imitateur</div>
+      </div>
+      <div class="intro-sep"></div>
+      <div class="intro-block reveal delay-4">
+        <div class="intro-icon">🎁</div>
+        <div class="intro-label">Personnalisation</div>
+        <div class="intro-value">100% sur mesure, de la tablette au packaging</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     STORY TEASE
+═══════════════════════════════════════════════════════ -->
+<section id="story-tease">
+  <div class="container">
+    <div class="story-tease-grid">
+      <!-- Visual -->
+      <div class="story-visual-box reveal-left">
+        <div class="story-img-main">
+          <div class="story-img-placeholder ph-pistachio">
+            <!-- Remplacez par votre image: <img src="images/story-main.jpg" alt="Lamo's Chocolate"> -->
+            <svg class="ph-crown" viewBox="0 0 100 80" fill="none"><polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/><rect x="16" y="54" width="68" height="5" fill="#c9a84c"/><circle cx="50" cy="8" r="4" fill="#c9a84c"/><circle cx="12" cy="14" r="3.5" fill="#c9a84c"/><circle cx="88" cy="14" r="3.5" fill="#c9a84c"/></svg>
+            <span class="ph-text" style="font-family:'Cinzel',serif;font-size:.5rem;letter-spacing:.4em;color:rgba(201,168,76,.3);text-transform:uppercase;">Lamo's Chocolate</span>
+          </div>
+          <div class="story-img-overlay"></div>
+        </div>
+        <div class="story-img-frame"></div>
+        <div class="story-year-badge">
+          <span class="story-year-num">2021</span>
+          <span class="story-year-label">Fondation</span>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="story-text-side reveal-right">
+        <span class="gold-line gold-line-left" style="margin-bottom:1.2rem;"></span>
+        <p class="eyebrow">L'ADN d'une maison extraordinaire</p>
+        <h2 class="h-display" style="margin-bottom:2rem;">
+          Né bien avant<br><em>le chocolat</em>
+        </h2>
+
+        <blockquote class="story-quote">
+          « LAMOS n'est pas né du chocolat.<br>LAMOS est né de l'excellence. »
+        </blockquote>
+
+        <p class="story-body">
+          Avant LAMOS Chocolate, il y avait <strong>LAMOS Sweets</strong>. Une maison fondée à Dubaï, bâtie sur une obsession rare dans le monde de la haute gastronomie : l'excellence absolue de la pâtisserie et de la viennoiserie.
+        </p>
+        <p class="story-body">
+          En 2021, cette culture du détail rencontre le chocolat. Pas comme un produit de plus, mais comme l'aboutissement naturel d'une maîtrise déjà prouvée auprès des <strong>hôtels 5 étoiles, banques privées et maisons de joaillerie</strong> du Golfe.
+        </p>
+
+        <div class="story-badges">
+          <span class="badge">Fondé 2021</span>
+          <span class="badge">Dubai · Suisse</span>
+          <span class="badge">Manufacture Artisanale</span>
+          <span class="badge">Chefs Primés</span>
+          <span class="badge">4.5/5 UAE Premium</span>
+        </div>
+
+        <div style="margin-top:2.5rem;">
+          <a href="about.html" class="btn btn-outline"><span>Lire notre histoire complète</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FEATURED PRODUCTS
+═══════════════════════════════════════════════════════ -->
+<section id="featured">
+  <div class="container">
+    <div class="section-header">
+      <span class="gold-line reveal"></span>
+      <p class="eyebrow reveal delay-1">Nos créations signature</p>
+      <h2 class="h-display h-display-center reveal delay-2">L'art du <em>chocolat d'exception</em></h2>
+      <p class="reveal delay-3">Chaque tablette est fabriquée à la main par des chefs primés, avec des ingrédients choisis aux quatre coins du monde.</p>
+    </div>
+
+    <div class="featured-grid">
+      <!-- Flagship -->
+      <div class="featured-card reveal data-product="pistachio">
+        <div class="fc-image-wrap">
+          <!-- <img src="images/pistachio-kunafa.jpg" alt="Pistachio & Kunafa" class="fc-image"> -->
+          <div class="prod-ph ph-pistachio fc-image" style="min-height:100%;">
+            <svg class="prod-ph-crown" viewBox="0 0 100 80" fill="none"><polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/><rect x="16" y="54" width="68" height="5" fill="#c9a84c"/><circle cx="50" cy="8" r="4" fill="#c9a84c"/></svg>
+            <span class="prod-ph-label">Pistachio & Kunafa</span>
+          </div>
+          <div style="position:absolute;top:1rem;left:0;background:var(--c-gold);color:var(--c-dark);font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;padding:.3rem .85rem;">Signature</div>
+          <div class="fc-overlay">
+            <a href="boutique.html" class="btn btn-gold"><span>Voir en boutique</span></a>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-type">Chocolat Dubai · Milk Chocolate</div>
+          <h3 class="fc-name">Pistachio & Kunafa</h3>
+          <p class="fc-desc">Crème pistachio-kunafa artisanale (35%) dans un chocolat au lait soyeux Carma. La technique originale de LAMOS — celle qui a tout commencé.</p>
+          <div class="fc-footer">
+            <div class="fc-price">dès CHF 9.50 <span>· 45g / 80g / 200g</span></div>
+            <a href="boutique.html" class="btn btn-sm btn-gold"><span>Commander</span></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pecan -->
+      <div class="featured-card reveal delay-2">
+        <div class="fc-image-wrap">
+          <div class="prod-ph ph-dark fc-image" style="min-height:100%;">
+            <svg class="prod-ph-crown" viewBox="0 0 100 80" fill="none"><polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/><rect x="16" y="54" width="68" height="5" fill="#c9a84c"/><circle cx="50" cy="8" r="4" fill="#c9a84c"/></svg>
+            <span class="prod-ph-label">Pecan Praline</span>
+          </div>
+          <div class="fc-overlay">
+            <a href="boutique.html" class="btn btn-gold"><span>Voir en boutique</span></a>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-type">Chocolat Noir · Dark Chocolate</div>
+          <h3 class="fc-name">Pecan Praline</h3>
+          <p class="fc-desc">Couverture noir 55,2% et praliné pécan 55%. Douceur boisée, caractère affirmé, finesse absolue.</p>
+          <div class="fc-footer">
+            <div class="fc-price">CHF 15.90 <span>· 80g</span></div>
+            <a href="boutique.html" class="btn btn-sm btn-gold"><span>Commander</span></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Matcha -->
+      <div class="featured-card reveal delay-3">
+        <div class="fc-image-wrap">
+          <div class="prod-ph ph-matcha fc-image" style="min-height:100%;">
+            <svg class="prod-ph-crown" viewBox="0 0 100 80" fill="none"><polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/><rect x="16" y="54" width="68" height="5" fill="#c9a84c"/><circle cx="50" cy="8" r="4" fill="#c9a84c"/></svg>
+            <span class="prod-ph-label">Matcha</span>
+          </div>
+          <div style="position:absolute;top:1rem;left:0;background:var(--c-green2);color:var(--c-cream);font-family:'Cinzel',serif;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;padding:.3rem .85rem;">Nouveau</div>
+          <div class="fc-overlay">
+            <a href="boutique.html" class="btn btn-gold"><span>Voir en boutique</span></a>
+          </div>
+        </div>
+        <div class="fc-body">
+          <div class="fc-type">Collection Exclusive</div>
+          <h3 class="fc-name">Matcha</h3>
+          <p class="fc-desc">Matcha cérémonial Grade A rencontrant le chocolat blanc suisse Carma. Du Japon à Genève, en passant par Dubaï.</p>
+          <div class="fc-footer">
+            <div class="fc-price">CHF 16.90 <span>· 80g</span></div>
+            <a href="boutique.html" class="btn btn-sm btn-gold"><span>Commander</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:3.5rem;" class="reveal">
+      <a href="boutique.html" class="btn btn-outline btn-lg"><span>Voir toute la collection →</span></a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     STATS
+═══════════════════════════════════════════════════════ -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <span class="stat-num"><span data-counter="126" data-suffix="M">0M</span></span>
+        <span class="stat-label">Vues TikTok<br>Phénomène Dubai Chocolate</span>
+      </div>
+      <div class="stat-item reveal delay-1">
+        <span class="stat-num"><span data-counter="4.5" data-suffix="/5">0/5</span></span>
+        <span class="stat-label">Note UAE<br>Plateformes Premium</span>
+      </div>
+      <div class="stat-item reveal delay-2">
+        <span class="stat-num"><span data-counter="1259" data-prefix="+" data-suffix="%">0%</span></span>
+        <span class="stat-label">Croissance conversations<br>Dubai Chocolate en 1 an</span>
+      </div>
+      <div class="stat-item reveal delay-3">
+        <span class="stat-num"><span data-counter="100" data-suffix="%">0%</span></span>
+        <span class="stat-label">Personnalisation<br>Chocolat · Packaging</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     INGREDIENTS
+═══════════════════════════════════════════════════════ -->
+<section id="ingredients-prev">
+  <div class="container">
+    <div class="section-header">
+      <span class="gold-line reveal"></span>
+      <p class="eyebrow reveal delay-1">Les ingrédients comme déclaration de foi</p>
+      <h2 class="h-display h-display-center reveal delay-2">Dans le monde du chocolat premium,<br><em>les ingrédients sont l'histoire</em></h2>
+    </div>
+
+    <div class="ing-cards">
+      <div class="ing-card reveal">
+        <span class="ing-flag">🇨🇭 Suisse</span>
+        <div class="ing-icon-wrap">🍫</div>
+        <h3 class="ing-name">Chocolat Carma</h3>
+        <p class="ing-sub">L'une des couvertures les plus respectées au monde. La référence absolue du marché suisse, de confiance auprès des meilleurs chocolatiers de la planète.</p>
+      </div>
+      <div class="ing-card reveal delay-2">
+        <span class="ing-flag">🇧🇪 Belgique</span>
+        <div class="ing-icon-wrap">🌿</div>
+        <h3 class="ing-name">Crème Callebaut</h3>
+        <p class="ing-sub">La référence absolue du marché. Une crème incomparable, la préférée des grands chefs pâtissiers du monde entier. Texture, saveur, perfection.</p>
+      </div>
+      <div class="ing-card reveal delay-4">
+        <span class="ing-flag">🇮🇷 Iran · Rafsanjan</span>
+        <div class="ing-icon-wrap">🌰</div>
+        <h3 class="ing-name">Pistaches Rafsanjan</h3>
+        <p class="ing-sub">Les pistaches de Rafsanjan, considérées comme les meilleures au monde. Douces, riches, d'un vert profond. Celles que les grands chefs se disputent.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     PHILOSOPHY QUOTE
+═══════════════════════════════════════════════════════ -->
+<section id="philosophy">
+  <div class="pattern-overlay"></div>
+  <div class="container">
+    <div class="phil-inner">
+      <span class="gold-line reveal" style="margin-bottom:2rem;"></span>
+      <blockquote class="phil-quote reveal">
+        « Il existe des maisons nées pour vendre<br>
+        et des maisons nées pour <em>émouvoir</em>.<br>
+        LAMOS appartient à la seconde. »
+      </blockquote>
+      <p class="phil-attr reveal delay-2">— L'Esprit Lamo's Chocolate</p>
+
+      <div class="city-chain reveal delay-3" style="margin-top:3.5rem;">
+        <span class="city-name">Dubai</span>
+        <span class="city-dot"></span>
+        <span class="city-name">Sharjah</span>
+        <span class="city-dot"></span>
+        <span class="city-name">Abu Dhabi</span>
+        <span class="city-dot"></span>
+        <span class="city-name">Genève</span>
+        <span class="city-dot"></span>
+        <span class="city-name">Suisse</span>
+      </div>
+
+      <div style="margin-top:3.5rem;" class="reveal delay-4">
+        <a href="contact.html" class="btn btn-gold btn-lg"><span>Commander · Partenariat · Cadeaux</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg width="36" height="30" viewBox="0 0 100 80" fill="none"><polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/><rect x="16" y="54" width="68" height="5" fill="#c9a84c"/><circle cx="50" cy="8" r="4" fill="#c9a84c"/><circle cx="12" cy="14" r="3.5" fill="#c9a84c"/><circle cx="88" cy="14" r="3.5" fill="#c9a84c"/></svg>
+          <span class="footer-logo-name">LAMO'S CHOCOLATE</span>
+        </div>
+        <p class="footer-tagline">L'esprit de Dubaï, la noblesse du chocolat suisse.</p>
+        <div class="footer-social">
+          <a href="#" class="social-link" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor"/></svg>
+          </a>
+          <a href="#" class="social-link" aria-label="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+          </a>
+          <a href="#" class="social-link" aria-label="TikTok">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Navigation</p>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="boutique.html">Boutique</a></li>
+          <li><a href="about.html">À Propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Créations</p>
+        <ul>
+          <li><a href="boutique.html">Pistachio & Kunafa</a></li>
+          <li><a href="boutique.html">Pecan Praline</a></li>
+          <li><a href="boutique.html">Coffee Chocolate</a></li>
+          <li><a href="boutique.html">Mascarpone</a></li>
+          <li><a href="boutique.html">Matcha</a></li>
+          <li><a href="boutique.html">Fruits Rouges</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Newsletter</p>
+        <p style="font-size:.85rem;color:var(--c-text2);margin-bottom:1.25rem;font-style:italic;">Recevez nos nouveautés et offres exclusives.</p>
+        <div class="footer-newsletter">
+          <input type="email" placeholder="votre@email.com">
+          <button>S'inscrire</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 Lamo's Chocolate · Tous droits réservés · lamos-chocolate.ch</p>
+      <div class="footer-cities">
+        <span>Dubai</span><span></span>
+        <span>Switzerland</span><span></span>
+        <span>Since 2021</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
