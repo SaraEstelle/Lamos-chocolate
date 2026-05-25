@@ -1297,6 +1297,3 @@ volumes:
 ```
 
 ---
-
-*File written as part of Stage 3 — Technical Documentation*
-*Lamos Chocolate European Digital Platform — Holberton School France 2026*
