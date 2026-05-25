@@ -113,6 +113,121 @@ All tables are implemented in **PostgreSQL 16**. MySQL-specific syntax (`AUTO_IN
 └─────────────────────┘
 ```
 
+```mermaid
+erDiagram
+    categories {
+        int id PK
+        varchar name_fr
+        varchar name_en
+        varchar slug
+        timestamptz created_at
+    }
+    products {
+        int id PK
+        varchar slug
+        varchar name_fr
+        varchar name_en
+        text description_fr
+        text description_en
+        int category_id FK
+        boolean is_active
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    skus {
+        int id PK
+        int product_id FK
+        varchar sku_code
+        varchar format
+        int weight_g
+        decimal price
+        varchar currency
+        boolean is_active
+        int production_delay_days
+        int batch_size
+        timestamptz created_at
+    }
+    stock {
+        int id PK
+        int sku_id FK
+        int quantity
+        int threshold_alert
+        timestamptz updated_at
+        int updated_by FK
+    }
+    shipping_zones {
+        int id PK
+        varchar zone_name
+        text_array countries
+        int delay_days
+        decimal cost
+    }
+    customers {
+        int id PK
+        varchar first_name
+        varchar last_name
+        varchar email
+        varchar password_hash
+        varchar language_pref
+        boolean is_active
+        timestamptz created_at
+        timestamptz last_login
+    }
+    orders {
+        int id PK
+        int customer_id FK
+        varchar order_number
+        varchar status
+        decimal total_amount
+        varchar currency
+        varchar stripe_session_id
+        varchar shipping_country
+        int estimated_delivery_days
+        timestamptz created_at
+        timestamptz updated_at
+    }
+    order_items {
+        int id PK
+        int order_id FK
+        int sku_id FK
+        int quantity
+        decimal unit_price
+        decimal subtotal
+    }
+    b2b_requests {
+        int id PK
+        varchar company_name
+        varchar contact_email
+        varchar status
+        inet ip_address
+        int processed_by FK
+        timestamptz created_at
+    }
+    admin_users {
+        int id PK
+        varchar email
+        varchar role
+        boolean is_active
+    }
+    password_reset_tokens {
+        int id PK
+        int customer_id FK
+        varchar token
+        timestamptz expires_at
+        boolean used
+    }
+
+    categories ||--o{ products : "has"
+    products ||--o{ skus : "has variants"
+    skus ||--|| stock : "has stock"
+    skus ||--o{ order_items : "included in"
+    orders ||--o{ order_items : "contains"
+    customers ||--o{ orders : "places"
+    customers ||--o{ password_reset_tokens : "has"
+    admin_users ||--o{ b2b_requests : "processes"
+    admin_users ||--o{ stock : "updates"
+```
+
 ---
 
 ## 2.2 — Full PostgreSQL DDL
