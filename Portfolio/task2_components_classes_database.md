@@ -228,6 +228,173 @@ erDiagram
     admin_users ||--o{ stock : "updates"
 ```
 
+
+
+
+```mermaid
+classDiagram
+  class Category {
+    +int id
+    +String name_fr
+    +String name_en
+    +String slug
+    +Timestamptz created_at
+    +create(data) Category
+    +findById(id) Category
+    +findAll() Category[]
+    +update(id, data) Category
+    +deleteById(id) Boolean
+  }
+  class Product {
+    +int id
+    +String slug
+    +String name_fr
+    +String name_en
+    +int category_id
+    +Boolean is_active
+    +Timestamptz created_at
+    +create(data) Product
+    +findById(id) Product
+    +findByCategory(categoryId) Product[]
+    +findAll(filters) Product[]
+    +update(id, data) Product
+    +deleteById(id) Boolean
+  }
+  class SKU {
+    +int id
+    +int product_id
+    +String sku_code
+    +String format
+    +Decimal price
+    +String currency
+    +Boolean is_active
+    +create(data) SKU
+    +findById(id) SKU
+    +findByProduct(productId) SKU[]
+    +update(id, data) SKU
+    +deleteById(id) Boolean
+  }
+  class Stock {
+    +int id
+    +int sku_id
+    +int quantity
+    +int threshold_alert
+    +Timestamptz updated_at
+    +int updated_by
+    +create(data) Stock
+    +findBySku(skuId) Stock
+    +findAll() Stock[]
+    +update(skuId, data) Stock
+    +adjustQuantity(skuId, delta) Stock
+    +deleteById(id) Boolean
+  }
+  class ShippingZone {
+    +int id
+    +String zone_name
+    +String[] countries
+    +int delay_days
+    +Decimal cost
+    +create(data) ShippingZone
+    +findById(id) ShippingZone
+    +findAll() ShippingZone[]
+    +findByCountry(country) ShippingZone
+    +update(id, data) ShippingZone
+    +deleteById(id) Boolean
+  }
+  class Customer {
+    +int id
+    +String email
+    +String first_name
+    +String last_name
+    +String language_pref
+    +Boolean is_active
+    +Timestamptz created_at
+    +create(data) Customer
+    +findById(id) Customer
+    +findByEmail(email) Customer
+    +findAll(filters) Customer[]
+    +update(id, data) Customer
+    +deleteById(id) Boolean
+  }
+  class Order {
+    +int id
+    +int customer_id
+    +String order_number
+    +String status
+    +Decimal total_amount
+    +String currency
+    +String stripe_session_id
+    +create(data) Order
+    +findById(id) Order
+    +findByCustomer(customerId) Order[]
+    +findAll(filters) Order[]
+    +update(id, data) Order
+    +updateStatus(id, status) Order
+    +deleteById(id) Boolean
+  }
+  class OrderItem {
+    +int id
+    +int order_id
+    +int sku_id
+    +int quantity
+    +Decimal unit_price
+    +Decimal subtotal
+    +create(data) OrderItem
+    +findById(id) OrderItem
+    +findByOrder(orderId) OrderItem[]
+    +update(id, data) OrderItem
+    +deleteById(id) Boolean
+  }
+  class B2BRequest {
+    +int id
+    +String company_name
+    +String contact_email
+    +String status
+    +inet ip_address
+    +int processed_by
+    +create(data) B2BRequest
+    +findById(id) B2BRequest
+    +findAll(filters) B2BRequest[]
+    +update(id, data) B2BRequest
+    +process(id, adminId) B2BRequest
+    +deleteById(id) Boolean
+  }
+  class AdminUser {
+    +int id
+    +String email
+    +String role
+    +Boolean is_active
+    +create(data) AdminUser
+    +findById(id) AdminUser
+    +findByEmail(email) AdminUser
+    +findAll() AdminUser[]
+    +update(id, data) AdminUser
+    +deleteById(id) Boolean
+  }
+  class PasswordResetToken {
+    +int id
+    +int customer_id
+    +String token
+    +Timestamptz expires_at
+    +Boolean used
+    +create(customerId) PasswordResetToken
+    +findByToken(token) PasswordResetToken
+    +validate(token) Boolean
+    +markAsUsed(id) Boolean
+    +deleteExpired() int
+    +deleteById(id) Boolean
+  }
+
+  Category "1" --> "0..*" Product : has
+  Product "1" --> "0..*" SKU : has variants
+  SKU "1" --> "1" Stock : has stock
+  SKU "1" --> "0..*" OrderItem : included in
+  Order "1" --> "0..*" OrderItem : contains
+  Customer "1" --> "0..*" Order : places
+  Customer "1" --> "0..*" PasswordResetToken : has
+  AdminUser "1" --> "0..*" B2BRequest : processes
+  AdminUser "1" --> "0..*" Stock : updates
+```
 ---
 
 ## 2.2 — Full PostgreSQL DDL
