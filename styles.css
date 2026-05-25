@@ -128,8 +128,19 @@ nav#nav.scrolled {
   border-bottom: 1px solid rgba(201,168,76,0.12);
 }
 .nav-logo { display: flex; align-items: center; gap: 0.85rem; }
-.nav-logo svg { width: 40px; height: 40px; transition: transform var(--dur-mid) var(--ease-out); }
-.nav-logo:hover svg { transform: rotate(5deg) scale(1.05); }
+.nav-logo-img {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  transition: transform var(--dur-mid) var(--ease-out);
+}
+.nav-logo:hover .nav-logo-img { transform: scale(1.04); }
+.footer-logo-img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
 .nav-logo-text {
   display: flex; flex-direction: column; line-height: 1;
 }
