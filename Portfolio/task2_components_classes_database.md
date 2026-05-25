@@ -55,27 +55,27 @@ All tables are implemented in **PostgreSQL 16**. MySQL-specific syntax (`AUTO_IN
            │ 1                  │    total_amount         │
            │                    │    currency (ENUM)      │
            │ 1                  │    stripe_payment_id    │
-┌──────────┴──────────┐         │    stripe_session_id   │
-│        skus          │         │    shipping_*          │
-├─────────────────────┤         │    language (ENUM)     │
-│ PK id               │◄────────│    estimated_delivery  │
-│ FK product_id       │    N    │    notes               │
-│    sku_code (UNIQUE) │         │    created_at          │
-│    format           │         │    updated_at          │
-│    weight_g         │         └────────────┬───────────┘
-│    price            │                      │ 1
-│    currency (ENUM)  │                      │
-│    is_active        │                      │ N
-│    production_      │         ┌────────────▼───────────┐
-│    delay_days       │         │       order_items      │
-│    batch_size       │         ├─────────────────────────┤
-│    created_at       │         │ PK id                  │
-└──────────┬──────────┘         │ FK order_id            │
-           │ N                  │ FK sku_id              │
-           │                    │    quantity > 0        │
-           │ 1                  │    unit_price          │
-┌──────────▼──────────┐         │    subtotal            │
-│      products       │         └─────────────────────────┘
+┌──────────┴───────────┐        │    stripe_session_id    │
+│        skus          │        │    shipping_*           │
+├───────────────────── ┤        │    language (ENUM)      │
+│ PK id                │◄───────│    estimated_delivery   │
+│ FK product_id        │    N   │    notes                │
+│    sku_code (UNIQUE) │        │    created_at           │
+│    format            │        │    updated_at           │
+│    weight_g          │        └────────────┬────────────┘
+│    price             │                     │ 1
+│    currency (ENUM)   │                     │
+│    is_active         │                     │ N
+│    production_       │         ┌───────────▼────────────┐
+│    delay_days        │         │       order_items      │
+│    batch_size        │         ├────────────────────────┤
+│    created_at        │         │ PK id                  │
+└──────────┬───────────┘         │ FK order_id            │
+           │ N                   │ FK sku_id              │
+           │                     │    quantity > 0        │
+           │ 1                   │    unit_price          │
+┌──────────▼──────────┐          │    subtotal            │
+│      products       │          └────────────────────────┘
 ├─────────────────────┤
 │ PK id               │         ┌─────────────────────────┐
 │    slug (UNIQUE)    │         │      b2b_requests       │
