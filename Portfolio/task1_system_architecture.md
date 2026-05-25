@@ -78,34 +78,34 @@ The Lamos Chocolate system is a **multi-layer full-stack web application** organ
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│               DJANGO APPLICATION — Python 3.12 (Docker)            │
+│               DJANGO APPLICATION — Python 3.12 (Docker)             │
 │                   [Application Layer — MVT]                         │
 │                                                                     │
-│  ┌────────────────────┐  ┌──────────────────┐  ┌────────────────┐  │
-│  │      VIEWS         │  │     MODELS       │  │   TEMPLATES    │  │
-│  │   (Django apps)    │  │  (Django ORM)    │  │ (Django tmpl.) │  │
-│  │                    │  │                  │  │                │  │
-│  │ • main (home,      │  │ • Product        │  │ • HTML files   │  │
-│  │   about, i18n)     │  │ • SKU            │  │ • Template     │  │
-│  │ • shop (catalog,   │  │ • Order          │  │   inheritance  │  │
-│  │   product pages)   │  │ • OrderItem      │  │ • i18n tags    │  │
-│  │ • cart (session    │  │ • Customer       │  │   ({% trans %})│  │
-│  │   management)      │  │ • B2BRequest     │  │ • Reusable     │  │
-│  │ • checkout         │  │ • Stock          │  │   partials     │  │
-│  │   (Stripe)         │  │ • ShippingZone   │  │                │  │
-│  │ • accounts         │  │ • AdminUser      │  │                │  │
-│  │   (auth)           │  │ • PasswordReset  │  │                │  │
-│  │ • customer_area    │  │   Token          │  │                │  │
-│  │   (order hist.)    │  │                  │  │                │  │
-│  │ • b2b (form)       │  │                  │  │                │  │
-│  │ • backoffice       │  │                  │  │                │  │
-│  │   (admin panel)    │  │                  │  │                │  │
-│  │ • forecasting      │  │                  │  │                │  │
-│  │   (delivery calc.) │  │                  │  │                │  │
-│  └────────┬───────────┘  └────────┬─────────┘  └────────────────┘  │
+│  ┌────────────────────┐  ┌──────────────────┐  ┌────────────────┐   │
+│  │      VIEWS         │  │     MODELS       │  │   TEMPLATES    │   │
+│  │   (Django apps)    │  │  (Django ORM)    │  │ (Django tmpl.) │   │
+│  │                    │  │                  │  │                │   │
+│  │ • main (home,      │  │ • Product        │  │ • HTML files   │   │
+│  │   about, i18n)     │  │ • SKU            │  │ • Template     │   │
+│  │ • shop (catalog,   │  │ • Order          │  │   inheritance  │   │
+│  │   product pages)   │  │ • OrderItem      │  │ • i18n tags    │   │
+│  │ • cart (session    │  │ • Customer       │  │   ({% trans %})│   │
+│  │   management)      │  │ • B2BRequest     │  │ • Reusable     │   │
+│  │ • checkout         │  │ • Stock          │  │   partials     │   │
+│  │   (Stripe)         │  │ • ShippingZone   │  │                │   │
+│  │ • accounts         │  │ • AdminUser      │  │                │   │
+│  │   (auth)           │  │ • PasswordReset  │  │                │   │
+│  │ • customer_area    │  │   Token          │  │                │   │
+│  │   (order hist.)    │  │                  │  │                │   │
+│  │ • b2b (form)       │  │                  │  │                │   │
+│  │ • backoffice       │  │                  │  │                │   │
+│  │   (admin panel)    │  │                  │  │                │   │
+│  │ • forecasting      │  │                  │  │                │   │
+│  │   (delivery calc.) │  │                  │  │                │   │
+│  └────────┬───────────┘  └────────┬─────────┘  └────────────────┘   │
 │           │                       │                                 │
 │  ┌────────┴───────────────────────┴───────────────────────────────┐ │
-│  │                  BUILT-IN DJANGO SERVICES                       │ │
+│  │                  BUILT-IN DJANGO SERVICES                      │ │
 │  │  • django.contrib.auth  (sessions, login, logout, permissions) │ │
 │  │  • django.middleware.locale  (i18n, language routing)          │ │
 │  │  • django.core.mail  (transactional emails)                    │ │
@@ -146,7 +146,7 @@ The Lamos Chocolate system is a **multi-layer full-stack web application** organ
           │                      ├── Top 3 Products                 │
           │                      ├── B2C vs B2B Ratio               │
           │                      ├── Days Until Stockout / SKU      │
-          │                      ├── Production Relaunch Alerts      │
+          │                      ├── Production Relaunch Alerts     │
           │                      └── Monthly Seasonality            │
           └─────────────────────────────────────────────────────────┘
 
@@ -387,10 +387,10 @@ Developer → git push → GitHub
                     │           │
                   Tests       Lint
               (pytest-django) (flake8)
-              PostgreSQL 16   │
-               service        │
-                    │         │
-                    └────┬────┘
+              PostgreSQL 16     │
+               service          │
+                    │           │
+                    └────┬──────┘
                          │
                    (if all pass)
                          │
