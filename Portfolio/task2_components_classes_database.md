@@ -112,6 +112,41 @@ All tables are implemented in **PostgreSQL 16**. MySQL-specific syntax (`AUTO_IN
 │    cost             │
 └─────────────────────┘
 ```
+----
+2.2 — Class Diagram & CRUD Methods
+This class diagram is derived from the ERD schema (§ 2.1). It translates the PostgreSQL tables into business classes with their typed attributes and standardized CRUD methods, ready to be implemented in the service/repository layer.
+Adopted Conventions
+SymbolMeaning+Public member(data)Generic object passed as parameter (e.g. DTO, JSON payload)BooleanDeletion confirmation return value (true = success)[]Array / list of resultsfiltersOptional filters object (pagination, status, date…)
+Standard CRUD Methods (present on all classes)
+Each class exposes the five basic operations:
+
+create(data) — inserts a new record, returns the created object.
+findById(id) — retrieves a record by its primary key.
+findAll() — returns all records, with optional filters depending on the class.
+update(id, data) — updates the provided fields, returns the modified object.
+deleteById(id) — deletes the record, returns true on success.
+
+Specific Business Methods
+Some classes expose additional methods related to their own logic:
+ClassMethodRoleProductfindByCategory(categoryId)Filter products by categorySKUfindByProduct(productId)Retrieve all variants of a productStockadjustQuantity(skuId, delta)Increment or decrement stock (order, restocking)StockfindBySku(skuId)Direct access to the stock of a given SKUOrderupdateStatus(id, status)State transition (pending → paid → shipped…)OrderfindByCustomer(customerId)Order history for a customerCustomerfindByEmail(email)Authentication / uniqueness checkShippingZonefindByCountry(country)Resolve the pricing zone at checkoutB2BRequestprocess(id, adminId)Process a B2B request by an adminPasswordResetTokenvalidate(token)Verify that a token is valid and not expiredPasswordResetTokenmarkAsUsed(id)Invalidate the token after usePasswordResetTokendeleteExpired()Scheduled purge of expired tokens
+Relationships Between Classes
+Multiplicities exactly match the cardinalities from the ERD:
+
+Category → Product: a category contains zero or more products.
+Product → SKU: a product has zero or more variants (size, weight…).
+SKU → Stock: each SKU has exactly one stock record (1–1 relationship).
+SKU → OrderItem: a SKU can appear in multiple order lines.
+Order → OrderItem: an order contains one or more lines.
+Customer → Order: a customer places zero or more orders.
+Customer → PasswordResetToken: a customer can have multiple tokens (history).
+AdminUser → B2BRequest: an admin handles zero or more B2B requests.
+AdminUser → Stock: an admin can update zero or more stock records.
+
+
+Note: ShippingZone has no direct FK to the other tables in the current schema.
+It is resolved dynamically at checkout time via findByCountry(),
+by comparing the delivery country against the countries TEXT[] array of each zone.
+
 
 ```mermaid
 erDiagram
