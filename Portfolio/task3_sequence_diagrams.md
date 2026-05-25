@@ -30,73 +30,56 @@ Each diagram is accompanied by a step-by-step description detailing every intera
 
 > **Use case**: A logged-in customer adds a product to their cart, proceeds to checkout, pays via Stripe, and receives a confirmation.
 
-```
-Browser       Nginx      Django       Session       DB            Stripe       SMTP
-   │             │          │             │           │               │           │
-   │─ GET /shop/ ►          │             │           │               │           │
-   │             │─ forward ►             │           │               │           │
-   │             │          │─ Product.objects.filter(is_active=True) ►           │
-   │             │          │  .prefetch_related('skus__stock')        │           │
-   │             │          │◄─ products queryset ─────────────────────┘           │
-   │             │◄─ render catalog.html ─┘            │               │           │
-   │◄────────────┘          │             │             │               │           │
-   │                        │             │             │               │           │
-   │─ POST /api/cart/add/ ──►             │             │               │           │
-   │  {sku_id, quantity}     │             │             │               │           │
-   │             │          │─ read cart ─►             │               │           │
-   │             │          │◄─ cart dict ┘             │               │           │
-   │             │          │─ Stock.objects.get(sku=sku) ────────────►  │           │
-   │             │          │◄─ stock.quantity ─────────────────────────┘           │
-   │             │          │─ update cart ►            │               │           │
-   │             │          │  session.modified = True  │               │           │
-   │             │◄─ JsonResponse {cart_count, subtotal} ┘              │           │
-   │◄────────────┘          │             │             │               │           │
-   │                        │             │             │               │           │
-   │─ POST /checkout/create-session/ ──────►            │               │           │
-   │             │          │─ read cart ─►             │               │           │
-   │             │          │◄─ cart items ┘            │               │           │
-   │             │          │─ Customer.objects.get() ───────────────►  │           │
-   │             │          │◄─ customer data ─────────────────────────┘           │
-   │             │          │─ ShippingZone.get_zone_for_country(country)           │
-   │             │          │◄─ shipping_zone ──────────────────────────┘           │
-   │             │          │─ sku.calculate_estimated_days(qty, zone)              │
-   │             │          │  → estimated_delivery_days                            │
-   │             │          │                            │               │           │
-   │             │          │─── stripe.checkout.Session.create(line_items) ────────►
-   │             │          │    {locale, success_url, cancel_url,       │           │
-   │             │          │     customer_email, metadata}              │           │
-   │             │          │◄── {session.id, session.url} ──────────────────────────┘
-   │             │          │                            │               │           │
-   │             │◄─ redirect(session.url) HTTP 303 ─────┘              │           │
-   │◄────────────┘          │             │             │               │           │
-   │                        │             │             │               │           │
-   │──── redirect → Stripe Hosted Checkout Page ──────────────────────►            │
-   │                        │             │             │               │           │
-   │      [CUSTOMER ENTERS CREDIT CARD ON STRIPE'S PAGE]               │           │
-   │                        │             │             │               │           │
-   │◄──── Stripe redirects to success_url ?session_id=cs_... ──────────┘           │
-   │─ GET /checkout/confirmation/ ─────────►            │               │           │
-   │             │          │             │             │               │           │
-   │             │          │──── [ASYNC WEBHOOK] ────────────────────────►         │
-   │             │          │◄─── POST /checkout/webhook/ ────────────────┘         │
-   │             │          │     {event: payment_intent.succeeded,      │           │
-   │             │          │      payment_intent_id, amount, metadata}  │           │
-   │             │          │                            │               │           │
-   │             │          │─ stripe.Webhook.construct_event()          │           │
-   │             │          │  (signature verification)                  │           │
-   │             │          │                            │               │           │
-   │             │          │─ Order.objects.create(     │               │           │
-   │             │          │    estimated_delivery_days=X) ─────────────►           │
-   │             │          │─ OrderItem.objects.bulk_create(items) ──────►          │
-   │             │          │─ Stock.decrement(qty) via select_for_update() ─────────►
-   │             │          │◄─ OK ────────────────────────────────────────┘          │
-   │             │          │─── send_mail() confirmation email ─────────────────────►
-   │             │          │    (bilingual, includes estimated_delivery_days)         │
-   │             │          │◄─── email sent ─────────────────────────────────────────┘
-   │             │◄─ render confirmation.html ──────────┘              │           │
-   │◄────────────┘          │             │             │              │           │
-```
 
+```mermaid
+sequenceDiagram
+    actor Browser
+    participant Nginx
+    participant Django
+    participant Session
+    participant DB as PostgreSQL
+    participant Stripe
+    participant SMTP
+
+    Browser->>Nginx: GET /en/shop/
+    Nginx->>Django: forward
+    Django->>DB: Product.objects.filter(is_active=True).prefetch_related()
+    DB-->>Django: products queryset
+    Django-->>Browser: render catalog.html
+
+    Browser->>Django: POST /api/cart/add/ {sku_id, quantity}
+    Django->>Session: read cart
+    Session-->>Django: cart dict
+    Django->>DB: Stock.objects.get(sku=sku)
+    DB-->>Django: stock.quantity
+    Django->>Session: update cart / session.modified=True
+    Django-->>Browser: JsonResponse {cart_count, subtotal}
+
+    Browser->>Django: POST /checkout/create-session/
+    Django->>DB: ShippingZone.get_zone_for_country(country)
+    DB-->>Django: shipping_zone
+    Note over Django: sku.calculate_estimated_days(qty, zone)
+    Django->>Stripe: stripe.checkout.Session.create(line_items, locale)
+    Stripe-->>Django: {session.id, session.url}
+    Django-->>Browser: redirect(session.url) HTTP 303
+
+    Browser->>Stripe: HTTPS — Stripe Hosted Checkout
+    Note over Browser,Stripe: Customer enters credit card
+    Stripe-->>Browser: redirect to success_url
+
+    Browser->>Django: GET /checkout/confirmation/?session_id=cs_...
+
+    Note over Stripe,Django: ASYNC WEBHOOK
+    Stripe->>Django: POST /checkout/webhook/\n{payment_intent.succeeded}
+    Note over Django: stripe.Webhook.construct_event() — signature check
+    Django->>DB: Order.objects.create(estimated_delivery_days=X)
+    Django->>DB: OrderItem.objects.bulk_create(items)
+    Django->>DB: stock.decrement() with select_for_update()
+    Django->>SMTP: send_mail() — HTML confirmation email
+    Django-->>Stripe: JsonResponse {status: received} HTTP 200
+
+    Django-->>Browser: render confirmation.html
+```
 ### Step-by-Step Description
 
 | # | Actor | Action | Technical Detail |
@@ -133,79 +116,53 @@ Browser       Nginx      Django       Session       DB            Stripe       S
 
 > **Use case**: A visitor creates an account, logs in, accesses their order history, and resets their password.
 
-```
-Browser       Django       DB          Django Auth    SMTP
-   │             │           │               │           │
-   │─ GET /accounts/register/ ────────────────►          │
-   │◄─ render register.html ──────────────────┘          │
-   │                         │              │            │
-   │─ POST /accounts/register/ ────────────────────────── │
-   │  {first_name, last_name, email,         │            │
-   │   password1, password2}                 │            │
-   │             │            │              │            │
-   │             │─ CustomerRegistrationForm.is_valid()   │
-   │             │  (email format, min length,            │
-   │             │   password match validation)           │
-   │             │            │              │            │
-   │             │─ Customer.objects.filter(email=email).exists() ─►
-   │             │◄─ False (email available) ──────────────┘        │
-   │             │            │              │            │
-   │             │─ make_password(password1) → password_hash        │
-   │             │─ Customer.objects.create(...) ──────────────────►│
-   │             │◄─ customer.id ──────────────────────────────────┘│
-   │             │─── send_mail() welcome email ───────────────────►│
-   │             │◄─── sent ──────────────────────────────────────── │
-   │◄─ redirect /accounts/login/ (flash: "Account created!") ────── │
-   │                         │              │            │
-   │─ POST /accounts/login/ ─────────────────►           │
-   │  {email, password}       │              │            │
-   │             │─ Customer.objects.get(email=email) ─────────────►│
-   │             │◄─ customer object ─────────────────────────────── │
-   │             │            │              │            │
-   │             │─ check_password(password, customer.password_hash)  │
-   │             │  → True                   │            │
-   │             │                           │            │
-   │             │─ request.session['customer_id'] = customer.pk      │
-   │             │─ customer.last_login = timezone.now()              │
-   │             │─ customer.save()          │            │
-   │◄─ redirect /my-account/ (flash: "Welcome Sara!") ──── │
-   │                         │              │            │
-   │─ GET /my-account/orders/ ──────────────►            │
-   │             │─ @login_required → check session['customer_id']    │
-   │             │─ Order.objects.filter(customer=customer) ─────────►│
-   │             │  .order_by('-created_at')               │          │
-   │             │◄─ orders queryset ─────────────────────────────────┘
-   │◄─ render orders.html ───────────────────┘           │
-   │                         │              │            │
-   │                         │              │            │
-   │   [--- PASSWORD RESET FLOW ---]        │            │
-   │                         │              │            │
-   │─ POST /accounts/forgot-password/ ───────►           │
-   │  {email}                │              │            │
-   │             │─ Customer.objects.filter(email=email).first()       │
-   │             │◄─ customer (or None)      │            │
-   │             │─ if customer:             │            │
-   │             │   token = secrets.token_urlsafe(32)                 │
-   │             │   PasswordResetToken.objects.create(               │
-   │             │     token=token, expires_at=now()+1h) ───────────►  │
-   │             │◄─ OK ───────────────────────────────────────────── │
-   │             │─── send_mail() reset link ──────────────────────────►
-   │             │    (link: /accounts/reset-password/<token>/)       │
-   │◄─ redirect (flash: "Email sent if account exists") — always ─────  │
-   │                         │              │            │
-   │─ GET /accounts/reset-password/<token>/ ──────────────►          │
-   │             │─ PasswordResetToken.objects.get(token=token)       │
-   │             │  .is_valid → True (not used + not expired)         │
-   │◄─ render reset_password_form.html ──────────────────── │
-   │                         │              │            │
-   │─ POST /accounts/reset-password/<token>/ ──────────────►         │
-   │  {new_password, confirm_password}       │            │
-   │             │─ form validation          │            │
-   │             │─ customer.set_password(new_password) ────────────►  │
-   │             │─ token.used = True; token.save() ──────────────────►│
-   │◄─ redirect /accounts/login/ (flash: "Password updated") ──────── │
-```
 
+
+```mermaid
+sequenceDiagram
+    actor Browser
+    participant Django
+    participant DB as PostgreSQL
+    participant SMTP
+
+    Browser->>Django: GET /accounts/register/
+    Django-->>Browser: render register.html
+
+    Browser->>Django: POST {first_name, last_name, email, password1, password2}
+    Note over Django: CustomerRegistrationForm.is_valid()
+    Django->>DB: Customer.objects.filter(email=email).exists()
+    DB-->>Django: False (available)
+    Note over Django: make_password(password1)
+    Django->>DB: Customer.objects.create(...)
+    DB-->>Django: customer.id
+    Django->>SMTP: send_mail() welcome email
+    Django-->>Browser: redirect /accounts/login/
+
+    Browser->>Django: POST /accounts/login/ {email, password}
+    Django->>DB: Customer.objects.get(email=email)
+    DB-->>Django: customer object
+    Note over Django: check_password(raw, hash) → True
+    Note over Django: session['customer_id'] = customer.pk
+    Django-->>Browser: redirect /my-account/
+
+    Browser->>Django: GET /my-account/orders/
+    Note over Django: @login_required check
+    Django->>DB: Order.objects.filter(customer).order_by('-created_at')
+    DB-->>Django: orders queryset
+    Django-->>Browser: render orders.html
+
+    Note over Browser,SMTP: PASSWORD RESET FLOW
+    Browser->>Django: POST /accounts/forgot-password/ {email}
+    Note over Django: secrets.token_urlsafe(32)
+    Django->>DB: PasswordResetToken.objects.create(expires_at=+1h)
+    Django->>SMTP: send_mail() reset link
+    Django-->>Browser: redirect (always same response — anti-enumeration)
+
+    Browser->>Django: POST /accounts/reset-password/token/
+    Note over Django: token.is_valid → True
+    Django->>DB: customer.set_password() + token.used=True
+    Django-->>Browser: redirect /accounts/login/
+```
 ### Step-by-Step Description
 
 **Phase 1 — Registration**
@@ -249,62 +206,36 @@ Browser       Django       DB          Django Auth    SMTP
 
 > **Use case**: A purchasing manager submits a corporate form. The Lamos team receives a notification, the request is stored, and the admin can view and process it.
 
-```
-Browser(B2B)   Django       DB           SMTP(Lamos)   Browser(Admin)
-    │             │           │               │              │
-    │─ GET /fr/b2b/ ──────────►              │              │
-    │◄─ render b2b.html ───────┘             │              │
-    │                          │             │              │
-    │─ POST /fr/b2b/submit/ ────►            │              │
-    │  {company_name,           │            │              │
-    │   contact_name,           │            │              │
-    │   contact_email,          │            │              │
-    │   contact_phone,          │            │              │
-    │   sector,                 │            │              │
-    │   estimated_qty,          │            │              │
-    │   occasion,               │            │              │
-    │   message,                │            │              │
-    │   language}               │            │              │
-    │             │             │            │              │
-    │             │─ B2BRequestForm.is_valid()              │
-    │             │  (required: company_name, contact_name, │
-    │             │   contact_email — email format)         │
-    │             │             │            │              │
-    │             │─ B2BRequest.objects.create(             │
-    │             │    status='new',          │             │
-    │             │    ip_address=request     │             │
-    │             │    .META['REMOTE_ADDR']) ─────────────►  │
-    │             │◄─ b2b_request.id ────────────────────── │
-    │             │             │            │              │
-    │             │─── send_mail() notification ────────────►
-    │             │    TO: contact@lamos-chocolate.com      │
-    │             │    Subject: "New B2B Request — [Company]"
-    │             │    Body: full request details           │
-    │             │◄─── sent ───────────────────────────────┘
-    │◄─ redirect /b2b/confirmation/ ───────── │              │
-    │                          │             │              │
-    │                          │             │              │
-    │   [--- ADMIN REVIEWS B2B REQUESTS ---]                │
-    │                          │             │   ┌──────────┘
-    │                          │             │   │
-    │                          │   GET /backoffice/b2b/ ◄──┘
-    │                          │◄──────────────────────────
-    │                          │─ @admin_required → check session['admin_id']
-    │                          │  + admin.role in ('admin', 'superadmin')
-    │                          │─ B2BRequest.objects.all() ───────────────►
-    │                          │  .order_by('-created_at')  │
-    │                          │◄─ queryset ───────────────────────────────┘
-    │                          │─── render backoffice/b2b_requests.html ────────────►
-    │                          │                            │              │
-    │                          │   POST /backoffice/b2b/<id>/update-status/ ◄───────┘
-    │                          │◄──────────────────────────────────────────
-    │                          │    {status: 'in_progress'} │              │
-    │                          │─ B2BRequest.objects.filter(pk=id).update( │
-    │                          │    status='in_progress',    │             │
-    │                          │    processed_at=timezone.now(),           │
-    │                          │    processed_by=admin) ────────────────────►
-    │                          │◄─ OK ─────────────────────────────────────┘
-    │                          │─── redirect /backoffice/b2b/ (flash: "Status updated") ──────────────►
+
+
+```mermaid
+sequenceDiagram
+    actor B2B as B2B Client
+    participant Django
+    participant DB as PostgreSQL
+    participant SMTP
+    actor Admin
+
+    B2B->>Django: GET /fr/b2b/
+    Django-->>B2B: render b2b.html
+
+    B2B->>Django: POST /fr/b2b/submit/ {company, contact, email, qty, message}
+    Note over Django: B2BRequestForm.is_valid()
+    Django->>DB: B2BRequest.objects.create(status='new', ip_address=...)
+    DB-->>Django: b2b_request.id
+    Django->>SMTP: send_mail() to Lamos team
+    Django-->>B2B: redirect /b2b/confirmation/
+
+    Admin->>Django: GET /backoffice/b2b/
+    Note over Django: @admin_required check
+    Django->>DB: B2BRequest.objects.all().order_by('-created_at')
+    DB-->>Django: queryset
+    Django-->>Admin: render b2b_requests.html
+
+    Admin->>Django: POST /backoffice/b2b/7/update-status/ {status: in_progress}
+    Django->>DB: B2BRequest.objects.filter(pk=7).update(status, processed_at, processed_by)
+    DB-->>Django: OK
+    Django-->>Admin: redirect /backoffice/b2b/ (flash: Status updated)
 ```
 
 ### Step-by-Step Description
@@ -328,123 +259,82 @@ Browser(B2B)   Django       DB           SMTP(Lamos)   Browser(Admin)
 
 > **Use case**: A Lamos admin updates a product's stock from the back-office panel. The change is immediately visible on the storefront.
 
-```
-Browser(Admin)   Django(Backoffice)   DB         Browser(Customer)  Django(Shop)
-    │                │                 │                │               │
-    │─ POST /backoffice/login/ ──────────►               │               │
-    │  {email, password}               │                │               │
-    │              │─ AdminUser.objects.get(email=email) ►               │
-    │              │◄─ admin found ────────────────────── │               │
-    │              │─ admin.check_password(password) → True              │
-    │              │─ request.session['admin_id'] = admin.pk             │
-    │◄─ redirect /backoffice/dashboard/ ─────────────────┘               │
-    │                                  │                │               │
-    │─ GET /backoffice/products/ ────────►               │               │
-    │              │─ Product.objects.all() ─────────────►               │
-    │              │  .prefetch_related('skus__stock')   │               │
-    │              │◄─ full product list ──────────────── │               │
-    │◄─ render backoffice/products.html ─┘               │               │
-    │                                  │                │               │
-    │─ POST /backoffice/stock/<sku_id>/update/ ────────────►              │
-    │  {quantity: 75}                  │                │               │
-    │              │─ Stock.objects.select_for_update() ─►               │
-    │              │  .get(sku_id=sku_id)                │               │
-    │              │◄─ stock object ───────────────────── │               │
-    │              │─ stock.quantity  = 75               │               │
-    │              │─ stock.updated_by = admin           │               │
-    │              │─ stock.save() ─────────────────────►│               │
-    │              │◄─ OK ─────────────────────────────── │               │
-    │◄─ JsonResponse {success: true, new_quantity: 75, is_low: false} ── │
-    │                                  │                │               │
-    │                                  │          [INDEPENDENT REQUEST] │
-    │                                  │                │               │
-    │                                  │   GET /shop/lamos-pistachio/ ──►
-    │                                  │                │─ Product.objects.get(slug=slug)
-    │                                  │                │  .prefetch_related('skus__stock')
-    │                                  │                │─ sku.available_quantity → 75
-    │                                  │                │◄─ product + stock data ──────────┘
-    │                                  │                │─ sku.calculate_estimated_days(1, zone)
-    │                                  │◄─ render product.html (badge: "Available", est: 2 days) ─────┘
-    │                                  │                │               │
-    │─ POST /backoffice/products/new/ ─────────────────────►             │
-    │  {name_fr, name_en,              │                │               │
-    │   description_*, price,          │                │               │
-    │   category_id, sku_code,         │                │               │
-    │   format, production_delay_days, │                │               │
-    │   batch_size, initial_stock,     │                │               │
-    │   image}                         │                │               │
-    │              │─ ProductCreateForm.is_valid()       │               │
-    │              │─ Product.objects.create(...) ────────►               │
-    │              │◄─ product.id ─────────────────────── │               │
-    │              │─ SKU.objects.create(product=product) ►               │
-    │              │◄─ sku.id ─────────────────────────── │               │
-    │              │─ Stock.objects.create(sku=sku,        │               │
-    │              │    quantity=initial_stock) ───────────►               │
-    │              │◄─ OK ─────────────────────────────── │               │
-    │◄─ redirect /backoffice/products/ (flash: "Product created") ─────── │
-```
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant Django_Back as Django Backoffice
+    participant DB as PostgreSQL
+    actor Customer
+    participant Django_Shop as Django Shop
 
+    Admin->>Django_Back: POST /backoffice/login/ {email, password}
+    Django_Back->>DB: AdminUser.objects.get(email=email)
+    DB-->>Django_Back: admin object
+    Note over Django_Back: session['admin_id'] = admin.pk
+    Django_Back-->>Admin: redirect /backoffice/dashboard/
+
+    Admin->>Django_Back: GET /backoffice/products/
+    Django_Back->>DB: Product.objects.all().prefetch_related('skus__stock')
+    DB-->>Django_Back: product list
+    Django_Back-->>Admin: render backoffice/products.html
+
+    Admin->>Django_Back: POST /backoffice/stock/3/update/ {quantity: 75}
+    Django_Back->>DB: Stock.objects.select_for_update().get(sku_id=3)
+    DB-->>Django_Back: stock object
+    Django_Back->>DB: stock.quantity=75 / stock.save()
+    DB-->>Django_Back: OK
+    Django_Back-->>Admin: JsonResponse {success: true, new_quantity: 75}
+
+    Note over Customer,Django_Shop: INDEPENDENT REQUEST
+    Customer->>Django_Shop: GET /shop/lamos-pistachio/
+    Django_Shop->>DB: Product.objects.get(slug=slug).prefetch_related()
+    DB-->>Django_Shop: product + stock (qty=75)
+    Note over Django_Shop: calculate_estimated_days(1, zone) = 2 days
+    Django_Shop-->>Customer: render product.html (Available — 2 days delivery)
+```
 ---
 
 ## 3.6 — Diagram 5: CI/CD Pipeline — Automated Deployment
 
 > **Use case**: A developer pushes code to `main` after a validated pull request. GitHub Actions triggers the full deployment pipeline.
 
-```
-Developer    GitHub        GitHub Actions        Docker          Server(Prod)   Nginx
-    │           │                │                  │                │           │
-    │─ git push feature/xxx ──────►                 │                │           │
-    │           │─ PR opened ────►                  │                │           │
-    │           │  [Peer code review]               │                │           │
-    │           │─ PR merged to main ───────────────►                │           │
-    │           │                │                  │                │           │
-    │           │──── trigger CI/CD workflow ────────►               │           │
-    │           │                │                  │                │           │
-    │           │         ┌──────┴──────┐           │                │           │
-    │           │         │  JOB: test  │           │                │           │
-    │           │         ├─────────────┤           │                │           │
-    │           │         │ postgres:16 │           │                │           │
-    │           │         │ service     │           │                │           │
-    │           │         │ (Alpine)    │           │                │           │
-    │           │         │             │           │                │           │
-    │           │         │ pip install │           │                │           │
-    │           │         │ pytest      │           │                │           │
-    │           │         │ pytest-django           │                │           │
-    │           │         │             │           │                │           │
-    │           │         │ pytest tests/ ──────────►                │           │
-    │           │         │ --cov=apps               │                │           │
-    │           │         │ --cov-fail-under=70      │                │           │
-    │           │         │ ✓ passed    │           │                │           │
-    │           │         └──────┬──────┘           │                │           │
-    │           │                │                  │                │           │
-    │           │         ┌──────┴──────┐           │                │           │
-    │           │         │  JOB: lint  │           │                │           │
-    │           │         │  (flake8)   │           │                │           │
-    │           │         │  ✓ passed   │           │                │           │
-    │           │         └──────┬──────┘           │                │           │
-    │           │                │                  │                │           │
-    │           │         ┌──────┴────────────┐     │                │           │
-    │           │         │  JOB: deploy      │     │                │           │
-    │           │         │  (needs test+lint)│     │                │           │
-    │           │         ├───────────────────┤     │                │           │
-    │           │         │ SSH to server     │     │                │           │
-    │           │         │ git pull main     │     │                │           │
-    │           │         │ docker compose    │─────►                │           │
-    │           │         │   build           │     │ build images   │           │
-    │           │         │ docker compose    │─────►                │           │
-    │           │         │   up -d           │     │ restart all    │           │
-    │           │         │                   │     │ containers     │           │
-    │           │         │ manage.py migrate │─────►                │           │
-    │           │         │ manage.py         │─────►                │           │
-    │           │         │ collectstatic     │     │                │           │
-    │           │         │                   │     │                │──────────►│
-    │           │         │ nginx -s reload   │     │                │           │ reload
-    │           │         │  ✓ deployed       │     │                │◄──────────┘
-    │           │         └──────┬────────────┘     │                │
-    │           │                │                  │                │
-    │◄───────────────── Slack notification: "✅ Deploy successful — lamos-eu.com" ──
-```
+```mermaid
+flowchart TD
+    DEV["👩‍💻 Developer\ngit push feature/xxx"]
+    GH["GitHub\nPull Request"]
+    MERGE["main branch\nPR merged"]
 
+    subgraph Actions["GitHub Actions"]
+        T["JOB: test\n• postgres:16 service\n• pytest + pytest-django\n• --cov-fail-under=70"]
+        L["JOB: lint\n• flake8 apps/ lamos/"]
+        D["JOB: deploy\n• needs: test + lint\n• if: branch == main"]
+    end
+
+    subgraph Server["Linux Ubuntu Server"]
+        PULL["git pull origin main"]
+        BUILD["docker compose build"]
+        UP["docker compose up -d"]
+        MIG["manage.py migrate"]
+        STATIC["manage.py collectstatic"]
+        NGINX["nginx -s reload"]
+    end
+
+    SLACK["✅ Slack notification\nlamos-eu.com live"]
+
+    DEV --> GH
+    GH --> MERGE
+    MERGE --> T
+    MERGE --> L
+    T --> D
+    L --> D
+    D --> PULL
+    PULL --> BUILD
+    BUILD --> UP
+    UP --> MIG
+    MIG --> STATIC
+    STATIC --> NGINX
+    NGINX --> SLACK
+```
 ### CI/CD Step Description
 
 | Phase | Step | Action | Detail |
