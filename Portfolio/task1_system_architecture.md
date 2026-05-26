@@ -51,161 +51,90 @@ The Lamos Chocolate system is a **multi-layer full-stack web application** organ
 
 ## 1.2 — High-Level Architecture Diagram
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          END USERS                                  │
-│                                                                     │
-│   [B2C Visitor / Customer]    [B2B Client]    [Lamos Admin]         │
-│         Browser (FR/EN)          Browser          Browser           │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │ HTTPS (port 443)
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  NGINX — Reverse Proxy (Docker)                     │
-│              (Linux Ubuntu Server — Production)                     │
-│  • SSL/TLS termination (Let's Encrypt certificate)                  │
-│  • Direct serving of static files (CSS, JS, images)                 │
-│  • Forwards dynamic requests → Gunicorn (port 8000)                 │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │ HTTP (port 8000, internal Docker network)
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                  GUNICORN — WSGI Server (Docker)                    │
-│              (4 workers — production)                               │
-│  • Serves the Django application in production                      │
-│  • Handles request concurrency                                      │
-└──────────────────────────┬──────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│               DJANGO APPLICATION — Python 3.12 (Docker)             │
-│                   [Application Layer — MVT]                         │
-│                                                                     │
-│  ┌────────────────────┐  ┌──────────────────┐  ┌────────────────┐   │
-│  │      VIEWS         │  │     MODELS       │  │   TEMPLATES    │   │
-│  │   (Django apps)    │  │  (Django ORM)    │  │ (Django tmpl.) │   │
-│  │                    │  │                  │  │                │   │
-│  │ • main (home,      │  │ • Product        │  │ • HTML files   │   │
-│  │   about, i18n)     │  │ • SKU            │  │ • Template     │   │
-│  │ • shop (catalog,   │  │ • Order          │  │   inheritance  │   │
-│  │   product pages)   │  │ • OrderItem      │  │ • i18n tags    │   │
-│  │ • cart (session    │  │ • Customer       │  │   ({% trans %})│   │
-│  │   management)      │  │ • B2BRequest     │  │ • Reusable     │   │
-│  │ • checkout         │  │ • Stock          │  │   partials     │   │
-│  │   (Stripe)         │  │ • ShippingZone   │  │                │   │
-│  │ • accounts         │  │ • AdminUser      │  │                │   │
-│  │   (auth)           │  │ • PasswordReset  │  │                │   │
-│  │ • customer_area    │  │   Token          │  │                │   │
-│  │   (order hist.)    │  │                  │  │                │   │
-│  │ • b2b (form)       │  │                  │  │                │   │
-│  │ • backoffice       │  │                  │  │                │   │
-│  │   (admin panel)    │  │                  │  │                │   │
-│  │ • forecasting      │  │                  │  │                │   │
-│  │   (delivery calc.) │  │                  │  │                │   │
-│  └────────┬───────────┘  └────────┬─────────┘  └────────────────┘   │
-│           │                       │                                 │
-│  ┌────────┴───────────────────────┴───────────────────────────────┐ │
-│  │                  BUILT-IN DJANGO SERVICES                      │ │
-│  │  • django.contrib.auth  (sessions, login, logout, permissions) │ │
-│  │  • django.middleware.locale  (i18n, language routing)          │ │
-│  │  • django.core.mail  (transactional emails)                    │ │
-│  │  • django.contrib.admin  (native admin for superusers)         │ │
-│  │  • django.contrib.postgres  (ArrayField, GIN index, INET)      │ │
-│  │  • Stripe Python SDK  (webhooks + checkout sessions)           │ │
-│  └────────────────────────────┬───────────────────────────────────┘ │
-└───────────────────────────────┼─────────────────────────────────────┘
-                                │
-          ┌─────────────────────┼──────────────────────┐
-          │                     │                      │
-          ▼                     ▼                      ▼
-┌──────────────────┐   ┌──────────────────┐   ┌────────────────────┐
-│  DATABASE        │   │  STRIPE API      │   │  EMAIL             │
-│  PostgreSQL 16   │   │  (external)      │   │  (external)        │
-│  (Docker)        │   │                  │   │                    │
-│                  │   │ • Checkout       │   │ • django.core.mail │
-│ • ENUM types     │   │   Sessions       │   │ + django-anymail   │
-│ • BOOLEAN        │   │ • Webhooks       │   │ • Order confirm.   │
-│ • TIMESTAMPTZ    │   │   (payment_      │   │ • B2B notifications│
-│ • INET           │   │   intent.        │   │ • Password reset   │
-│ • TEXT[]         │   │   succeeded)     │   │ • Registration     │
-│ • Triggers       │   │ • Test/Prod keys │   │                    │
-│ • Partial indexes│   │                  │   │                    │
-│ • Django ORM     │   │                  │   │                    │
-└──────────────────┘   └──────────────────┘   └────────────────────┘
-
-          ┌─────────────────────────────────────────────────────────┐
-          │              BI LAYER — DATA REPORTING                  │
-          │                                                         │
-          │  Python Data Connector (pandas + psycopg2)              │
-          │     │                                                   │
-          │     └──► PostgreSQL (READ-ONLY user lamos_bi_reader)    │
-          │               │                                         │
-          │               └──► Power BI Desktop / Looker Studio     │
-          │                      KPI Dashboards:                    │
-          │                      ├── Orders & Revenue               │
-          │                      ├── Top 3 Products                 │
-          │                      ├── B2C vs B2B Ratio               │
-          │                      ├── Days Until Stockout / SKU      │
-          │                      ├── Production Relaunch Alerts     │
-          │                      └── Monthly Seasonality            │
-          └─────────────────────────────────────────────────────────┘
-
-          ┌─────────────────────────────────────────────────────────┐
-          │              INFRASTRUCTURE & CI/CD                     │
-          │                                                         │
-          │  [Developer Workstation]                                │
-          │    │   git push → [GitHub Repository]                   │
-          │    │                   │                                │
-          │    │           [GitHub Actions]                         │
-          │    │           • Run pytest + pytest-django             │
-          │    │           • PostgreSQL 16 service (Alpine)         │
-          │    │           • Build Docker image                     │
-          │    │           • Deploy to production server            │
-          │    │                   │                                │
-          │    │     [Docker Compose — 4 services]                  │
-          │    │     • db      (PostgreSQL 16-alpine)               │
-          │    │     • app     (Django + Gunicorn)                  │
-          │    │     • nginx   (Reverse proxy + SSL)                │
-          │    │     • pgbouncer (Connection pooling — prod only)   │
-          │    │                                                    │
-          │  [Linux Ubuntu Server — Production]                     │
-          │    • All services run in Docker containers              │
-          │    • Let's Encrypt SSL via Certbot                      │
-          └─────────────────────────────────────────────────────────┘
-```
 ```mermaid
-graph TD
-    Users["End Users\n(Browser FR/EN)"]
+flowchart TB
 
-    subgraph Docker["Docker Compose — Production"]
-        Nginx["Nginx\nReverse Proxy + SSL"]
-        Gunicorn["Gunicorn\nWSGI 4 workers"]
-        subgraph Django["Django Application"]
-            Views["Views\n(Django Apps)"]
-            Models["Models\n(Django ORM)"]
-            Templates["Templates\n(Django Engine)"]
-        end
-        DB["PostgreSQL 16\n(ENUM · BOOLEAN · TIMESTAMPTZ\nINET · TEXT[] · Triggers)"]
-    end
+%% ===== USERS LAYER =====
+subgraph Users_Layer["👥 Users Layer"]
+    direction LR
+    Visitors["Visitors / B2C Customers\n(Browser FR/EN)"]
+    B2B["B2B Prospects\n(Browser)"]
+    Admins["Lamos Admins\n(Browser)"]
+end
 
-    Stripe["Stripe API\n(external)"]
-    Email["Email\nMailgun / SMTP"]
+%% ===== DELIVERY LAYER =====
+subgraph Delivery_Layer["🌐 Delivery Layer · Docker Compose — Production"]
+    Nginx["Nginx\nReverse Proxy · SSL/TLS · :443\nStatic files served directly"]
+    Gunicorn["Gunicorn WSGI\n4 workers · internal :8000"]
+end
 
-    subgraph BI["BI Layer (external)"]
-        Python["pandas + psycopg2\n(read-only user)"]
-        Dashboard["Power BI / Looker\nDashboards"]
-    end
+%% ===== PRESENTATION LAYER =====
+subgraph Presentation_Layer["🖥 Presentation Layer"]
+    direction LR
+    DjangoViews["Django Views (Apps)\nmain · shop · cart · checkout\naccounts · customer_area · b2b · backoffice"]
+    DjangoTemplates["Django Templates Engine\ni18n ({% trans %} · {% blocktrans %})\ni18n_patterns (FR/EN URLs)"]
+end
 
-    Users -->|HTTPS :443| Nginx
-    Nginx -->|HTTP :8000| Gunicorn
-    Gunicorn --> Django
-    Views --> Models
-    Views --> Templates
-    Models <--> DB
-    Views --> Stripe
-    Views --> Email
-    DB --> Python
-    Python --> Dashboard
+%% ===== APPLICATION LAYER =====
+subgraph Application_Layer["⚙️ Application Layer · Services"]
+    direction LR
+    CheckoutSvc["checkout/services.py\n(Stripe sessions · webhook handling)"]
+    ForecastSvc["forecasting/services.py\n(delivery calc · batch alerts · BI queries)"]
+    MailSvc["django.core.mail + django-anymail\n(order confirm · reset pwd · B2B notif)"]
+    CartSvc["cart/services.py\n(request.session-based cart)"]
+end
+
+%% ===== BUSINESS LOGIC LAYER =====
+subgraph Business_Layer["🧠 Business Logic Layer · Models & Rules"]
+    direction LR
+    DjangoModels["Django ORM Models\nProduct · SKU · Stock · Order · OrderItem\nCustomer · ShippingZone · B2BRequest\nAdminUser · PasswordResetToken"]
+    Rules["Business Rules\nDjango Forms · Model validators\nCHECK constraints · DB Triggers\n@admin_required · @login_required\nRole-based access control"]
+end
+
+%% ===== PERSISTENCE LAYER =====
+subgraph Persistence_Layer["🗄 Persistence Layer"]
+    direction LR
+    DjangoORM["Django ORM\n+ Django Migrations (built-in)"]
+    DB["PostgreSQL 16\nENUM · BOOLEAN · TIMESTAMPTZ\nINET · TEXT[] · Triggers\nMVCC · Partial indexes · Advisory locks\nGIN index (countries array)"]
+end
+
+%% ===== EXTERNAL SERVICES =====
+subgraph External_Layer["☁️ External Services"]
+    direction LR
+    Stripe["Stripe API\nHosted Checkout · Webhooks\nPCI-DSS compliant"]
+    SMTP["django-anymail · SMTP TLS :587\nGmail (dev) · Mailgun (prod)"]
+end
+
+%% ===== BI LAYER =====
+subgraph BI_Layer["📊 BI Layer · External — Read-Only"]
+    direction LR
+    PythonBI["pandas + psycopg2\nlamos_bi_reader — SELECT only"]
+    Dashboard["Power BI / Looker Studio\nKPIs · Forecasting · Seasonality"]
+end
+
+%% ===== CONNECTIONS =====
+Users_Layer     -->|"HTTPS :443"| Delivery_Layer
+Nginx           -->|"proxy_pass :8000"| Gunicorn
+Gunicorn        --> Presentation_Layer
+
+DjangoViews     --> DjangoTemplates
+DjangoViews     --> Application_Layer
+
+CheckoutSvc     --> Business_Layer
+ForecastSvc     --> Business_Layer
+MailSvc         --> Business_Layer
+CartSvc         --> Business_Layer
+
+DjangoModels    --> Rules
+Business_Layer  --> Persistence_Layer
+
+DjangoORM       <-->|"django.db connection pool"| DB
+
+CheckoutSvc     -->|"REST API + Webhooks"| Stripe
+MailSvc         -->|"SMTP TLS / Mailgun API"| SMTP
+
+DB              -->|"read-only connection"| PythonBI
+PythonBI        --> Dashboard
 ```
 ---
 
