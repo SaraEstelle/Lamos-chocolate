@@ -23,416 +23,433 @@ All tables are implemented in **PostgreSQL 16**. MySQL-specific syntax (`AUTO_IN
 | `ENGINE=InnoDB DEFAULT CHARSET=utf8mb4` | Removed (encoding at DB level) |
 | `VARCHAR(45)` for IP | `INET` (native PostgreSQL type) |
 
-### Table Relationships Overview
+### Table Relationships Overview:
+The relational schema below represents the complete PostgreSQL database architecture used by the Lamos Chocolate platform. It formalizes the core business entities — products, categories, SKUs, stock, customers, orders, order_items, B2B flows, shipping_zones, and related administrative tables — and their logical relationships.
+Purpose of this ERD: structure data in a normalized way (3NF) to ensure consistency, integrity, and scalability; replace MySQL specifics with PostgreSQL‑native equivalents (reusable ENUM types, INET, arrays, trigger‑based updated_at, TIMESTAMPTZ); align the database with the Django model layer where each table maps to a Django model and inherits standard audit fields; make key relationships explicit (one‑to‑many: Category → Products, Product → SKUs, Customer → Orders; one‑to‑one: SKU → Stock; many‑to‑one: OrderItems → Orders & SKUs; administrative links: AdminUser → stock updates & B2B processing); and support operational needs such as forecasting and logistics via fields like production_delay_days, batch_size, shipping_zones, and estimated_delivery_days. This diagram is intended as the single source of truth for backend development, Django migrations, SQL optimization, and overall data consistency.
 
-```
-┌─────────────────────┐         ┌─────────────────────────┐
-│    admin_users      │         │       customers         │
-├─────────────────────┤         ├─────────────────────────┤
-│ PK id               │         │ PK id                   │
-│    email            │         │    first_name           │
-│    password_hash    │         │    last_name            │
-│    role (ENUM)      │         │    email (UNIQUE)       │
-│    is_active        │         │    password_hash        │
-│    created_at       │         │    phone                │
-│    last_login       │         │    address_line1/2      │
-└──────────┬──────────┘         │    city / postal_code   │
-           │                    │    country              │
-           │ updated_by (FK)    │    language_pref        │
-           │                    │    is_active            │
-           ▼                    │    created_at           │
-┌──────────────────────┐        └────────────┬────────────┘
-│       stock          │                     │ 1
-├──────────────────────┤                     │
-│ PK id                │                     │ N
-│ FK sku_id (UNIQUE)   │        ┌────────────▼────────────┐
-│    quantity ≥ 0      │        │         orders          │
-│    threshold_alert   │        ├─────────────────────────┤
-│    updated_at        │        │ PK id                   │
-│ FK updated_by        │        │ FK customer_id          │
-└──────────────────────┘        │    order_number (UNIQUE)│
-           ▲                    │    status (ENUM)        │
-           │ 1                  │    total_amount         │
-           │                    │    currency (ENUM)      │
-           │ 1                  │    stripe_payment_id    │
-┌──────────┴───────────┐        │    stripe_session_id    │
-│        skus          │        │    shipping_*           │
-├───────────────────── ┤        │    language (ENUM)      │
-│ PK id                │◄───────│    estimated_delivery   │
-│ FK product_id        │    N   │    notes                │
-│    sku_code (UNIQUE) │        │    created_at           │
-│    format            │        │    updated_at           │
-│    weight_g          │        └────────────┬────────────┘
-│    price             │                     │ 1
-│    currency (ENUM)   │                     │
-│    is_active         │                     │ N
-│    production_       │         ┌───────────▼────────────┐
-│    delay_days        │         │       order_items      │
-│    batch_size        │         ├────────────────────────┤
-│    created_at        │         │ PK id                  │
-└──────────┬───────────┘         │ FK order_id            │
-           │ N                   │ FK sku_id              │
-           │                     │    quantity > 0        │
-           │ 1                   │    unit_price          │
-┌──────────▼──────────┐          │    subtotal            │
-│      products       │          └────────────────────────┘
-├─────────────────────┤
-│ PK id               │         ┌─────────────────────────┐
-│    slug (UNIQUE)    │         │      b2b_requests       │
-│    name_fr / name_en│         ├─────────────────────────┤
-│    description_*    │         │ PK id                   │
-│    ingredients_*    │         │    company_name         │
-│    allergens_*      │         │    contact_name/email   │
-│ FK category_id      │         │    contact_phone        │
-│    image_url        │         │    sector               │
-│    is_active        │         │    estimated_qty        │
-│    created_at       │         │    occasion / message   │
-│    updated_at       │         │    status (ENUM)        │
-└──────────┬──────────┘         │    language (ENUM)      │
-           │ N                  │    ip_address (INET)    │
-           │                    │    created_at           │
-           │ 1                  │    processed_at         │
-┌──────────▼──────────┐         │ FK processed_by         │
-│     categories      │         └─────────────────────────┘
-├─────────────────────┤
-│ PK id               │         ┌─────────────────────────┐
-│    name_fr / name_en│         │  password_reset_tokens  │
-│    slug (UNIQUE)    │         ├─────────────────────────┤
-│    created_at       │         │ PK id                   │
-└─────────────────────┘         │ FK customer_id          │
-                                │    token (UNIQUE)       │
-                                │    expires_at           │
-┌─────────────────────┐         │    used (BOOLEAN)       │
-│    shipping_zones   │         │    created_at           │
-├─────────────────────┤         └─────────────────────────┘
-│ PK id               │
-│    zone_name        │  ← New table — forecasting model
-│    countries TEXT[] │  ← PostgreSQL native array
-│    delay_days       │
-│    cost             │
-└─────────────────────┘
-```
-
+Note on BaseModel and implementation details: in the Django layer every model inherits from a common BaseModel that provides an auto‑generated id, created_at (auto_now_add=True) and updated_at (auto_now=True); on the database side a PostgreSQL trigger update_updated_at() enforces updated_at consistency, and orders.shipping_zone_id is implemented as a real foreign key.
 
 ```mermaid
 erDiagram
+    base_model {
+        int id PK "GENERATED ALWAYS AS IDENTITY"
+        timestamptz created_at "auto_now_add=True"
+        timestamptz updated_at "auto_now=True / trigger"
+    }
+
     categories {
         int id PK
         varchar name_fr
         varchar name_en
-        varchar slug
+        varchar slug "UNIQUE"
         timestamptz created_at
     }
+
     products {
         int id PK
-        varchar slug
+        varchar slug "UNIQUE"
         varchar name_fr
         varchar name_en
         text description_fr
         text description_en
+        text ingredients_fr
+        varchar allergens_fr
+        varchar allergens_en
         int category_id FK
+        varchar image_url
         boolean is_active
         timestamptz created_at
-        timestamptz updated_at
+        timestamptz updated_at "trigger"
     }
+
     skus {
         int id PK
         int product_id FK
-        varchar sku_code
+        varchar sku_code "UNIQUE"
         varchar format
         int weight_g
         decimal price
-        varchar currency
+        currency_type currency "ENUM EUR/CHF"
         boolean is_active
-        int production_delay_days
-        int batch_size
+        int production_delay_days "DEFAULT 7"
+        int batch_size "DEFAULT 50"
         timestamptz created_at
     }
+
     stock {
         int id PK
-        int sku_id FK
-        int quantity
-        int threshold_alert
-        timestamptz updated_at
+        int sku_id FK "UNIQUE — OneToOneField"
+        int quantity "CHECK >= 0"
+        int threshold_alert "DEFAULT 5"
+        timestamptz updated_at "auto_now=True"
         int updated_by FK
     }
+
     shipping_zones {
         int id PK
         varchar zone_name
-        text_array countries
+        text_array countries "ArrayField — GIN index"
         int delay_days
         decimal cost
     }
+
     customers {
         int id PK
         varchar first_name
         varchar last_name
-        varchar email
-        varchar password_hash
-        varchar language_pref
+        varchar email "UNIQUE"
+        varchar password_hash "make_password PBKDF2"
+        varchar phone
+        varchar address_line1
+        varchar city
+        varchar postal_code
+        varchar country
+        language_type language_pref "ENUM fr/en"
         boolean is_active
         timestamptz created_at
         timestamptz last_login
     }
+
     orders {
         int id PK
         int customer_id FK
-        varchar order_number
-        varchar status
+        int shipping_zone_id FK "← delivery zone at order time"
+        varchar order_number "UNIQUE — LM-YYYYMMDD-XXXXX"
+        order_status status "ENUM pending…refunded"
         decimal total_amount
-        varchar currency
+        currency_type currency "ENUM EUR/CHF"
+        varchar stripe_payment_id
         varchar stripe_session_id
+        varchar shipping_first_name
+        varchar shipping_city
+        varchar shipping_postal_code
         varchar shipping_country
-        int estimated_delivery_days
+        int estimated_delivery_days "computed by forecasting/services.py"
+        language_type language "ENUM fr/en"
+        text notes
         timestamptz created_at
-        timestamptz updated_at
+        timestamptz updated_at "trigger"
     }
+
     order_items {
         int id PK
         int order_id FK
         int sku_id FK
-        int quantity
-        decimal unit_price
+        int quantity "CHECK > 0"
+        decimal unit_price "snapshot — immutable"
         decimal subtotal
     }
+
     b2b_requests {
         int id PK
         varchar company_name
+        varchar contact_name
         varchar contact_email
-        varchar status
-        inet ip_address
-        int processed_by FK
+        varchar contact_phone
+        varchar sector
+        int estimated_qty
+        varchar occasion
+        text message
+        b2b_status status "ENUM new…refused"
+        language_type language "ENUM fr/en"
+        inet ip_address "GenericIPAddressField"
         timestamptz created_at
+        timestamptz processed_at
+        int processed_by FK
     }
+
     admin_users {
         int id PK
-        varchar email
-        varchar role
+        varchar email "UNIQUE"
+        varchar password_hash
+        varchar first_name
+        varchar last_name
+        admin_role role "ENUM superadmin/admin/viewer"
         boolean is_active
+        timestamptz created_at
+        timestamptz last_login
     }
+
     password_reset_tokens {
         int id PK
         int customer_id FK
-        varchar token
-        timestamptz expires_at
-        boolean used
+        varchar token "UNIQUE — secrets.token_urlsafe(32)"
+        timestamptz expires_at "NOW() + 1h"
+        boolean used "DEFAULT FALSE"
+        timestamptz created_at
     }
 
-    categories ||--o{ products : "has"
-    products ||--o{ skus : "has variants"
-    skus ||--|| stock : "has stock"
-    skus ||--o{ order_items : "included in"
-    orders ||--o{ order_items : "contains"
-    customers ||--o{ orders : "places"
-    customers ||--o{ password_reset_tokens : "has"
-    admin_users ||--o{ b2b_requests : "processes"
-    admin_users ||--o{ stock : "updates"
+    base_model ||--|| categories             : "inherits"
+    base_model ||--|| products               : "inherits"
+    base_model ||--|| skus                   : "inherits"
+    base_model ||--|| stock                  : "inherits"
+    base_model ||--|| shipping_zones         : "inherits"
+    base_model ||--|| customers              : "inherits"
+    base_model ||--|| orders                 : "inherits"
+    base_model ||--|| order_items            : "inherits"
+    base_model ||--|| b2b_requests           : "inherits"
+    base_model ||--|| admin_users            : "inherits"
+    base_model ||--|| password_reset_tokens  : "inherits"
+
+    categories     ||--o{ products              : "has"
+    products       ||--o{ skus                  : "has variants"
+    skus           ||--||  stock                : "OneToOneField"
+    skus           ||--o{ order_items           : "included in"
+    orders         ||--o{ order_items           : "contains"
+    customers      ||--o{ orders                : "places"
+    customers      ||--o{ password_reset_tokens : "has"
+    admin_users    ||--o{ b2b_requests          : "processes"
+    admin_users    ||--o{ stock                 : "updates"
+    shipping_zones ||--o{ orders               : "applied to"
 ```
 
-## 2.2 — Class Diagram & CRUD Methods
 
-This class diagram is derived from the ERD schema (§ 2.1). It translates the PostgreSQL tables into business classes with their typed attributes and standardized CRUD methods, ready to be implemented in the service/repository layer.
-Adopted Conventions
-SymbolMeaning+Public member(data)Generic object passed as parameter (e.g. DTO, JSON payload)BooleanDeletion confirmation return value (true = success)[]Array / list of resultsfiltersOptional filters object (pagination, status, date…)
-Standard CRUD Methods (present on all classes)
-Each class exposes the five basic operations:
+## 2.2 — Class Diagram & CRUD Methods:
+The class diagram below models the application’s domain objects and their service‑level responsibilities, mirroring the Django model layer and exposing the primary CRUD operations used by the backend. It documents core domain classes — Category, Product, SKU, Stock, ShippingZone, Customer, Order, OrderItem, B2BRequest, AdminUser, PasswordResetToken — their associations (inheritance from a common base, one‑to‑many, one‑to‑one, and many‑to‑one links) and the typical methods each class provides for creation, retrieval, update and deletion.
+Purpose of this diagram: provide a developer‑facing blueprint for the object API and persistence patterns so that service code, repository layers, and unit tests can be implemented consistently; make explicit which domain objects encapsulate business logic (availability checks, stock adjustments, estimated delivery calculations, order number generation, password handling, B2B processing); and clarify responsibilities for transactional operations (e.g., decrementing stock when an order is placed, bulk creating order items, marking tokens as used).
 
-create(data) — inserts a new record, returns the created object.
-findById(id) — retrieves a record by its primary key.
-findAll() — returns all records, with optional filters depending on the class.
-update(id, data) — updates the provided fields, returns the modified object.
-deleteById(id) — deletes the record, returns true on success.
+Note on BaseModel and CRUD semantics: every domain class inherits from an abstract BaseModel that supplies id, created_at, updated_at and common persistence helpers (save(), delete(), findById(), toDict()); individual classes extend this with domain methods (for example, SKU.available_quantity(), Stock.decrement(), Order.generate_order_number()). These methods represent the canonical CRUD and domain operations expected from the service layer and should map directly to Django model managers or repository functions in the implementation.
 
-Specific Business Methods
-Some classes expose additional methods related to their own logic:
-ClassMethodRoleProductfindByCategory(categoryId)Filter products by categorySKUfindByProduct(productId)Retrieve all variants of a productStockadjustQuantity(skuId, delta)Increment or decrement stock (order, restocking)StockfindBySku(skuId)Direct access to the stock of a given SKUOrderupdateStatus(id, status)State transition (pending → paid → shipped…)OrderfindByCustomer(customerId)Order history for a customerCustomerfindByEmail(email)Authentication / uniqueness checkShippingZonefindByCountry(country)Resolve the pricing zone at checkoutB2BRequestprocess(id, adminId)Process a B2B request by an adminPasswordResetTokenvalidate(token)Verify that a token is valid and not expiredPasswordResetTokenmarkAsUsed(id)Invalidate the token after usePasswordResetTokendeleteExpired()Scheduled purge of expired tokens
-Relationships Between Classes
-Multiplicities exactly match the cardinalities from the ERD:
-
-Category → Product: a category contains zero or more products.
-Product → SKU: a product has zero or more variants (size, weight…).
-SKU → Stock: each SKU has exactly one stock record (1–1 relationship).
-SKU → OrderItem: a SKU can appear in multiple order lines.
-Order → OrderItem: an order contains one or more lines.
-Customer → Order: a customer places zero or more orders.
-Customer → PasswordResetToken: a customer can have multiple tokens (history).
-AdminUser → B2BRequest: an admin handles zero or more B2B requests.
-AdminUser → Stock: an admin can update zero or more stock records.
-
-
-Note: ShippingZone has no direct FK to the other tables in the current schema.
-It is resolved dynamically at checkout time via findByCountry(),
-by comparing the delivery country against the countries TEXT[] array of each zone.
-
-
-
+This diagram is intended as the single source of truth for object responsibilities, method signatures, and interaction points between domain logic and persistence, helping ensure consistent implementation across views, serializers, and background jobs.
 ```mermaid
 classDiagram
-  class Category {
-    +int id
-    +String name_fr
-    +String name_en
-    +String slug
-    +Timestamptz created_at
-    +create(data) Category
-    +findById(id) Category
-    +findAll() Category[]
-    +update(id, data) Category
-    +deleteById(id) Boolean
-  }
-  class Product {
-    +int id
-    +String slug
-    +String name_fr
-    +String name_en
-    +int category_id
-    +Boolean is_active
-    +Timestamptz created_at
-    +create(data) Product
-    +findById(id) Product
-    +findByCategory(categoryId) Product[]
-    +findAll(filters) Product[]
-    +update(id, data) Product
-    +deleteById(id) Boolean
-  }
-  class SKU {
-    +int id
-    +int product_id
-    +String sku_code
-    +String format
-    +Decimal price
-    +String currency
-    +Boolean is_active
-    +create(data) SKU
-    +findById(id) SKU
-    +findByProduct(productId) SKU[]
-    +update(id, data) SKU
-    +deleteById(id) Boolean
-  }
-  class Stock {
-    +int id
-    +int sku_id
-    +int quantity
-    +int threshold_alert
-    +Timestamptz updated_at
-    +int updated_by
-    +create(data) Stock
-    +findBySku(skuId) Stock
-    +findAll() Stock[]
-    +update(skuId, data) Stock
-    +adjustQuantity(skuId, delta) Stock
-    +deleteById(id) Boolean
-  }
-  class ShippingZone {
-    +int id
-    +String zone_name
-    +String[] countries
-    +int delay_days
-    +Decimal cost
-    +create(data) ShippingZone
-    +findById(id) ShippingZone
-    +findAll() ShippingZone[]
-    +findByCountry(country) ShippingZone
-    +update(id, data) ShippingZone
-    +deleteById(id) Boolean
-  }
-  class Customer {
-    +int id
-    +String email
-    +String first_name
-    +String last_name
-    +String language_pref
-    +Boolean is_active
-    +Timestamptz created_at
-    +create(data) Customer
-    +findById(id) Customer
-    +findByEmail(email) Customer
-    +findAll(filters) Customer[]
-    +update(id, data) Customer
-    +deleteById(id) Boolean
-  }
-  class Order {
-    +int id
-    +int customer_id
-    +String order_number
-    +String status
-    +Decimal total_amount
-    +String currency
-    +String stripe_session_id
-    +create(data) Order
-    +findById(id) Order
-    +findByCustomer(customerId) Order[]
-    +findAll(filters) Order[]
-    +update(id, data) Order
-    +updateStatus(id, status) Order
-    +deleteById(id) Boolean
-  }
-  class OrderItem {
-    +int id
-    +int order_id
-    +int sku_id
-    +int quantity
-    +Decimal unit_price
-    +Decimal subtotal
-    +create(data) OrderItem
-    +findById(id) OrderItem
-    +findByOrder(orderId) OrderItem[]
-    +update(id, data) OrderItem
-    +deleteById(id) Boolean
-  }
-  class B2BRequest {
-    +int id
-    +String company_name
-    +String contact_email
-    +String status
-    +inet ip_address
-    +int processed_by
-    +create(data) B2BRequest
-    +findById(id) B2BRequest
-    +findAll(filters) B2BRequest[]
-    +update(id, data) B2BRequest
-    +process(id, adminId) B2BRequest
-    +deleteById(id) Boolean
-  }
-  class AdminUser {
-    +int id
-    +String email
-    +String role
-    +Boolean is_active
-    +create(data) AdminUser
-    +findById(id) AdminUser
-    +findByEmail(email) AdminUser
-    +findAll() AdminUser[]
-    +update(id, data) AdminUser
-    +deleteById(id) Boolean
-  }
-  class PasswordResetToken {
-    +int id
-    +int customer_id
-    +String token
-    +Timestamptz expires_at
-    +Boolean used
-    +create(customerId) PasswordResetToken
-    +findByToken(token) PasswordResetToken
-    +validate(token) Boolean
-    +markAsUsed(id) Boolean
-    +deleteExpired() int
-    +deleteById(id) Boolean
-  }
 
-  Category "1" --> "0..*" Product : has
-  Product "1" --> "0..*" SKU : has variants
-  SKU "1" --> "1" Stock : has stock
-  SKU "1" --> "0..*" OrderItem : included in
-  Order "1" --> "0..*" OrderItem : contains
-  Customer "1" --> "0..*" Order : places
-  Customer "1" --> "0..*" PasswordResetToken : has
-  AdminUser "1" --> "0..*" B2BRequest : processes
-  AdminUser "1" --> "0..*" Stock : updates
+    %% ===== BASE MODEL (Django models.Model) =====
+    class BaseModel {
+        <<abstract>>
+        +int id
+        +DateTimeField created_at
+        +DateTimeField updated_at
+        +save() void
+        +delete() void
+        +findById(id) BaseModel
+        +toDict() dict
+    }
+
+    %% ===== CATALOG =====
+    class Category {
+        +CharField name_fr
+        +CharField name_en
+        +SlugField slug
+        +create(data) Category
+        +findAll() Category[]
+        +findBySlug(slug) Category
+        +update(id, data) Category
+        +deleteById(id) Boolean
+        +get_name(lang) str
+    }
+
+    class Product {
+        +SlugField slug
+        +CharField name_fr
+        +CharField name_en
+        +TextField description_fr
+        +TextField description_en
+        +TextField ingredients_fr
+        +CharField allergens_fr
+        +ForeignKey category_id
+        +BooleanField is_active
+        +CharField image_url
+        +create(data) Product
+        +findBySlug(slug) Product
+        +findByCategory(categoryId) Product[]
+        +findAll(filters) Product[]
+        +update(id, data) Product
+        +softDelete(id) Boolean
+        +get_name(lang) str
+        +get_description(lang) str
+        +get_primary_sku() SKU
+    }
+
+    class SKU {
+        +ForeignKey product_id
+        +CharField sku_code
+        +CharField format
+        +IntegerField weight_g
+        +DecimalField price
+        +CharField currency
+        +BooleanField is_active
+        +IntegerField production_delay_days
+        +IntegerField batch_size
+        +create(data) SKU
+        +findByProduct(productId) SKU[]
+        +findByCode(skuCode) SKU
+        +update(id, data) SKU
+        +deleteById(id) Boolean
+        +available_quantity() int
+        +is_available() bool
+        +calculate_estimated_days(qty, zone) int
+    }
+
+    %% ===== STOCK =====
+    class Stock {
+        +OneToOneField sku_id
+        +IntegerField quantity
+        +IntegerField threshold_alert
+        +ForeignKey updated_by
+        +create(data) Stock
+        +findBySku(skuId) Stock
+        +findAllLow() Stock[]
+        +update(skuId, data) Stock
+        +decrement(qty, updated_by) void
+        +adjustQuantity(skuId, delta) Stock
+        +is_low() bool
+        +days_until_stockout(units_per_week) int
+    }
+
+    %% ===== SHIPPING =====
+    class ShippingZone {
+        +CharField zone_name
+        +ArrayField countries
+        +IntegerField delay_days
+        +DecimalField cost
+        +create(data) ShippingZone
+        +findAll() ShippingZone[]
+        +findByCountry(country) ShippingZone
+        +get_zone_for_country(country_code) ShippingZone
+        +update(id, data) ShippingZone
+        +deleteById(id) Boolean
+    }
+
+    %% ===== CUSTOMER =====
+    class Customer {
+        +CharField email
+        +CharField first_name
+        +CharField last_name
+        +CharField password_hash
+        +CharField phone
+        +CharField language_pref
+        +BooleanField is_active
+        +DateTimeField last_login
+        +create(data) Customer
+        +findByEmail(email) Customer
+        +findAll(filters) Customer[]
+        +update(id, data) Customer
+        +deleteById(id) Boolean
+        +set_password(raw) void
+        +check_password(raw) bool
+        +full_name() str
+    }
+
+    %% ===== ORDERS =====
+    class Order {
+        +ForeignKey customer_id
+        +ForeignKey shipping_zone_id
+        +CharField order_number
+        +CharField status
+        +DecimalField total_amount
+        +CharField currency
+        +CharField stripe_payment_id
+        +CharField stripe_session_id
+        +CharField shipping_country
+        +IntegerField estimated_delivery_days
+        +create(data) Order
+        +findByCustomer(customerId) Order[]
+        +findByStripeSession(sessionId) Order
+        +findAll(filters) Order[]
+        +update(id, data) Order
+        +updateStatus(id, status) Order
+        +deleteById(id) Boolean
+        +generate_order_number() str
+    }
+
+    class OrderItem {
+        +ForeignKey order_id
+        +ForeignKey sku_id
+        +IntegerField quantity
+        +DecimalField unit_price
+        +DecimalField subtotal
+        +create(data) OrderItem
+        +findByOrder(orderId) OrderItem[]
+        +bulkCreate(items) OrderItem[]
+        +update(id, data) OrderItem
+        +deleteById(id) Boolean
+    }
+
+    %% ===== B2B =====
+    class B2BRequest {
+        +CharField company_name
+        +CharField contact_name
+        +EmailField contact_email
+        +CharField contact_phone
+        +CharField sector
+        +IntegerField estimated_qty
+        +CharField occasion
+        +CharField status
+        +GenericIPAddressField ip_address
+        +ForeignKey processed_by
+        +DateTimeField processed_at
+        +create(data) B2BRequest
+        +findAll(filters) B2BRequest[]
+        +update(id, data) B2BRequest
+        +process(id, adminId) B2BRequest
+        +updateStatus(id, status) B2BRequest
+    }
+
+    %% ===== ADMIN =====
+    class AdminUser {
+        +EmailField email
+        +CharField password_hash
+        +CharField first_name
+        +CharField last_name
+        +CharField role
+        +BooleanField is_active
+        +DateTimeField last_login
+        +create(data) AdminUser
+        +findByEmail(email) AdminUser
+        +findAll() AdminUser[]
+        +update(id, data) AdminUser
+        +deleteById(id) Boolean
+        +set_password(raw) void
+        +check_password(raw) bool
+        +is_superadmin() bool
+    }
+
+    %% ===== AUTH =====
+    class PasswordResetToken {
+        +ForeignKey customer_id
+        +CharField token
+        +DateTimeField expires_at
+        +BooleanField used
+        +create(customerId) PasswordResetToken
+        +findByToken(token) PasswordResetToken
+        +is_valid() bool
+        +markAsUsed() void
+        +deleteExpired() int
+    }
+
+    %% ===== INHERITANCE (Django models.Model) =====
+    BaseModel <|-- Category
+    BaseModel <|-- Product
+    BaseModel <|-- SKU
+    BaseModel <|-- Stock
+    BaseModel <|-- ShippingZone
+    BaseModel <|-- Customer
+    BaseModel <|-- Order
+    BaseModel <|-- OrderItem
+    BaseModel <|-- B2BRequest
+    BaseModel <|-- AdminUser
+    BaseModel <|-- PasswordResetToken
+
+    %% ===== ASSOCIATIONS =====
+    Category      "1"  -->  "0..*"  Product              : has
+    Product       "1"  -->  "0..*"  SKU                  : has variants
+    SKU           "1"  -->  "1"     Stock                : OneToOneField
+    SKU           "1"  -->  "0..*"  OrderItem            : included in
+    Order         "1"  -->  "0..*"  OrderItem            : contains
+    Customer      "1"  -->  "0..*"  Order                : places
+    Customer      "1"  -->  "0..*"  PasswordResetToken   : has
+    AdminUser     "1"  -->  "0..*"  B2BRequest           : processes
+    AdminUser     "1"  -->  "0..*"  Stock                : updates
+    ShippingZone  "1"  -->  "0..*"  Order                : applied to
 ```
+
 ---
 
-## 2.2 — Full PostgreSQL DDL
+## 2.2 — Full PostgreSQL DDL:
+
+The following section provides the complete PostgreSQL DDL used to build the database schema for the Lamos Chocolate platform. It serves as a transparent, implementation‑level view of the system, showing how the conceptual ERD is translated into real SQL structures. This DDL highlights several PostgreSQL‑specific design choices — reusable ENUM types, GIN indexes, array columns, identity columns, and a trigger‑based mechanism for maintaining updated_at — which replace MySQL‑specific features and ensure strong data integrity, performance, and scalability.
+Including the full DDL makes the architecture reproducible, auditable, and aligned with the Django ORM models, providing a reliable foundation for migrations, forecasting features, and production deployment.
 
 ```sql
 -- ================================================================
@@ -705,7 +722,10 @@ CREATE INDEX idx_reset_tokens_lookup
 
 ---
 
-## 2.3 — Seed Data (PostgreSQL)
+## 2.3 — Seed Data (PostgreSQL):
+The seed data below provides a minimal but functional dataset used to initialize the PostgreSQL database for the Lamos Chocolate platform. It includes predefined shipping zones, categories, products, SKUs, stock levels, and a default admin user, ensuring that the application can run immediately after the first migration without requiring manual data entry.
+This dataset also reflects real business logic — such as forecasting fields (production_delay_days, batch_size, delay_days) and multilingual product information — allowing developers to test catalog browsing, ordering flows, stock alerts, and admin features in a realistic environment.
+Including seed data ensures reproducibility, simplifies onboarding for new developers, and guarantees consistent behavior across development, staging, and demo environments.
 
 ```sql
 -- Shipping zones (forecasting model)
@@ -770,7 +790,12 @@ INSERT INTO admin_users (email, password_hash, first_name, last_name, role) VALU
 
 ---
 
-## 2.4 — Forecasting Model
+## 2.4 — Forecasting Model:
+The forecasting model introduces a lightweight but effective predictive layer that enhances both customer experience and operational planning. It combines real‑time stock levels, SKU production constraints, and shipping zone delays to compute an accurate estimated_delivery_days value at order time. This value is stored directly in the orders table to ensure consistency across emails, dashboards, and historical analytics.
+
+The model handles multiple scenarios — sufficient stock, partial stock, or zero stock — by calculating production batches, lead times, and shipping delays. This approach allows the platform to provide transparent delivery expectations to customers while giving the business actionable insights into production needs.
+
+To support business intelligence, several analytical SQL views compute key KPIs such as sell‑through velocity, days until stockout, production relaunch alerts, and monthly seasonality. These views form the foundation for future dashboards, automated alerts, and long‑term forecasting features.
 
 ### Estimated Delivery Calculation Logic
 
@@ -897,6 +922,12 @@ ORDER BY month DESC;
 ---
 
 ## 2.5 — Django Models
+The Django model layer provides the application‑level representation of the Lamos Chocolate domain. Each model maps directly to the PostgreSQL tables defined earlier, ensuring full alignment between the ORM and the underlying database schema. The models encapsulate business logic such as multilingual product fields, SKU‑level forecasting attributes, stock management, customer authentication, B2B request processing, and order lifecycle tracking.
+
+This layer also integrates essential compliance considerations for both EU GDPR and Swiss LPD 2023. Personal data such as customer profiles, addresses, IP addresses, and order information is stored using Django’s secure field types, with hashed passwords, optional fields for minimization, and explicit retention‑friendly structures (e.g., processed_at, used, is_active). Sensitive operations—password resets, stock updates, admin actions—are logged through relational links (updated_by, processed_by) to ensure auditability and accountability.
+By centralizing validation, access rules, and computed properties (e.g., available_quantity, is_low, calculate_estimated_days), the model layer enforces data integrity while supporting future extensions such as consent tracking, data export, and right‑to‑erasure workflows.
+
+Overall, these Django models form the operational backbone of the platform, bridging business logic, forecasting features, and regulatory requirements in a clean, maintainable, and production‑ready structure.
 
 ```python
 # apps/shop/models.py
@@ -1277,7 +1308,26 @@ class PasswordResetToken(models.Model):
 ---
 
 ## 2.6 — Django Project Structure
+The Django project is organized into a clean, modular architecture that separates concerns across dedicated apps and environment‑specific settings. This structure ensures maintainability, scalability, and compliance with both EU GDPR and Swiss LPD 2023, particularly in areas involving personal data, authentication, and operational logging.
 
+The lamos/ package contains the core configuration of the platform, including a multi‑file settings system (base, development, staging, production, testing) that supports secure deployment practices such as environment variables, PgBouncer connection pooling, and strict separation between debug and production environments. The root URL dispatcher uses i18n_patterns to provide full multilingual routing across the site.
+
+The apps/ directory groups all business logic into focused Django apps:
+
+main for public pages and language switching
+
+shop as the central domain layer containing all models (single source of truth), catalog views, and admin integration
+
+cart and checkout for session‑based cart logic and Stripe payment workflows
+
+accounts and customer_area for authentication, profile management, and order history
+
+b2b for corporate requests and lead processing
+
+backoffice for the custom administrative interface with role‑based access control
+
+This modular design enforces clear boundaries between public, customer, and administrative features, while supporting secure handling of personal data, auditability of admin actions, and future extensions such as analytics dashboards or API endpoints.
+Overall, the project structure reflects production‑grade Django best practices and provides a robust foundation for long‑term evolution of the platform.
 ```
 lamos_platform/
 ├── lamos/                           ← Main Django package
@@ -1352,6 +1402,14 @@ lamos_platform/
 ```
 
 ## 2.7 — Django Settings (Key Configuration)
+The Django settings are structured to provide a secure, scalable, and environment‑aware configuration for the Lamos Chocolate platform. The project uses a multi‑file settings architecture (base, development, staging, production, testing) to ensure clean separation between local development, CI testing, and production deployment. Sensitive values such as the SECRET_KEY, database credentials, and Stripe API keys are injected through environment variables, following best practices for security, 12‑factor applications, and GDPR/LPD compliance.
+
+The platform is fully configured for PostgreSQL, leveraging advanced features such as ArrayField, GIN indexing, and timezone‑aware timestamps. Internationalization is enabled through i18n_patterns, multilingual settings, and locale directories, ensuring consistent French/English support across the entire site.
+
+In production, the application runs inside Docker containers orchestrated via docker-compose. The stack includes a PostgreSQL 16 database, a Gunicorn‑powered Django application server, and an Nginx reverse proxy with HTTPS support. Health checks, persistent volumes, and environment‑specific overrides ensure reliability and predictable deployments.
+This architecture also supports compliance with EU GDPR and Swiss LPD 2023, as personal data is stored securely, access is restricted by environment, and no secrets are hard‑coded in the repository.
+
+Overall, the settings system provides a robust foundation for secure operations, predictable deployments, and long‑term maintainability of the platform.
 
 ```python
 # lamos/settings/base.py
@@ -1462,6 +1520,21 @@ volumes:
 ---
 
 ## 2.8 — Reusable Frontend Component (Django Template Tag)
+This reusable Django template tag implements a fully encapsulated product card component, used throughout the catalog, homepage sections, and recommendation blocks. By centralizing the markup and logic in a single template tag, the frontend remains consistent, maintainable, and easy to extend as new features are added.
+
+The component integrates several key features of the platform:
+
+Internationalization (i18n) through {% trans %} and {% blocktrans %}, ensuring that product names, labels, and delivery estimates automatically adapt to the user’s selected language.
+
+Dynamic availability logic, using sku.is_available to display badges, disable buttons, and adjust the visual state of the card.
+
+Forecasting integration, where estimated_days is injected by the view layer to show real‑time delivery estimates based on stock levels and production constraints.
+
+Performance optimizations, including lazy‑loaded images, lightweight HTML, and a placeholder fallback for missing product images.
+
+Clean UX patterns, such as consistent button styles, accessible alt text, and clear out‑of‑stock indicators.
+
+By abstracting this UI element into a reusable component, the platform ensures visual consistency, reduces duplication, and simplifies future enhancements such as badges, promotions, or A/B‑tested layouts. This approach aligns with modern frontend best practices while remaining fully compatible with Django’s server‑rendered architecture.
 
 ```django
 {# templatetags/product_tags.py #}
