@@ -395,15 +395,9 @@ Week start date          Apr20 Apr27  May4 May11 May18 May25  Jun1  Jun8 Jun15 J
 | **Final Presentation & Submission** | Live demo delivered, final report submitted, project officially closed | Week 12 — July 17, 2026 |
 
 ---
-### STAGE 3 
+# STAGE 3 : Technical documentation 
 ---
 # Stage 3 — Task 0: User Stories & Mockups
-## Lamos Chocolate — European Digital Platform
-
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker · GitHub Actions
-
 ---
 
 ## 0.1 — Introduction & Prioritization Method
@@ -820,12 +814,6 @@ Wireframes V0 are produced in **Figma** and cover main screens in desktop (1440p
 ---
 
 # Stage 3 — Task 1: System Architecture
-## Lamos Chocolate — European Digital Platform
-
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker · GitHub Actions
-
 ---
 
 ## 1.1 — Architecture Overview
@@ -1276,12 +1264,6 @@ Browser → POST /accounts/login/ → Django
 
 
 # Stage 3 — Task 2: Components, Classes & Database Design
-## Lamos Chocolate — European Digital Platform
-
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker
-
 ---
 
 ## 2.1 — Database Schema (ERD)
@@ -2851,11 +2833,7 @@ By abstracting this UI element into a reusable component, the platform ensures v
 ---
 
 # Stage 3 — Task 3: Sequence Diagrams
-## Lamos Chocolate — European Digital Platform
 
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker
 ---
 
 ## 3.1 — Introduction
@@ -3493,11 +3471,6 @@ The Django `sessionid` cookie is **strictly necessary** for the e-commerce cart 
 ---
 
 # Stage 3 — Task 4: API Specifications
-## Lamos Chocolate — European Digital Platform
-
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker
 
 ---
 
@@ -4454,12 +4427,6 @@ MAILGUN_DOMAIN=mg.lamos-eu.com
 ---
 
 # Stage 3 — Task 5: SCM & QA Strategies
-## Lamos Chocolate — European Digital Platform
-
-> **Project**: Lamos Chocolate — European Digital Platform
-> **Team**: Sara Rebati · Valentin Planchon
-> **Stack**: Django 5.x · PostgreSQL 16 · Docker · GitHub Actions
-
 ---
 
 ## 5.1 — Source Control Management (SCM)
