@@ -18,6 +18,28 @@ const state = {
   qty: 1
 };
 
+/* ── Mock users (hardcoded until Django backend is connected) ── */
+const MOCK_USERS = [
+  { email: 'admin@lamos.com',  password: 'admin', firstName: 'Admin',    lastName: 'Lamos',   role: 'admin' },
+  { email: 'b2c@lamos.com',    password: 'lamos', firstName: 'Client',   lastName: 'B2C',     role: 'b2c'   },
+  { email: 'b2b@lamos.com',    password: 'lamos', firstName: 'Partenaire', lastName: 'B2B',   role: 'b2b'   },
+];
+
+/* ── Auth helpers — localStorage session ── */
+function getSession() {
+  try { return JSON.parse(localStorage.getItem('lamos_session')); }
+  catch { return null; }
+}
+
+function setSession(user) {
+  const { password, ...safe } = user;
+  localStorage.setItem('lamos_session', JSON.stringify(safe));
+}
+
+function clearSession() {
+  localStorage.removeItem('lamos_session');
+}
+
 /* ═══════════════════════════════════════════════════════════
    1. PAGE LOADER
 ═══════════════════════════════════════════════════════════ */
@@ -111,6 +133,9 @@ function initNav() {
 
   /* Cart count */
   updateCartCount();
+
+  /* Auth state — update nav if user is logged in */
+  updateAuthUI();
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -708,20 +733,127 @@ function initAccount() {
     });
   }
 
-  /* ── Form submissions (mock — no backend yet) ── */
-  $$('.auth-form[data-validate]').forEach(form => {
-    on(form, 'submit', e => {
+  /* ── Login form submission ── */
+  const loginForm = card.querySelector('.auth-signin .auth-form');
+  if (loginForm) {
+    on(loginForm, 'submit', e => {
       e.preventDefault();
-      if (!validateAccountForm(form)) return;
+      if (!validateAccountForm(loginForm)) return;
 
-      const btn = form.querySelector('.account-submit');
+      const email = loginForm.querySelector('#login-email').value.trim().toLowerCase();
+      const pwd   = loginForm.querySelector('#login-password').value;
+      const btn   = loginForm.querySelector('.account-submit');
+
+      if (btn) { btn.querySelector('span').textContent = 'Chargement…'; btn.style.pointerEvents = 'none'; }
+
+      /* Simulate network delay */
+      setTimeout(() => {
+        const user = MOCK_USERS.find(u => u.email === email && u.password === pwd);
+        if (user) {
+          setSession(user);
+          if (btn) { btn.querySelector('span').textContent = '✓ Connecté'; btn.style.background = 'var(--c-green2)'; }
+          setTimeout(() => { window.location.href = 'index.html'; }, 600);
+        } else {
+          if (btn) { btn.querySelector('span').textContent = 'Se connecter'; btn.style.pointerEvents = ''; }
+          showAuthError(loginForm, 'Email ou mot de passe incorrect.');
+        }
+      }, 800);
+    });
+  }
+
+  /* ── Register form submission ── */
+  const registerForm = card.querySelector('.auth-signup .auth-form');
+  if (registerForm) {
+    on(registerForm, 'submit', e => {
+      e.preventDefault();
+      if (!validateAccountForm(registerForm)) return;
+
+      const email = registerForm.querySelector('#reg-email').value.trim().toLowerCase();
+      const btn   = registerForm.querySelector('.account-submit');
+
       if (btn) { btn.querySelector('span').textContent = 'Chargement…'; btn.style.pointerEvents = 'none'; }
 
       setTimeout(() => {
-        if (btn) { btn.querySelector('span').textContent = '✓'; btn.style.background = 'var(--c-green2)'; }
-      }, 1200);
+        /* Check if email already exists in mock users */
+        if (MOCK_USERS.some(u => u.email === email)) {
+          if (btn) { btn.querySelector('span').textContent = 'Créer mon compte'; btn.style.pointerEvents = ''; }
+          showAuthError(registerForm, 'Un compte existe déjà avec cet email.');
+          return;
+        }
+
+        /* Create mock session for the new user */
+        const newUser = {
+          email,
+          firstName: registerForm.querySelector('#reg-firstname').value.trim(),
+          lastName:  registerForm.querySelector('#reg-lastname').value.trim(),
+          role: 'b2c'
+        };
+        setSession(newUser);
+        if (btn) { btn.querySelector('span').textContent = '✓ Compte créé'; btn.style.background = 'var(--c-green2)'; }
+        setTimeout(() => { window.location.href = 'index.html'; }, 600);
+      }, 800);
     });
+  }
+
+  /* ── Redirect if already logged in ── */
+  if (getSession()) {
+    showLoggedInState(card);
+  }
+}
+
+/* ── Display auth error message below the form ── */
+function showAuthError(form, message) {
+  let errBox = form.querySelector('.auth-error');
+  if (!errBox) {
+    errBox = document.createElement('p');
+    errBox.className = 'auth-error';
+    form.appendChild(errBox);
+  }
+  errBox.textContent = message;
+  setTimeout(() => { errBox.textContent = ''; }, 4000);
+}
+
+/* ── When user visits account.html while logged in ── */
+function showLoggedInState(card) {
+  const session = getSession();
+  if (!session) return;
+
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100%;padding:3rem;text-align:center;">
+      <div>
+        <svg class="auth-crown" viewBox="0 0 100 80" fill="none" style="width:50px;opacity:0.5;margin:0 auto 1rem;">
+          <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+          <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+        </svg>
+        <h2 class="auth-title" style="margin-bottom:0.5rem;">Bonjour, ${session.firstName} !</h2>
+        <p style="color:var(--c-text2);margin-bottom:0.5rem;font-family:var(--font-display);font-style:italic;font-size:1.1rem;">
+          ${session.email} · ${session.role.toUpperCase()}
+        </p>
+        <p style="color:var(--c-text3);margin-bottom:2rem;">Vous êtes connecté à votre espace.</p>
+        <button class="btn btn-gold" id="btnLogout" style="padding:0.9rem 2.5rem;border-radius:4px;">
+          <span>Se déconnecter</span>
+        </button>
+      </div>
+    </div>`;
+
+  on($('#btnLogout'), 'click', () => {
+    clearSession();
+    window.location.reload();
   });
+}
+
+/* ── Update nav UI based on auth state (runs on every page) ── */
+function updateAuthUI() {
+  const session = getSession();
+  const accountLink = $('.nav-account');
+  if (!accountLink) return;
+
+  if (session) {
+    /* Show user initial instead of generic icon */
+    const initial = session.firstName.charAt(0).toUpperCase();
+    accountLink.innerHTML = `<span class="nav-account-initial">${initial}</span>`;
+    accountLink.title = `${session.firstName} ${session.lastName} (${session.role})`;
+  }
 }
 
 /* ── Account form validation ──

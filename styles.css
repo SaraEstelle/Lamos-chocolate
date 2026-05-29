@@ -1412,6 +1412,29 @@ footer#footer {
 }
 .nav-account:hover { color: var(--c-gold); }
 
+/* Logged-in state: gold circle with user initial */
+.nav-account-initial {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--c-gold);
+  color: var(--c-dark);
+  font-family: var(--font-title); font-size: 0.55rem;
+  font-weight: 600; letter-spacing: 0;
+}
+
+/* Auth error message (login/register) */
+.auth-error {
+  width: 100%; text-align: center;
+  font-family: var(--font-body); font-size: 0.85rem;
+  color: #c04040; margin-top: 0.25rem;
+  animation: authErrorFade 0.3s ease-out;
+}
+@keyframes authErrorFade {
+  from { opacity: 0; transform: translateY(-5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Benefits ── */
 #account-benefits {
   background: var(--c-dark2);
