@@ -635,6 +635,136 @@ function initTimeline() {
 }
 
 /* ═══════════════════════════════════════════════════════════
+   17. ACCOUNT PAGE — ANIMATED SPLIT SCREEN
+   ─────────────────────────────────────────────────────────
+   Sliding panel auth (Florin Pop pattern).
+   Toggle .mode-register on #authCard to switch between
+   sign-in and sign-up views with a sliding gold overlay.
+═══════════════════════════════════════════════════════════ */
+function initAccount() {
+  const card = $('#authCard');
+  if (!card) return;
+
+  /* ── Panel toggle ──
+     Desktop: buttons inside the gold overlay (#btnSignUp / #btnSignIn)
+     Mobile:  inline text links (.auth-switch-link) since overlay is hidden */
+  const btnSignUp = $('#btnSignUp');
+  const btnSignIn = $('#btnSignIn');
+
+  on(btnSignUp, 'click', () => card.classList.add('mode-register'));
+  on(btnSignIn, 'click', () => card.classList.remove('mode-register'));
+
+  /* Mobile fallback links (visible only < 768px) */
+  $$('.auth-switch-link').forEach(btn => {
+    on(btn, 'click', () => {
+      if (btn.dataset.target === 'register') card.classList.add('mode-register');
+      else card.classList.remove('mode-register');
+    });
+  });
+
+  /* ── Password show/hide toggles ── */
+  $$('.password-toggle').forEach(btn => {
+    on(btn, 'click', () => {
+      const input = btn.closest('.password-wrap').querySelector('input');
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      btn.style.color = isPassword ? 'var(--c-gold)' : '';
+    });
+  });
+
+  /* ── Password strength meter ──
+     Score 0-4 based on: length ≥ 8, uppercase, digit, special char */
+  const regPwd = $('#reg-password');
+  const strengthBar = $('.password-strength-bar');
+  if (regPwd && strengthBar) {
+    on(regPwd, 'input', () => {
+      const val = regPwd.value;
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+
+      strengthBar.className = 'password-strength-bar';
+      if (val.length === 0) return;
+      if (score <= 1) strengthBar.classList.add('weak');
+      else if (score === 2) strengthBar.classList.add('fair');
+      else if (score === 3) strengthBar.classList.add('good');
+      else strengthBar.classList.add('strong');
+    });
+  }
+
+  /* ── Password confirmation — real-time mismatch feedback ── */
+  const regConfirm = $('#reg-password-confirm');
+  if (regPwd && regConfirm) {
+    on(regConfirm, 'input', () => {
+      const mismatch = regConfirm.value.length > 0 && regConfirm.value !== regPwd.value;
+      regConfirm.classList.toggle('error', mismatch);
+      const group = regConfirm.closest('.form-group');
+      const errEl = group?.querySelector('.form-error-msg');
+      if (errEl) errEl.textContent = mismatch ? 'Les mots de passe ne correspondent pas.' : '';
+      group?.classList.toggle('has-error', mismatch);
+    });
+  }
+
+  /* ── Form submissions (mock — no backend yet) ── */
+  $$('.auth-form[data-validate]').forEach(form => {
+    on(form, 'submit', e => {
+      e.preventDefault();
+      if (!validateAccountForm(form)) return;
+
+      const btn = form.querySelector('.account-submit');
+      if (btn) { btn.querySelector('span').textContent = 'Chargement…'; btn.style.pointerEvents = 'none'; }
+
+      setTimeout(() => {
+        if (btn) { btn.querySelector('span').textContent = '✓'; btn.style.background = 'var(--c-green2)'; }
+      }, 1200);
+    });
+  });
+}
+
+/* ── Account form validation ──
+   Validates required fields, checkbox (CGU), password length ≥ 8,
+   and password confirmation match. Uses the shared validateField() helper. */
+function validateAccountForm(form) {
+  let valid = true;
+  $$('[required]', form).forEach(input => {
+    if (input.type === 'checkbox') {
+      const group = input.closest('.form-check');
+      if (!input.checked) {
+        valid = false;
+        if (group) group.style.color = '#b03030';
+      } else if (group) group.style.color = '';
+      return;
+    }
+    if (!validateField(input)) valid = false;
+  });
+
+  const pwd = form.querySelector('#reg-password');
+  const confirm = form.querySelector('#reg-password-confirm');
+  if (pwd && confirm && pwd.value !== confirm.value) {
+    confirm.classList.add('error');
+    const group = confirm.closest('.form-group');
+    const errEl = group?.querySelector('.form-error-msg');
+    if (errEl) errEl.textContent = 'Les mots de passe ne correspondent pas.';
+    group?.classList.toggle('has-error', true);
+    valid = false;
+  }
+
+  if (pwd && pwd.value.length < 8 && pwd.value.length > 0) {
+    pwd.classList.add('error');
+    const group = pwd.closest('.form-group');
+    const errEl = group?.querySelector('.form-error-msg');
+    if (errEl) errEl.textContent = 'Minimum 8 caractères.';
+    group?.classList.toggle('has-error', true);
+    valid = false;
+  }
+
+  return valid;
+}
+
+/* ═══════════════════════════════════════════════════════════
    INIT ALL
 ═══════════════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
@@ -654,4 +784,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initMagnetic();
   initNewsletter();
   initTimeline();
+  initAccount();
 });
