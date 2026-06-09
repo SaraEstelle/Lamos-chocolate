@@ -92,3 +92,9 @@ build/
 
 # Local database
 *.sqlite3
+
+# =========================
+# Node
+# =========================
+
+node_modules/

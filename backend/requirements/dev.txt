@@ -1,5 +1,12 @@
+# ============================
+# Development dependencies
+# ============================
+
+# Includes all base dependencies
 -r base.txt
 
-django-debug-toolbar
+# Debugging panel in the browser
+django-debug-toolbar==4.4.6
 
-ipython
+# Enhanced interactive shell
+ipython==8.26.0
