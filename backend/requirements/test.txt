@@ -1,0 +1,13 @@
+# ============================
+# Test dependencies
+# ============================
+
+# Includes all base dependencies
+-r base.txt
+
+# Test framework
+pytest==8.3.2
+pytest-django==4.8.0
+
+# Coverage reporting
+pytest-cov==5.0.0
