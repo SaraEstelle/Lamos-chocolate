@@ -81,3 +81,14 @@ Thumbs.db
 dist/
 build/
 *.egg-info/
+# Python packaging
+*.egg
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Local database
+*.sqlite3
