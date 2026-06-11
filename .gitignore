@@ -92,3 +92,4 @@ build/
 
 # Local database
 *.sqlite3
+*.mo
