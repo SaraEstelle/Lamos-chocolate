@@ -1,0 +1,32 @@
+[
+  {
+    "model": "shop.shippingzone",
+    "pk": 1,
+    "fields": {
+      "zone_name": "France",
+      "countries": ["FR"],
+      "delay_days": 3,
+      "cost": "5.90"
+    }
+  },
+  {
+    "model": "shop.shippingzone",
+    "pk": 2,
+    "fields": {
+      "zone_name": "Union Européenne",
+      "countries": ["DE", "BE", "ES", "IT", "LU", "NL", "PT", "AT"],
+      "delay_days": 5,
+      "cost": "9.90"
+    }
+  },
+  {
+    "model": "shop.shippingzone",
+    "pk": 3,
+    "fields": {
+      "zone_name": "Suisse",
+      "countries": ["CH"],
+      "delay_days": 7,
+      "cost": "14.90"
+    }
+  }
+]
