@@ -4,11 +4,7 @@ import string
 from django.db import models
 from django.utils import timezone
 
-from apps.common.constants import (
-    CurrencyChoices,
-    LanguageChoices,
-    OrderStatusChoices,
-)
+from apps.common.constants import CurrencyChoices, LanguageChoices, OrderStatusChoices
 
 
 class Order(models.Model):
@@ -64,8 +60,7 @@ class Order(models.Model):
     def generate_order_number():
         date_part = timezone.now().strftime("%Y%m%d")
         random_part = "".join(
-            secrets.choice(string.ascii_uppercase + string.digits)
-            for _ in range(5)
+            secrets.choice(string.ascii_uppercase + string.digits) for _ in range(5)
         )
         return f"LM-{date_part}-{random_part}"
 

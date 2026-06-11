@@ -1,22 +1,14 @@
 from pathlib import Path
 
-from decouple import config, Csv
+from decouple import Csv, config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
 
-DEBUG = config(
-    "DEBUG",
-    default=False,
-    cast=bool
-)
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS",
-    default="localhost,127.0.0.1",
-    cast=Csv()
-)
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
 DJANGO_APPS = [
     "django.contrib.admin",
@@ -91,31 +83,22 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation."
-                "UserAttributeSimilarityValidator",
+        "UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation."
-                "MinimumLengthValidator",
+        "NAME": "django.contrib.auth.password_validation." "MinimumLengthValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation."
-                "CommonPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation." "CommonPasswordValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation."
-                "NumericPasswordValidator",
+        "NAME": "django.contrib.auth.password_validation." "NumericPasswordValidator",
     },
 ]
 
-LANGUAGE_CODE = config(
-    "LANGUAGE_CODE",
-    default="fr"
-)
+LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr")
 
-TIME_ZONE = config(
-    "TIME_ZONE",
-    default="Europe/Paris"
-)
+TIME_ZONE = config("TIME_ZONE", default="Europe/Paris")
 
 LANGUAGES = [
     ("fr", "Français"),
@@ -144,10 +127,7 @@ EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
-DEFAULT_FROM_EMAIL = config(
-    "DEFAULT_FROM_EMAIL",
-    default="noreply@lamos-chocolate.ch"
-)
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@lamos-chocolate.ch")
 
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
