@@ -16,6 +16,11 @@ Structure des URLs :
 - /api/cart/add/        → AJAX (pas de langue)
 - /checkout/webhook/    → Stripe webhook (pas de langue)
 - /admin/               → Django Admin (pas de langue)
+
+Règulation Suisse (RGPD) :
+- Pas de tracking sans consentement
+- Cookies sécurisés (SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE)
+- Droit d'accès aux données
 """
 
 from django.contrib import admin
@@ -25,29 +30,43 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # ============================================================================
-# ROUTES AVEC SUPPORT i18n (FR/EN)
-# Ces routes seront accessibles en /fr/ et /en/
+# ROUTES AVEC SUPPORT i18n (FR/EN/DE/IT)
+# Ces routes seront accessibles en /fr/, /en/, /de/, /it/
 # ============================================================================
 i18n_urlpatterns = [
-    # App principale (homepage, about, brand story)
+    # =========================================================================
+    # App principale — homepage, about, brand story, pages statiques
+    # =========================================================================
     path("", include("apps.main.urls", namespace="main")),
 
-    # Catalogue produits
+    # =========================================================================
+    # Catalogue produits — listing, détail produit, filtres
+    # =========================================================================
     path("shop/", include("apps.shop.urls", namespace="shop")),
 
-    # Panier
+    # =========================================================================
+    # Panier — ajouter/retirer articles, voir le panier
+    # =========================================================================
     path("cart/", include("apps.cart.urls", namespace="cart")),
 
-    # Paiement Stripe
+    # =========================================================================
+    # Paiement — checkout, confirmation, intégration Stripe
+    # =========================================================================
     path("checkout/", include("apps.checkout.urls", namespace="checkout")),
 
-    # Authentification client (login, register, reset password)
+    # =========================================================================
+    # Authentification client — login, register, reset password
+    # =========================================================================
     path("accounts/", include("apps.accounts.urls", namespace="accounts")),
 
-    # Espace client (mon compte, historique commandes)
+    # =========================================================================
+    # Espace client — mon compte, historique commandes, adresses
+    # =========================================================================
     path("my-account/", include("apps.customer_area.urls", namespace="customer_area")),
 
-    # Portail B2B (formulaire corporate)
+    # =========================================================================
+    # Portail B2B — formulaire corporate, demande de devis
+    # =========================================================================
     path("b2b/", include("apps.b2b.urls", namespace="b2b")),
 ]
 
@@ -56,43 +75,67 @@ i18n_urlpatterns = [
 # Ces routes ne supportent qu'une seule langue globale
 # ============================================================================
 urlpatterns = [
-    # Django Admin (réservé aux superusers)
+    # =========================================================================
+    # Django Admin — interface d'administration (réservé aux superusers)
+    # /admin/login, /admin/users, /admin/products, etc.
+    # =========================================================================
     path("admin/", admin.site.urls),
 
-    # API AJAX (panier, cart add, etc.) - pas de langue car JSON
-    path("api/", include("apps.cart.urls_api")),
-
-    # Webhook Stripe (réception des paiements)
+    # =========================================================================
+    # Webhook Stripe — réception des paiements (requête POST raw de Stripe)
     # ⚠️ IMPORTANT : sans CSRF car Stripe envoie une requête raw
+    # Cette route traite les événements payment_intent.succeeded, etc.
+    # =========================================================================
     path("checkout/webhook/", include("apps.checkout.urls_webhook")),
 
-    # Admin personnalisé (tableau de bord, gestion produits, stocks)
+    # =========================================================================
+    # Admin personnalisé — tableau de bord, gestion produits, stocks
+    # Accessible seulement aux staff/superusers
+    # =========================================================================
     path("backoffice/", include("apps.backoffice.urls", namespace="backoffice")),
 
-    # Sélection de langue (formulaire django.views.i18n.set_language)
+    # =========================================================================
+    # Sélecteur de langue — formulaire Django pour changer la langue
+    # POST vers /i18n/setlang/ avec next=URL_retour
+    # =========================================================================
     path("i18n/", include("django.conf.urls.i18n")),
 ]
 
 # ============================================================================
-# AJOUTER LES ROUTES i18n AVEC PRÉFIXE /fr/ et /en/
+# AJOUTER LES ROUTES i18n AVEC PRÉFIXE /fr/, /en/, /de-ch/, /it-ch/
 # ============================================================================
-# Cette fonction Django ajoute automatiquement /fr/ et /en/ devant les routes
+# Cette fonction Django ajoute automatiquement les préfixes de langue
+# devant les routes i18n_urlpatterns
+#
+# prefix_default_language=False :
+# - Ne pas créer de routes dupliquées
+# - Sans ça : /shop/, /fr/shop/, /en/shop/
+# - Avec ça : /fr/shop/, /en/shop/ seulement
 urlpatterns += i18n_patterns(
     *i18n_urlpatterns,
-    prefix_default_language=False,  # Ne pas dupliquer les routes sans préfixe
+    prefix_default_language=False,
 )
 
 # ============================================================================
 # PAGES D'ERREUR PERSONNALISÉES
 # ============================================================================
 # Remplacer les pages d'erreur Django par des pages custom
-handler404 = "apps.main.views.page_not_found"          # 404 - Page non trouvée
-handler500 = "apps.main.views.server_error"            # 500 - Erreur serveur
-handler403 = "apps.main.views.permission_denied"       # 403 - Accès refusé
+# Elles doivent être définies dans apps.main.views
+#
+# Exemple : si un utilisateur accède à /invalid-path/,
+# Django appelle handler404 qui affiche une page custom 404.html
+# ============================================================================
+# handler404 = "apps.main.views.page_not_found"          # 404 - Page non trouvée
+# handler500 = "apps.main.views.server_error"            # 500 - Erreur serveur
+# handler403 = "apps.main.views.permission_denied"       # 403 - Accès refusé
 
 # ============================================================================
 # FICHIERS STATIQUES ET MÉDIA (images, uploads, CSS, JS)
-# En développement seulement (en production, Nginx s'en charge)
+# ============================================================================
+# En développement seulement (en production, Nginx/S3 s'en charge)
+#
+# STATIC_URL = '/static/' → CSS, JS, images du site (ne changent pas)
+# MEDIA_URL = '/media/' → uploads utilisateur (avatars, documents)
 # ============================================================================
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
