@@ -13,6 +13,14 @@ class Order(models.Model):
         on_delete=models.RESTRICT,
         related_name="orders",
     )
+    shipping_zone = models.ForeignKey(
+        "shop.ShippingZone",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+        help_text="Delivery zone applied at order time (forecasting).",
+    )
     order_number = models.CharField(max_length=30, unique=True)
     status = models.CharField(
         max_length=20,
@@ -82,6 +90,12 @@ class OrderItem(models.Model):
 
     class Meta:
         db_table = "order_items"
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0),
+                name="order_items_quantity_gt_0",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.quantity}x {self.sku.sku_code} @ {self.unit_price}"
