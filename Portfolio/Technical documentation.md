@@ -1397,10 +1397,18 @@ erDiagram
         varchar allergens_fr
         varchar allergens_en
         int category_id FK
-        varchar image_url
         boolean is_active
         timestamptz created_at
         timestamptz updated_at "trigger"
+    }
+
+    product_images {
+        uuid id PK
+        int product_id FK
+        varchar image_url
+        varchar alt_text
+        boolean is_primary "DEFAULT FALSE"
+        timestamptz created_at
     }
 
     skus {
@@ -1459,7 +1467,6 @@ erDiagram
         order_status status "ENUM pending…refunded"
         decimal total_amount
         currency_type currency "ENUM EUR/CHF"
-        varchar stripe_payment_id
         varchar stripe_session_id
         varchar shipping_first_name
         varchar shipping_city
@@ -1470,6 +1477,18 @@ erDiagram
         text notes
         timestamptz created_at
         timestamptz updated_at "trigger"
+    }
+
+    payments {
+        uuid id PK
+        int order_id FK "UNIQUE — OneToOneField"
+        varchar stripe_payment_intent "UNIQUE"
+        decimal amount
+        currency_type currency "ENUM EUR/CHF"
+        payment_status status "ENUM pending/succeeded/failed/refunded"
+        timestamptz paid_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     order_items {
@@ -1533,6 +1552,7 @@ erDiagram
     base_model ||--|| password_reset_tokens  : "inherits"
 
     categories     ||--o{ products              : "has"
+    products       ||--o{ product_images        : "has images"
     products       ||--o{ skus                  : "has variants"
     skus           ||--||  stock                : "OneToOneField"
     skus           ||--o{ order_items           : "included in"
@@ -1542,6 +1562,7 @@ erDiagram
     admin_users    ||--o{ b2b_requests          : "processes"
     admin_users    ||--o{ stock                 : "updates"
     shipping_zones ||--o{ orders               : "applied to"
+    orders         ||--|| payments              : "paid by"
 ```
 
 
@@ -1812,6 +1833,7 @@ CREATE TYPE order_status  AS ENUM (
 );
 CREATE TYPE b2b_status  AS ENUM ('new', 'in_progress', 'converted', 'refused');
 CREATE TYPE admin_role  AS ENUM ('superadmin', 'admin', 'viewer');
+CREATE TYPE payment_status AS ENUM ('pending', 'succeeded', 'failed', 'refunded');
 
 -- ----------------------------------------------------------------
 -- TRIGGER FUNCTION — automatic updated_at
@@ -1854,7 +1876,6 @@ CREATE TABLE products (
     allergens_fr   VARCHAR(500),
     allergens_en   VARCHAR(500),
     category_id    INTEGER       NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
-    image_url      VARCHAR(500),
     is_active      BOOLEAN       NOT NULL DEFAULT TRUE,
     created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
     updated_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW()
@@ -1863,6 +1884,22 @@ CREATE TABLE products (
 CREATE TRIGGER trg_products_updated_at
     BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ----------------------------------------------------------------
+-- TABLE: product_images (NEW — multi-image gallery per product)
+-- Replaces the single products.image_url field.
+-- ----------------------------------------------------------------
+
+CREATE TABLE product_images (
+    id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id INTEGER      NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    image_url  VARCHAR(500) NOT NULL,
+    alt_text   VARCHAR(255) NOT NULL DEFAULT '',
+    is_primary BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_product_images_product ON product_images (product_id);
 
 -- ----------------------------------------------------------------
 -- TABLE: admin_users
@@ -1971,7 +2008,6 @@ CREATE TABLE orders (
     status                  order_status   NOT NULL DEFAULT 'pending',
     total_amount            DECIMAL(10,2)  NOT NULL,
     currency                currency_type  NOT NULL DEFAULT 'EUR',
-    stripe_payment_id       VARCHAR(255),
     stripe_session_id       VARCHAR(255),
     shipping_first_name     VARCHAR(100),
     shipping_last_name      VARCHAR(100),
@@ -1999,6 +2035,28 @@ CREATE INDEX idx_orders_created  ON orders (created_at DESC);
 -- Partial index for active orders only (recommended for production)
 CREATE INDEX idx_orders_active ON orders (status)
     WHERE status NOT IN ('cancelled', 'refunded');
+
+-- ----------------------------------------------------------------
+-- TABLE: payments (NEW — dedicated Stripe payment lifecycle)
+-- One payment per order. Replaces orders.stripe_payment_id; the
+-- Checkout Session id stays on orders, the PaymentIntent lives here.
+-- ----------------------------------------------------------------
+
+CREATE TABLE payments (
+    id                    UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id              INTEGER        NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+    stripe_payment_intent VARCHAR(255)   NOT NULL UNIQUE,
+    amount                DECIMAL(10,2)  NOT NULL,
+    currency              currency_type  NOT NULL DEFAULT 'EUR',
+    status                payment_status NOT NULL DEFAULT 'pending',
+    paid_at               TIMESTAMPTZ,
+    created_at            TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at            TIMESTAMPTZ    NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trg_payments_updated_at
+    BEFORE UPDATE ON payments
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ----------------------------------------------------------------
 -- TABLE: order_items
