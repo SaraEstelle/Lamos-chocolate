@@ -65,3 +65,42 @@ class TestShippingZone:
         from apps.shop.models import ShippingZone
 
         assert ShippingZone.get_zone_for_country("XX") is None
+
+
+class TestProductImage:
+    def test_primary_image_url_returns_primary(self, db, sample_product):
+        from apps.shop.models import ProductImage
+
+        product, _, _ = sample_product
+        ProductImage.objects.create(
+            product=product, image_url="/secondary.webp", is_primary=False
+        )
+        ProductImage.objects.create(
+            product=product, image_url="/primary.webp", is_primary=True
+        )
+        assert product.primary_image_url == "/primary.webp"
+
+    def test_primary_image_url_falls_back_to_first(self, db, sample_product):
+        from apps.shop.models import ProductImage
+
+        product, _, _ = sample_product
+        ProductImage.objects.create(
+            product=product, image_url="/only.webp", is_primary=False
+        )
+        assert product.primary_image_url == "/only.webp"
+
+    def test_primary_image_url_empty_when_no_images(self, db, sample_product):
+        product, _, _ = sample_product
+        assert product.primary_image_url == ""
+
+    def test_ordering_puts_primary_first(self, db, sample_product):
+        from apps.shop.models import ProductImage
+
+        product, _, _ = sample_product
+        ProductImage.objects.create(
+            product=product, image_url="/secondary.webp", is_primary=False
+        )
+        primary = ProductImage.objects.create(
+            product=product, image_url="/primary.webp", is_primary=True
+        )
+        assert product.images.first() == primary
