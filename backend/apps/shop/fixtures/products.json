@@ -13,7 +13,6 @@
       "allergens_fr": "Fruits à coque, lait, soja.",
       "allergens_en": "Tree nuts, milk, soy.",
       "category": 1,
-      "image_url": "/static/images/pistachio-200g.webp",
       "is_active": true,
       "created_at": "2026-01-01T00:00:00Z",
       "updated_at": "2026-01-01T00:00:00Z"
@@ -33,7 +32,6 @@
       "allergens_fr": "Peut contenir des traces de fruits à coque et de lait.",
       "allergens_en": "May contain traces of tree nuts and milk.",
       "category": 1,
-      "image_url": "/static/images/coffee-chocolate.webp",
       "is_active": true,
       "created_at": "2026-01-01T00:00:00Z",
       "updated_at": "2026-01-01T00:00:00Z"
@@ -53,7 +51,6 @@
       "allergens_fr": "Lait, soja.",
       "allergens_en": "Milk, soy.",
       "category": 1,
-      "image_url": "/static/images/matcha.webp",
       "is_active": true,
       "created_at": "2026-01-01T00:00:00Z",
       "updated_at": "2026-01-01T00:00:00Z"
@@ -73,7 +70,6 @@
       "allergens_fr": "Fruits à coque.",
       "allergens_en": "Tree nuts.",
       "category": 3,
-      "image_url": "/static/images/pecan-praline.webp",
       "is_active": true,
       "created_at": "2026-01-01T00:00:00Z",
       "updated_at": "2026-01-01T00:00:00Z"
@@ -93,7 +89,6 @@
       "allergens_fr": "Fruits à coque, lait, soja.",
       "allergens_en": "Tree nuts, milk, soy.",
       "category": 2,
-      "image_url": "/static/images/coffret-decouverte.webp",
       "is_active": true,
       "created_at": "2026-01-01T00:00:00Z",
       "updated_at": "2026-01-01T00:00:00Z"

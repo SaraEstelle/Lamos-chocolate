@@ -1,4 +1,5 @@
 import math
+import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -39,7 +40,6 @@ class Product(models.Model):
         on_delete=models.RESTRICT,
         related_name="products",
     )
-    image_url = models.CharField(max_length=500, blank=True, default="")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -62,6 +62,32 @@ class Product(models.Model):
 
     def get_allergens(self, lang="fr"):
         return self.allergens_en if lang == "en" else self.allergens_fr
+
+    @property
+    def primary_image_url(self):
+        """URL of the primary image, else the first one, else an empty string."""
+        image = self.images.filter(is_primary=True).first() or self.images.first()
+        return image.image_url if image else ""
+
+
+class ProductImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="images",
+    )
+    image_url = models.CharField(max_length=500)
+    alt_text = models.CharField(max_length=255, blank=True, default="")
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "product_images"
+        ordering = ["-is_primary", "created_at"]
+
+    def __str__(self):
+        return f"Image of {self.product.name_fr}"
 
 
 class SKU(models.Model):
