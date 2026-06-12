@@ -34,3 +34,10 @@ class AdminRoleChoices(models.TextChoices):
     SUPERADMIN = "superadmin", "Super administrateur"
     ADMIN = "admin", "Administrateur"
     VIEWER = "viewer", "Lecteur"
+
+
+class PaymentStatusChoices(models.TextChoices):
+    PENDING = "pending", "En attente"
+    SUCCEEDED = "succeeded", "Réussi"
+    FAILED = "failed", "Échoué"
+    REFUNDED = "refunded", "Remboursé"

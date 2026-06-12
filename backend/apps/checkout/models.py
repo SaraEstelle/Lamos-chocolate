@@ -1,10 +1,16 @@
 import secrets
 import string
+import uuid
 
 from django.db import models
 from django.utils import timezone
 
-from apps.common.constants import CurrencyChoices, LanguageChoices, OrderStatusChoices
+from apps.common.constants import (
+    CurrencyChoices,
+    LanguageChoices,
+    OrderStatusChoices,
+    PaymentStatusChoices,
+)
 
 
 class Order(models.Model):
@@ -33,7 +39,6 @@ class Order(models.Model):
         choices=CurrencyChoices.choices,
         default=CurrencyChoices.EUR,
     )
-    stripe_payment_id = models.CharField(max_length=255, blank=True, default="")
     stripe_session_id = models.CharField(max_length=255, blank=True, default="")
     shipping_first_name = models.CharField(max_length=100, blank=True, default="")
     shipping_last_name = models.CharField(max_length=100, blank=True, default="")
@@ -103,3 +108,33 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.quantity * self.unit_price
         super().save(*args, **kwargs)
+
+
+class Payment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.OneToOneField(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="payment",
+    )
+    stripe_payment_intent = models.CharField(max_length=255, unique=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(
+        max_length=3,
+        choices=CurrencyChoices.choices,
+        default=CurrencyChoices.EUR,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=PaymentStatusChoices.choices,
+        default=PaymentStatusChoices.PENDING,
+    )
+    paid_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "payments"
+
+    def __str__(self):
+        return f"Payment {self.order.order_number} — {self.status}"

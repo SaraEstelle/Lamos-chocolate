@@ -81,3 +81,41 @@ class TestOrderItem:
                 OrderItem.objects.create(
                     order=order, sku=sku, quantity=0, unit_price=Decimal("12.90")
                 )
+
+
+class TestPayment:
+    def test_payment_defaults(self, db, sample_customer):
+        from apps.checkout.models import Payment
+
+        order = _make_order(sample_customer)
+        payment = Payment.objects.create(
+            order=order, stripe_payment_intent="pi_test_123", amount=Decimal("25.80")
+        )
+        assert payment.status == "pending"
+        assert payment.currency == "EUR"
+        assert payment.paid_at is None
+
+    def test_payment_one_to_one_reverse(self, db, sample_customer):
+        from apps.checkout.models import Payment
+
+        order = _make_order(sample_customer)
+        payment = Payment.objects.create(
+            order=order, stripe_payment_intent="pi_test_456", amount=Decimal("10.00")
+        )
+        assert order.payment == payment
+
+    def test_stripe_payment_intent_is_unique(self, db, sample_customer):
+        from apps.checkout.models import Payment
+
+        Payment.objects.create(
+            order=_make_order(sample_customer),
+            stripe_payment_intent="pi_duplicate",
+            amount=Decimal("5.00"),
+        )
+        with pytest.raises(IntegrityError):
+            with transaction.atomic():
+                Payment.objects.create(
+                    order=_make_order(sample_customer),
+                    stripe_payment_intent="pi_duplicate",
+                    amount=Decimal("5.00"),
+                )
