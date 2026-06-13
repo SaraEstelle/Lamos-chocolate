@@ -27,6 +27,11 @@ class CustomerAdmin(BaseUserAdmin):
     - Filters: is_active, is_staff, preferred_language
     """
 
+    # TEMPORARY FIX:
+    # Disable filter_horizontal because Customer does NOT inherit PermissionsMixin yet.
+    # This will be restored in Phase 3 when groups/user_permissions exist.
+    filter_horizontal = ()
+
     # Fields displayed in list
     list_display = ('email', 'first_name', 'last_name', 'is_active', 'is_staff', 'created_at')
 
