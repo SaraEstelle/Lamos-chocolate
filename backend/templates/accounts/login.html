@@ -1,0 +1,73 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Log in" %} - Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{% trans "Log in" %} 🔓</h2>
+                </div>
+                <div class="card-body">
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password.label_tag }}
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            {{ form.remember_me }}
+                            {{ form.remember_me.label_tag }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            {% trans "Log in" %} →
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p>
+                            <a href="{% url 'accounts:password_reset' %}">
+                                {% trans "Forgot password?" %}
+                            </a>
+                        </p>
+                        <p>{% trans "No account yet?" %}
+                            <a href="{% url 'accounts:register' %}">{% trans "Sign up" %}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

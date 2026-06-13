@@ -1,31 +1,34 @@
 """
 apps/accounts/urls.py
 =====================
-Routes d'authentification et gestion de compte.
+Routing for authentication.
 
-Contenu :
-- Inscription (register)
-- Connexion (login)
-- Déconnexion (logout)
-- Réinitialisation de mot de passe (password_reset)
-- Confirmation d'email (email_verify)
-
-Règulation Suisse (RGPD) :
-- Vérification d'email obligatoire
-- Mot de passe sécurisé (12+ caractères, complexe)
-- Droit d'accès et suppression des données
+Routes:
+- /register/
+- /login/
+- /logout/
+- /password-reset/
+- /password-reset-confirm/<token>/
 """
 
 from django.urls import path
+from . import views
 
-# Nom de cette app
 app_name = 'accounts'
 
-# Routes d'authentification
 urlpatterns = [
-    # path('register/', views.register_view, name='register'),                    # Inscription
-    # path('login/', views.login_view, name='login'),                            # Connexion
-    # path('logout/', views.logout_view, name='logout'),                         # Déconnexion
-    # path('password-reset/', views.password_reset_view, name='password_reset'), # Reset mot de passe
-    # path('verify-email/<token>/', views.verify_email_view, name='verify_email'), # Vérification email
+    # Registration
+    path('register/', views.register_view, name='register'),
+
+    # Login
+    path('login/', views.login_view, name='login'),
+
+    # Logout
+    path('logout/', views.logout_view, name='logout'),
+
+    # Password reset (step 1)
+    path('password-reset/', views.password_reset_view, name='password_reset'),
+
+    # Password reset (step 2 - via email link)
+    path('password-reset-confirm/<str:token>/', views.password_reset_confirm_view, name='password_reset_confirm'),
 ]

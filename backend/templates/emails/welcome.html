@@ -1,0 +1,75 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Welcome" %} - Lamos Chocolate</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #6f4e37 0%, #3e2723 100%); color: white; padding: 30px 20px; border-radius: 5px 5px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">🍫 Lamos Chocolate</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">{% trans "Welcome!" %}</p>
+        </div>
+
+        <!-- Content -->
+        <div style="background: white; padding: 30px 20px;">
+            <h2 style="color: #3e2723; margin-top: 0;">{% trans "Welcome" %} {{ customer.first_name }}! 👋</h2>
+
+            <p>
+                {% trans "Thank you for signing up with" %} <strong>Lamos Chocolate</strong>.
+            </p>
+
+            <p>
+                {% trans "Your account is now active. You can log in anytime to explore our selection of premium Swiss chocolates." %}
+            </p>
+
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ login_url }}" style="display: inline-block; background: #6f4e37; color: white; padding: 14px 32px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    {% trans "Log in" %} →
+                </a>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+            <h3 style="color: #3e2723;">{% trans "Your account" %}</h3>
+            <ul style="padding-left: 20px;">
+                <li><strong>{% trans "Email" %}:</strong> {{ customer.email }}</li>
+                <li><strong>{% trans "Name" %}:</strong> {{ customer.first_name }} {{ customer.last_name }}</li>
+                <li><strong>{% trans "Language" %}:</strong> {{ customer.get_language_pref_display }}</li>
+            </ul>
+
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+            <h3 style="color: #3e2723;">{% trans "Next steps" %}</h3>
+            <ol style="padding-left: 20px;">
+                <li>{% trans "Browse our chocolate catalog" %}</li>
+                <li>{% trans "Add your favorites to cart" %}</li>
+                <li>{% trans "Proceed to secure checkout" %}</li>
+                <li>{% trans "Receive your order in Switzerland" %}</li>
+            </ol>
+        </div>
+
+        <!-- Footer -->
+        <div style="background: #f9f9f9; padding: 20px; text-align: center; color: #666; font-size: 12px; border-radius: 0 0 5px 5px;">
+            <p style="margin: 5px 0;">
+                {% trans "Questions?" %}
+                <a href="mailto:support@lamoschocolate.ch" style="color: #6f4e37;">support@lamoschocolate.ch</a>
+            </p>
+            <p style="margin: 5px 0;">
+                © {{ company_name }} - {% trans "All rights reserved" %}
+            </p>
+            <p style="margin: 5px 0;">
+                <a href="/terms/" style="color: #6f4e37;">{% trans "Privacy Policy" %}</a> |
+                <a href="/terms/" style="color: #6f4e37;">{% trans "Terms of Service" %}</a>
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
