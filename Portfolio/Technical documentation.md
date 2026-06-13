@@ -1397,10 +1397,18 @@ erDiagram
         varchar allergens_fr
         varchar allergens_en
         int category_id FK
-        varchar image_url
         boolean is_active
         timestamptz created_at
         timestamptz updated_at "trigger"
+    }
+
+    product_images {
+        uuid id PK
+        int product_id FK
+        varchar image_url
+        varchar alt_text
+        boolean is_primary "DEFAULT FALSE"
+        timestamptz created_at
     }
 
     skus {
@@ -1459,7 +1467,6 @@ erDiagram
         order_status status "ENUM pending…refunded"
         decimal total_amount
         currency_type currency "ENUM EUR/CHF"
-        varchar stripe_payment_id
         varchar stripe_session_id
         varchar shipping_first_name
         varchar shipping_city
@@ -1470,6 +1477,18 @@ erDiagram
         text notes
         timestamptz created_at
         timestamptz updated_at "trigger"
+    }
+
+    payments {
+        uuid id PK
+        int order_id FK "UNIQUE — OneToOneField"
+        varchar stripe_payment_intent "UNIQUE"
+        decimal amount
+        currency_type currency "ENUM EUR/CHF"
+        payment_status status "ENUM pending/succeeded/failed/refunded"
+        timestamptz paid_at
+        timestamptz created_at
+        timestamptz updated_at
     }
 
     order_items {
@@ -1533,6 +1552,7 @@ erDiagram
     base_model ||--|| password_reset_tokens  : "inherits"
 
     categories     ||--o{ products              : "has"
+    products       ||--o{ product_images        : "has images"
     products       ||--o{ skus                  : "has variants"
     skus           ||--||  stock                : "OneToOneField"
     skus           ||--o{ order_items           : "included in"
@@ -1542,6 +1562,7 @@ erDiagram
     admin_users    ||--o{ b2b_requests          : "processes"
     admin_users    ||--o{ stock                 : "updates"
     shipping_zones ||--o{ orders               : "applied to"
+    orders         ||--|| payments              : "paid by"
 ```
 
 
@@ -1590,7 +1611,6 @@ classDiagram
         +CharField allergens_fr
         +ForeignKey category_id
         +BooleanField is_active
-        +CharField image_url
         +create(data) Product
         +findBySlug(slug) Product
         +findByCategory(categoryId) Product[]
@@ -1600,6 +1620,17 @@ classDiagram
         +get_name(lang) str
         +get_description(lang) str
         +get_primary_sku() SKU
+        +primary_image_url() str
+    }
+
+    class ProductImage {
+        +UUIDField id
+        +ForeignKey product_id
+        +CharField image_url
+        +CharField alt_text
+        +BooleanField is_primary
+        +create(data) ProductImage
+        +findByProduct(productId) ProductImage[]
     }
 
     class SKU {
@@ -1680,7 +1711,6 @@ classDiagram
         +CharField status
         +DecimalField total_amount
         +CharField currency
-        +CharField stripe_payment_id
         +CharField stripe_session_id
         +CharField shipping_country
         +IntegerField estimated_delivery_days
@@ -1705,6 +1735,21 @@ classDiagram
         +bulkCreate(items) OrderItem[]
         +update(id, data) OrderItem
         +deleteById(id) Boolean
+    }
+
+    %% ===== PAYMENT =====
+    class Payment {
+        +UUIDField id
+        +OneToOneField order_id
+        +CharField stripe_payment_intent
+        +DecimalField amount
+        +CharField currency
+        +CharField status
+        +DateTimeField paid_at
+        +create(data) Payment
+        +findByOrder(orderId) Payment
+        +findByIntent(intentId) Payment
+        +updateStatus(id, status) Payment
     }
 
     %% ===== B2B =====
@@ -1774,6 +1819,7 @@ classDiagram
 
     %% ===== ASSOCIATIONS =====
     Category      "1"  -->  "0..*"  Product              : has
+    Product       "1"  -->  "0..*"  ProductImage         : has images
     Product       "1"  -->  "0..*"  SKU                  : has variants
     SKU           "1"  -->  "1"     Stock                : OneToOneField
     SKU           "1"  -->  "0..*"  OrderItem            : included in
@@ -1783,6 +1829,7 @@ classDiagram
     AdminUser     "1"  -->  "0..*"  B2BRequest           : processes
     AdminUser     "1"  -->  "0..*"  Stock                : updates
     ShippingZone  "1"  -->  "0..*"  Order                : applied to
+    Order         "1"  -->  "1"     Payment              : paid by
 ```
 
 ---
@@ -1812,6 +1859,7 @@ CREATE TYPE order_status  AS ENUM (
 );
 CREATE TYPE b2b_status  AS ENUM ('new', 'in_progress', 'converted', 'refused');
 CREATE TYPE admin_role  AS ENUM ('superadmin', 'admin', 'viewer');
+CREATE TYPE payment_status AS ENUM ('pending', 'succeeded', 'failed', 'refunded');
 
 -- ----------------------------------------------------------------
 -- TRIGGER FUNCTION — automatic updated_at
@@ -1854,7 +1902,6 @@ CREATE TABLE products (
     allergens_fr   VARCHAR(500),
     allergens_en   VARCHAR(500),
     category_id    INTEGER       NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
-    image_url      VARCHAR(500),
     is_active      BOOLEAN       NOT NULL DEFAULT TRUE,
     created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
     updated_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW()
@@ -1863,6 +1910,22 @@ CREATE TABLE products (
 CREATE TRIGGER trg_products_updated_at
     BEFORE UPDATE ON products
     FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ----------------------------------------------------------------
+-- TABLE: product_images (NEW — multi-image gallery per product)
+-- Replaces the single products.image_url field.
+-- ----------------------------------------------------------------
+
+CREATE TABLE product_images (
+    id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id INTEGER      NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    image_url  VARCHAR(500) NOT NULL,
+    alt_text   VARCHAR(255) NOT NULL DEFAULT '',
+    is_primary BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_product_images_product ON product_images (product_id);
 
 -- ----------------------------------------------------------------
 -- TABLE: admin_users
@@ -1971,7 +2034,6 @@ CREATE TABLE orders (
     status                  order_status   NOT NULL DEFAULT 'pending',
     total_amount            DECIMAL(10,2)  NOT NULL,
     currency                currency_type  NOT NULL DEFAULT 'EUR',
-    stripe_payment_id       VARCHAR(255),
     stripe_session_id       VARCHAR(255),
     shipping_first_name     VARCHAR(100),
     shipping_last_name      VARCHAR(100),
@@ -1999,6 +2061,28 @@ CREATE INDEX idx_orders_created  ON orders (created_at DESC);
 -- Partial index for active orders only (recommended for production)
 CREATE INDEX idx_orders_active ON orders (status)
     WHERE status NOT IN ('cancelled', 'refunded');
+
+-- ----------------------------------------------------------------
+-- TABLE: payments (NEW — dedicated Stripe payment lifecycle)
+-- One payment per order. Replaces orders.stripe_payment_id; the
+-- Checkout Session id stays on orders, the PaymentIntent lives here.
+-- ----------------------------------------------------------------
+
+CREATE TABLE payments (
+    id                    UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id              INTEGER        NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+    stripe_payment_intent VARCHAR(255)   NOT NULL UNIQUE,
+    amount                DECIMAL(10,2)  NOT NULL,
+    currency              currency_type  NOT NULL DEFAULT 'EUR',
+    status                payment_status NOT NULL DEFAULT 'pending',
+    paid_at               TIMESTAMPTZ,
+    created_at            TIMESTAMPTZ    NOT NULL DEFAULT NOW(),
+    updated_at            TIMESTAMPTZ    NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER trg_payments_updated_at
+    BEFORE UPDATE ON payments
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ----------------------------------------------------------------
 -- TABLE: order_items
@@ -2083,7 +2167,7 @@ INSERT INTO categories (name_fr, name_en, slug) VALUES
 
 -- Products
 INSERT INTO products (slug, name_fr, name_en, description_fr, description_en,
-                      ingredients_fr, allergens_fr, allergens_en, category_id, image_url)
+                      ingredients_fr, allergens_fr, allergens_en, category_id)
 VALUES
     ('lamos-pistachio-kunafa-bar',
      'Tablette Pistache & Kunafa', 'Pistachio & Kunafa Bar',
@@ -2091,16 +2175,14 @@ VALUES
      'The original Lamos signature — Iranian pistachio, kunafa angel hair, Belgian white chocolate.',
      'Chocolat blanc (lait, sucre, beurre de cacao), pistache 28%, kunafa (ble), beurre clarifie.',
      'Lait, Gluten (ble), Fruits a coque (pistache)',
-     'Milk, Gluten (wheat), Nuts (pistachio)', 1,
-     '/static/images/products/pistachio-kunafa-bar.webp'),
+     'Milk, Gluten (wheat), Nuts (pistachio)', 1),
 
     ('lamos-coffret-decouverte-3',
      'Coffret Decouverte 3 Tablettes', 'Discovery Gift Box — 3 Bars',
      'Coffret cadeau avec 3 tablettes signature.',
      'Gift box featuring 3 signature bars.',
      'Voir composition de chaque tablette.',
-     'Lait, Gluten, Fruits a coque', 'Milk, Gluten, Nuts', 2,
-     '/static/images/products/coffret-decouverte-3.webp'),
+     'Lait, Gluten, Fruits a coque', 'Milk, Gluten, Nuts', 2),
 
     ('lamos-dark-rose-saffron',
      'Tablette Noir Rose & Safran', 'Dark Rose & Saffron Bar',
@@ -2108,8 +2190,13 @@ VALUES
      'Spring limited edition — 72% dark chocolate, rose petals, Iranian saffron.',
      'Chocolat noir (cacao min. 72%, sucre), petales de rose, safran, beurre de cacao.',
      'Peut contenir des traces de lait et fruits a coque.',
-     'May contain traces of milk and nuts.', 3,
-     '/static/images/products/dark-rose-saffron.webp');
+     'May contain traces of milk and nuts.', 3);
+
+-- Product images (primary image per product)
+INSERT INTO product_images (product_id, image_url, alt_text, is_primary) VALUES
+    (1, '/static/images/products/pistachio-kunafa-bar.webp', 'Tablette Pistache & Kunafa',     TRUE),
+    (2, '/static/images/products/coffret-decouverte-3.webp', 'Coffret Decouverte 3 Tablettes', TRUE),
+    (3, '/static/images/products/dark-rose-saffron.webp',    'Tablette Noir Rose & Safran',    TRUE);
 
 -- SKUs (with forecasting columns)
 INSERT INTO skus (product_id, sku_code, format, weight_g, price, currency,
@@ -2312,7 +2399,6 @@ class Product(models.Model):
     category       = models.ForeignKey(
         Category, on_delete=models.RESTRICT, related_name='products'
     )
-    image_url      = models.CharField(max_length=500, blank=True, null=True)
     is_active      = models.BooleanField(default=True)
     created_at     = models.DateTimeField(auto_now_add=True)
     updated_at     = models.DateTimeField(auto_now=True)
@@ -2330,8 +2416,28 @@ class Product(models.Model):
         """Returns the first active SKU."""
         return self.skus.filter(is_active=True).first()
 
+    @property
+    def primary_image_url(self):
+        image = self.images.filter(is_primary=True).first() or self.images.first()
+        return image.image_url if image else ''
+
     def __str__(self):
         return self.slug
+
+
+class ProductImage(models.Model):
+    id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product    = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='images'
+    )
+    image_url  = models.CharField(max_length=500)
+    alt_text   = models.CharField(max_length=255, blank=True, default='')
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'product_images'
+        ordering = ['-is_primary', 'created_at']
 
 
 class SKU(models.Model):
@@ -2502,7 +2608,6 @@ class Order(models.Model):
     currency             = models.CharField(
         max_length=3, choices=CURRENCY_CHOICES, default='EUR'
     )
-    stripe_payment_id    = models.CharField(max_length=255, blank=True, null=True)
     stripe_session_id    = models.CharField(max_length=255, blank=True, null=True)
     shipping_first_name  = models.CharField(max_length=100, blank=True, null=True)
     shipping_last_name   = models.CharField(max_length=100, blank=True, null=True)
@@ -2552,6 +2657,37 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'OrderItem[{self.order.order_number}] SKU={self.sku.sku_code} x{self.quantity}'
+
+
+class Payment(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'), ('succeeded', 'Succeeded'),
+        ('failed', 'Failed'), ('refunded', 'Refunded'),
+    ]
+
+    id                    = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    order                 = models.OneToOneField(
+        Order, on_delete=models.CASCADE, related_name='payment'
+    )
+    stripe_payment_intent = models.CharField(max_length=255, unique=True)
+    amount                = models.DecimalField(max_digits=10, decimal_places=2)
+    currency              = models.CharField(
+        max_length=3, choices=CURRENCY_CHOICES, default='EUR'
+    )
+    status                = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='pending'
+    )
+    paid_at               = models.DateTimeField(null=True, blank=True)
+    created_at            = models.DateTimeField(auto_now_add=True)
+    updated_at            = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'payments'
+
+    def __str__(self):
+        return f'Payment[{self.order.order_number}] — {self.status}'
 
 
 class B2BRequest(models.Model):
@@ -2884,7 +3020,7 @@ By abstracting this UI element into a reusable component, the platform ensures v
 {% block product_card %}
 <article class="product-card {% if not sku.is_available %}product-card--out-of-stock{% endif %}">
   <a href="{% url 'shop:product_detail' product.slug %}" class="product-card__image-link">
-    <img src="{{ product.image_url|default:'/static/images/placeholder.webp' }}"
+    <img src="{{ product.primary_image_url|default:'/static/images/placeholder.webp' }}"
          alt="{{ product.get_name(request.LANGUAGE_CODE) }}"
          loading="lazy" width="400" height="400">
     {% if not sku.is_available %}
@@ -3651,7 +3787,7 @@ def handle_payment_success(payment_intent, cart_items, customer, shipping_data,
     Called by the webhook handler after payment_intent.succeeded.
     Creates the order, order items, and decrements stock atomically.
     """
-    from apps.shop.models import Order, OrderItem, Stock
+    from apps.shop.models import Order, OrderItem, Payment, Stock
     from django.db import transaction
 
     with transaction.atomic():
@@ -3661,7 +3797,6 @@ def handle_payment_success(payment_intent, cart_items, customer, shipping_data,
             status='paid',
             total_amount=payment_intent['amount'] / 100,
             currency=payment_intent['currency'].upper(),
-            stripe_payment_id=payment_intent['id'],
             estimated_delivery_days=estimated_days,
             **shipping_data,
         )
@@ -3676,6 +3811,14 @@ def handle_payment_success(payment_intent, cart_items, customer, shipping_data,
             )
             stock = Stock.objects.select_for_update().get(sku_id=item['sku_id'])
             stock.decrement(item['quantity'])
+
+        Payment.objects.create(
+            order=order,
+            stripe_payment_intent=payment_intent['id'],
+            amount=payment_intent['amount'] / 100,
+            currency=payment_intent['currency'].upper(),
+            status='succeeded',
+        )
 
     return order
 ```
