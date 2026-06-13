@@ -1,0 +1,97 @@
+[
+  {
+    "model": "shop.product",
+    "pk": 1,
+    "fields": {
+      "slug": "pistache",
+      "name_fr": "Tablette Pistache",
+      "name_en": "Pistachio Bar",
+      "description_fr": "Chocolat au lait et pâte de pistache de Sicile.",
+      "description_en": "Milk chocolate with Sicilian pistachio paste.",
+      "ingredients_fr": "Chocolat au lait, pistaches (20%), sucre, beurre de cacao.",
+      "ingredients_en": "Milk chocolate, pistachios (20%), sugar, cocoa butter.",
+      "allergens_fr": "Fruits à coque, lait, soja.",
+      "allergens_en": "Tree nuts, milk, soy.",
+      "category": 1,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 2,
+    "fields": {
+      "slug": "cafe-chocolat",
+      "name_fr": "Tablette Café",
+      "name_en": "Coffee Chocolate Bar",
+      "description_fr": "Chocolat noir 70% infusé au café d'Éthiopie.",
+      "description_en": "70% dark chocolate infused with Ethiopian coffee.",
+      "ingredients_fr": "Chocolat noir 70%, café, sucre.",
+      "ingredients_en": "70% dark chocolate, coffee, sugar.",
+      "allergens_fr": "Peut contenir des traces de fruits à coque et de lait.",
+      "allergens_en": "May contain traces of tree nuts and milk.",
+      "category": 1,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 3,
+    "fields": {
+      "slug": "matcha",
+      "name_fr": "Tablette Matcha",
+      "name_en": "Matcha Bar",
+      "description_fr": "Chocolat blanc au thé matcha grade cérémonie.",
+      "description_en": "White chocolate with ceremonial grade matcha tea.",
+      "ingredients_fr": "Chocolat blanc, thé matcha (5%), sucre, beurre de cacao.",
+      "ingredients_en": "White chocolate, matcha tea (5%), sugar, cocoa butter.",
+      "allergens_fr": "Lait, soja.",
+      "allergens_en": "Milk, soy.",
+      "category": 1,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 4,
+    "fields": {
+      "slug": "praline-pecan",
+      "name_fr": "Praliné Pécan",
+      "name_en": "Pecan Praline",
+      "description_fr": "Praliné maison aux noix de pécan caramélisées.",
+      "description_en": "House praline with caramelized pecan nuts.",
+      "ingredients_fr": "Noix de pécan, sucre, chocolat noir, beurre de cacao.",
+      "ingredients_en": "Pecan nuts, sugar, dark chocolate, cocoa butter.",
+      "allergens_fr": "Fruits à coque.",
+      "allergens_en": "Tree nuts.",
+      "category": 3,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 5,
+    "fields": {
+      "slug": "coffret-decouverte",
+      "name_fr": "Coffret Découverte",
+      "name_en": "Discovery Box",
+      "description_fr": "Assortiment de nos créations signature.",
+      "description_en": "An assortment of our signature creations.",
+      "ingredients_fr": "Voir les produits individuels.",
+      "ingredients_en": "See individual products.",
+      "allergens_fr": "Fruits à coque, lait, soja.",
+      "allergens_en": "Tree nuts, milk, soy.",
+      "category": 2,
+      "is_active": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-01-01T00:00:00Z"
+    }
+  }
+]

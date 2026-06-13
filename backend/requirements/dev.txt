@@ -1,5 +1,22 @@
+# ============================
+# Development dependencies
+# ============================
+
+# Includes all base dependencies
 -r base.txt
 
-django-debug-toolbar
+# Includes test toolchain (pytest, coverage) in the dev image
+-r test.txt
 
-ipython
+# Debugging panel in the browser
+django-debug-toolbar==4.4.6
+
+# Enhanced interactive shell
+ipython==8.26.0
+
+# Code formatting
+black==24.8.0
+isort==5.13.2
+
+# Linting
+flake8==7.1.1
