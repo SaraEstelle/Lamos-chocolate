@@ -1,0 +1,146 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign up" %} - Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">{% trans "Create an account" %} 🍫</h2>
+                </div>
+                <div class="card-body">
+
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            {{ form.email.label_tag }}
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            {{ form.password.label_tag }}
+                            {{ form.password }}
+                            <small class="form-text text-muted">
+                                {{ form.password.help_text }}
+                            </small>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password Confirm -->
+                        <div class="mb-3">
+                            {{ form.password_confirm.label_tag }}
+                            {{ form.password_confirm }}
+                            {% if form.password_confirm.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.password_confirm.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="mb-3">
+                            {{ form.first_name.label_tag }}
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="mb-3">
+                            {{ form.last_name.label_tag }}
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone (Optional) -->
+                        <div class="mb-3">
+                            {{ form.phone.label_tag }}
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.phone.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Language (HYBRID: language_pref) -->
+                        <div class="mb-3">
+                            {{ form.language_pref.label_tag }}
+                            {{ form.language_pref }}
+                            {% if form.language_pref.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.language_pref.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- GDPR Checkbox (Swiss LPD + EU GDPR compliance) -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="gdpr" name="gdpr" required>
+                            <label class="form-check-label" for="gdpr">
+                                {% trans "I accept the " %}<a href="/terms/" target="_blank">{% trans "privacy policy" %}</a>
+                            </label>
+                            <div class="invalid-feedback">
+                                {% trans "You must accept the privacy policy." %}
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            {% trans "Sign up" %} →
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-3">
+                        <p>{% trans "Already have an account?" %}
+                            <a href="{% url 'accounts:login' %}">{% trans "Log in" %}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-control.is-invalid,
+.form-control:invalid {
+    border-color: #dc3545;
+}
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875em;
+}
+</style>
+{% endblock %}

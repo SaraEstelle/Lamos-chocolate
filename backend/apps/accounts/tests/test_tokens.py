@@ -1,46 +1,88 @@
-"""Unit tests for PasswordResetToken validity logic."""
+"""
+apps/accounts/tests/test_tokens.py
+===================================
+Tests for password reset tokens.
 
-from datetime import timedelta
+Tests:
+- generate_reset_token(): random unique token
+- create_reset_token(): creation with expiration
+- verify_reset_token(): validation (expired, used)
+- mark_token_as_used(): one-time use
+"""
 
+import pytest
 from django.utils import timezone
+from datetime import timedelta
+from apps.accounts.models import Customer, PasswordResetToken
+from apps.accounts.tokens import (
+    generate_reset_token, create_reset_token, verify_reset_token, mark_token_as_used
+)
 
 
-class TestPasswordResetToken:
-    def test_is_valid_fresh_token(self, db, sample_customer):
-        from apps.accounts.models import PasswordResetToken
+@pytest.mark.django_db
+class TestTokens:
+    """Tests for tokens."""
 
-        token = PasswordResetToken.objects.create(
-            customer=sample_customer,
-            token="valid-token-abc",
-            expires_at=timezone.now() + timedelta(hours=1),
+    def setup_method(self):
+        """Create a customer."""
+        self.customer = Customer.objects.create_user(
+            email='john@example.com',
+            password='SecurePass123!'
         )
-        assert token.is_valid is True
 
-    def test_is_valid_expired_token(self, db, sample_customer):
-        from apps.accounts.models import PasswordResetToken
+    def test_generate_reset_token_format(self):
+        """Generated token has correct format."""
+        token = generate_reset_token()
+        assert isinstance(token, str)
+        assert len(token) > 30
 
-        token = PasswordResetToken.objects.create(
-            customer=sample_customer,
-            token="expired-token-xyz",
-            expires_at=timezone.now() - timedelta(minutes=1),
-        )
-        assert token.is_valid is False
+    def test_generate_reset_token_unique(self):
+        """Generated tokens are unique."""
+        token1 = generate_reset_token()
+        token2 = generate_reset_token()
+        assert token1 != token2
 
-    def test_is_valid_used_token(self, db, sample_customer):
-        from apps.accounts.models import PasswordResetToken
+    def test_create_reset_token(self):
+        """Create a token."""
+        token = create_reset_token(self.customer)
+        assert token.customer == self.customer
+        assert token.is_used == False
+        assert token.expires_at > timezone.now()
 
-        token = PasswordResetToken.objects.create(
-            customer=sample_customer,
-            token="used-token-def",
-            expires_at=timezone.now() + timedelta(hours=1),
-            used=True,
-        )
-        assert token.is_valid is False
+    def test_verify_reset_token_valid(self):
+        """Verify a valid token."""
+        token = create_reset_token(self.customer)
+        verified = verify_reset_token(token.token)
+        assert verified is not None
+        assert verified.customer == self.customer
 
-    def test_create_for_customer_returns_valid_token(self, db, sample_customer):
-        from apps.accounts.models import PasswordResetToken
+    def test_verify_reset_token_invalid(self):
+        """Verify an invalid token."""
+        verified = verify_reset_token('invalid-token-xyz')
+        assert verified is None
 
-        token = PasswordResetToken.create_for_customer(sample_customer)
-        assert token.customer == sample_customer
-        assert token.token  # a non-empty secret was generated
-        assert token.is_valid is True
+    def test_verify_reset_token_expired(self):
+        """Verify an expired token."""
+        token = create_reset_token(self.customer)
+        token.expires_at = timezone.now() - timedelta(hours=1)
+        token.save()
+
+        verified = verify_reset_token(token.token)
+        assert verified is None
+
+    def test_verify_reset_token_used(self):
+        """Verify an already used token."""
+        token = create_reset_token(self.customer)
+        mark_token_as_used(token)
+
+        verified = verify_reset_token(token.token)
+        assert verified is None
+
+    def test_mark_token_as_used(self):
+        """Mark a token as used."""
+        token = create_reset_token(self.customer)
+        assert token.is_used == False
+
+        mark_token_as_used(token)
+        token.refresh_from_db()
+        assert token.is_used == True

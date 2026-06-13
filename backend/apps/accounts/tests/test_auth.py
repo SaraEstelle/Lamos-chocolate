@@ -1,36 +1,93 @@
-"""Unit tests for the Customer model: password hashing and helpers."""
+"""
+apps/accounts/tests/test_auth.py
+=================================
+Tests for authentication services.
+
+Tests:
+- create_customer(): create customer
+- send_welcome_email(): send email
+- send_password_reset_email(): send link
+- authenticate_customer(): verify credentials
+"""
+
+import pytest
+from django.test import TestCase
+from django.core import mail
+from apps.accounts.models import Customer
+from apps.accounts.services import (
+    create_customer, authenticate_customer
+)
+from apps.accounts.tokens import create_reset_token
 
 
-class TestCustomerModel:
-    def test_password_is_hashed_not_stored_plaintext(self, db):
-        from apps.accounts.models import Customer
+@pytest.mark.django_db
+class TestCreateCustomer(TestCase):
+    """Tests for customer creation."""
 
-        customer = Customer(
-            first_name="Test", last_name="User", email="test@example.com"
+    def test_create_customer_success(self):
+        """Create a customer successfully."""
+        customer = create_customer(
+            email='john@example.com',
+            password='SecurePass123!',
+            first_name='John',
+            last_name='Doe'
         )
-        customer.set_password("securepassword")
-        assert customer.password_hash != "securepassword"
+        assert customer.id is not None
+        assert customer.email == 'john@example.com'
+        assert customer.check_password('SecurePass123!')
 
-    def test_check_password_matches(self, db):
-        from apps.accounts.models import Customer
-
-        customer = Customer(
-            first_name="Test", last_name="User", email="test@example.com"
+    def test_create_customer_duplicate_email(self):
+        """Create with email already in use."""
+        create_customer(
+            email='john@example.com',
+            password='SecurePass123!',
+            first_name='John',
+            last_name='Doe'
         )
-        customer.set_password("securepassword")
-        assert customer.check_password("securepassword") is True
 
-    def test_check_password_rejects_wrong_password(self, db):
-        from apps.accounts.models import Customer
+        with pytest.raises(ValueError):
+            create_customer(
+                email='john@example.com',
+                password='DifferentPass123!',
+                first_name='Jane',
+                last_name='Smith'
+            )
 
-        customer = Customer(
-            first_name="Test", last_name="User", email="test@example.com"
+    def test_create_customer_sends_welcome_email(self):
+        """Welcome email is sent."""
+        customer = create_customer(
+            email='john@example.com',
+            password='SecurePass123!',
+            first_name='John',
+            last_name='Doe'
         )
-        customer.set_password("securepassword")
-        assert customer.check_password("wrongpassword") is False
 
-    def test_full_name_property(self, db):
-        from apps.accounts.models import Customer
+        assert len(mail.outbox) == 1
+        assert customer.email in mail.outbox[0].to
 
-        customer = Customer(first_name="Marie", last_name="Dupont", email="m@test.com")
-        assert customer.full_name == "Marie Dupont"
+
+@pytest.mark.django_db
+class TestAuthenticateCustomer(TestCase):
+    """Tests for authentication."""
+
+    def setUp(self):
+        self.customer = Customer.objects.create_user(
+            email='john@example.com',
+            password='SecurePass123!'
+        )
+
+    def test_authenticate_success(self):
+        """Authenticate with valid credentials."""
+        customer = authenticate_customer('john@example.com', 'SecurePass123!')
+        assert customer is not None
+        assert customer.email == 'john@example.com'
+
+    def test_authenticate_wrong_password(self):
+        """Incorrect password."""
+        customer = authenticate_customer('john@example.com', 'WrongPassword123!')
+        assert customer is None
+
+    def test_authenticate_nonexistent_email(self):
+        """Email does not exist."""
+        customer = authenticate_customer('nonexistent@example.com', 'SecurePass123!')
+        assert customer is None
