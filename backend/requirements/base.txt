@@ -1,14 +1,15 @@
-# Django
-Django>=5.2,<6.0
+# ============================
+# Base dependencies (all environments)
+# ============================
 
-# Environment variables
-django-environ>=0.11
+# Web framework
+Django==5.2
 
-# PostgreSQL
-psycopg2-binary>=2.9
+# PostgreSQL database adapter
+psycopg2-binary==2.9.9
 
-# Images
-Pillow>=11.0
+# Read configuration from environment variables (.env)
+python-decouple==3.8
 
-# Payments
-stripe>=11.0
+# Stripe payment integration
+stripe==11.1.0

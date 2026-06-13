@@ -92,4 +92,12 @@ build/
 
 # Local database
 *.sqlite3
+
+# Compiled translations
 *.mo
+
+# =========================
+# Node
+# =========================
+
+node_modules/
