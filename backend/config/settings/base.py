@@ -36,6 +36,13 @@ LOCAL_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
 
+# ============================================================================
+# AUTH — Custom user model
+# ============================================================================
+# Customer replaces Django's default User model. Must be set BEFORE the first
+# migration that references settings.AUTH_USER_MODEL (accounts.PasswordResetToken).
+AUTH_USER_MODEL = "accounts.Customer"
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
