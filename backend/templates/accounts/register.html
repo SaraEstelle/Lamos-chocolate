@@ -95,13 +95,13 @@
                             {% endif %}
                         </div>
 
-                        <!-- Language (HYBRID: language_pref) -->
+                        <!-- Language (HYBRID: preferred_language) -->
                         <div class="mb-3">
-                            {{ form.language_pref.label_tag }}
-                            {{ form.language_pref }}
-                            {% if form.language_pref.errors %}
+                            {{ form.preferred_language.label_tag }}
+                            {{ form.preferred_language }}
+                            {% if form.preferred_language.errors %}
                                 <div class="invalid-feedback d-block">
-                                    {{ form.language_pref.errors.0 }}
+                                    {{ form.preferred_language.errors.0 }}
                                 </div>
                             {% endif %}
                         </div>
