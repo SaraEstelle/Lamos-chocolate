@@ -1,0 +1,120 @@
+{% extends "base/base.html" %}
+{% load i18n custom_tags %}
+
+{% block title %}{{ product|localized:"name" }} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'shop:category' slug=product.category.slug %}">{{ product.category|localized:"name" }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">{{ product|localized:"name" }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Image gallery -->
+    <div class="col-12 col-md-6">
+      {% if images %}
+        <img src="{{ product.primary_image_url }}" id="main-product-image"
+             class="img-fluid rounded mb-2" alt="{{ product|localized:'name' }}">
+        <div class="d-flex gap-2 flex-wrap">
+          {% for image in images %}
+            <img src="{{ image.image_url }}" class="img-thumbnail"
+                 style="width: 72px; height: 72px; object-fit: cover; cursor: pointer;"
+                 alt="{{ image.alt_text }}"
+                 onclick="document.getElementById('main-product-image').src=this.src">
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 320px;">
+          <span class="text-muted">{% trans "No image" %}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Product info -->
+    <div class="col-12 col-md-6">
+      <h1 class="h3">{{ product|localized:"name" }}</h1>
+      <p class="text-muted">{{ product.category|localized:"name" }}</p>
+
+      {% with description=product|localized:"description" %}
+        {% if description %}<p>{{ description|linebreaks }}</p>{% endif %}
+      {% endwith %}
+
+      {% with ingredients=product|localized:"ingredients" %}
+        {% if ingredients %}
+          <h2 class="h6 mt-3">{% trans "Ingredients" %}</h2>
+          <p class="small text-muted">{{ ingredients }}</p>
+        {% endif %}
+      {% endwith %}
+
+      {% with allergens=product|localized:"allergens" %}
+        {% if allergens %}
+          <h2 class="h6 mt-3">{% trans "Allergens" %}</h2>
+          <p class="small text-muted">{{ allergens }}</p>
+        {% endif %}
+      {% endwith %}
+
+      <!-- Available formats (SKUs) -->
+      <h2 class="h5 mt-4">{% trans "Available formats" %}</h2>
+      {% url 'cart:add' as cart_add_url %}
+      <ul class="list-group mb-3">
+        {% for sku in skus %}
+          <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <strong>{{ sku.format }}</strong>
+                {% if sku.weight_g %}<span class="text-muted">· {{ sku.weight_g }}g</span>{% endif %}
+                <div class="fw-bold">{{ sku.price }} {{ sku.currency }}</div>
+                {% if sku.stock.quantity > 0 %}
+                  <span class="badge bg-success">{% trans "In stock" %}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{% trans "Out of stock" %}</span>
+                {% endif %}
+              </div>
+              <div>
+                {% if cart_add_url %}
+                  <form action="{{ cart_add_url }}" method="post" class="d-flex gap-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="sku_id" value="{{ sku.id }}">
+                    <input type="number" name="quantity" value="1" min="1"
+                           class="form-control form-control-sm" style="width: 64px;">
+                    <button type="submit" class="btn btn-dark btn-sm"
+                            {% if sku.stock.quantity == 0 %}disabled{% endif %}>
+                      {% trans "Add to cart" %}
+                    </button>
+                  </form>
+                {% else %}
+                  {# Cart app not wired yet — graceful degradation. #}
+                  <button type="button" class="btn btn-dark btn-sm" disabled
+                          title="{% trans 'Cart coming soon' %}">
+                    {% trans "Add to cart" %}
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Estimated delivery per shipping zone (Approach A) -->
+            {% if sku.delivery_estimates %}
+              <div class="mt-2 small text-muted">
+                <span class="me-1">{% trans "Estimated delivery:" %}</span>
+                {% for estimate in sku.delivery_estimates %}
+                  <span class="badge bg-light text-dark border">
+                    {{ estimate.zone.zone_name }}: {{ estimate.days }}{% trans "d" %}
+                  </span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">{% trans "No formats available." %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

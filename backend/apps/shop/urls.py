@@ -1,28 +1,27 @@
 """
 apps/shop/urls.py
 =================
-Routes du catalogue produits.
+Routes du catalogue produits (public, sans authentification).
 
-Contenu :
-- Listing produits (catalog)
-- Détail produit (product_detail)
-- Catégories (categories)
-- Recherche (search)
-- Filtrage (filters)
-
-Cette app ne nécessite pas d'authentification.
-Affichage public du catalogue.
+- catalog        : listing des produits actifs (?category=<slug> optionnel)
+- search         : recherche par nom/description (?q=)
+- category       : produits d'une catégorie (par slug)
+- product_detail : détail d'un produit (par slug)
 """
 
 from django.urls import path
 
-# Nom de cette app
-app_name = 'shop'
+from apps.shop import views
 
-# Routes du catalogue
+app_name = "shop"
+
 urlpatterns = [
-    # path('', views.catalog_view, name='catalog'),                           # Listing produits
-    # path('product/<slug:slug>/', views.product_detail_view, name='detail'), # Détail produit
-    # path('category/<slug:slug>/', views.category_view, name='category'),    # Produits d'une catégorie
-    # path('search/', views.search_view, name='search'),                      # Recherche
+    path("", views.CatalogView.as_view(), name="catalog"),
+    path("search/", views.SearchView.as_view(), name="search"),
+    path("category/<slug:slug>/", views.CategoryView.as_view(), name="category"),
+    path(
+        "product/<slug:slug>/",
+        views.ProductDetailView.as_view(),
+        name="product_detail",
+    ),
 ]
