@@ -1,0 +1,32 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'fr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% trans 'Lamos Chocolate — Swiss artisan chocolate' %}">
+    <title>{% block title %}Lamos Chocolate{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    {% include "base/navbar.html" %}
+
+    <main>
+        {% include "base/messages.html" %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "base/footer.html" %}
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
