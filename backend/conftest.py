@@ -65,7 +65,7 @@ def sample_customer(db):
         first_name="Marie",
         last_name="Test",
         email="marie.test@example.com",
-        language_pref="fr",
+        preferred_language="fr",
     )
     customer.set_password("testpassword123")
     customer.save()

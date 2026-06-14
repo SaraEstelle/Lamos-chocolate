@@ -150,7 +150,7 @@ def send_password_reset_email(customer: Customer, token: PasswordResetToken) -> 
 
     Content:
     - Reset link: /en/accounts/password-reset-confirm/{token}/
-    - "Expires in 24h"
+    - "Expires in 1h"
     - "If you didn't request this, ignore this email"
 
     Args:
@@ -174,7 +174,7 @@ def send_password_reset_email(customer: Customer, token: PasswordResetToken) -> 
             {
                 'customer': customer,
                 'reset_url': reset_url,
-                'expires_in_hours': 24,
+                'expires_in_hours': 1,
                 'company_name': 'Lamos Chocolate'
             }
         )

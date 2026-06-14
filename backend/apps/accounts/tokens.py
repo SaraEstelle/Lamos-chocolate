@@ -12,7 +12,7 @@ Responsibilities:
 Security:
 - Tokens are random (secrets.token_urlsafe)
 - Tokens are unique in DB
-- Tokens expire in 24h
+- Tokens expire in 1h
 - Tokens one-time use (can only be used once)
 - No revelation if token exists or not
 """
@@ -43,7 +43,7 @@ def create_reset_token(customer: Customer) -> PasswordResetToken:
 
     Process:
     1. Generate a unique token
-    2. Set expires_at = now + 24h
+    2. Set expires_at = now + 1h
     3. Save to DB
 
     Args:
@@ -55,14 +55,14 @@ def create_reset_token(customer: Customer) -> PasswordResetToken:
     Example:
         token = create_reset_token(customer)
         # token.token = "Wj7vB-8cXq9kL..."
-        # token.expires_at = 2026-06-13 15:42 (24h from now)
+        # token.expires_at = 2026-06-13 15:42 (1h from now)
     """
     # Generate a unique token
     token_string = generate_reset_token()
 
-    # Set expiration (24 hours)
+    # Set expiration (1 hour — security requirement)
     now = timezone.now()
-    expires_at = now + timedelta(hours=24)
+    expires_at = now + timedelta(hours=1)
 
     # Create in DB
     token = PasswordResetToken.objects.create(

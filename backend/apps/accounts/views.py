@@ -32,7 +32,7 @@ from apps.accounts.services import (
 )
 from apps.accounts.tokens import create_reset_token, verify_reset_token, mark_token_as_used
 from apps.accounts.models import Customer
-
+from django.utils.http import url_has_allowed_host_and_scheme
 
 logger = logging.getLogger('apps.accounts')
 
@@ -151,9 +151,16 @@ def login_view(request):
             # Success message
             messages.success(request, f"Welcome{customer.first_name}! 👋")
 
-            # Redirect to "next" or account dashboard
-            next_url = request.GET.get('next', 'customer_area:dashboard')
-            return redirect(next_url)
+            # Redirect to "next" only if it is a safe internal URL.
+            # Prevents Open Redirect attacks (e.g. ?next=https://evil.com).
+            next_url = request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(
+                url=next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(next_url)
+            return redirect('customer_area:dashboard')
 
         else:
             # Form is invalid (incorrect email/password)

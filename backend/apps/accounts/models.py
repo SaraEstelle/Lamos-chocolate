@@ -16,7 +16,11 @@ Règulation Suisse (RGPD) :
 
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    BaseUserManager,
+    PermissionsMixin,
+)
 from django.utils.translation import gettext_lazy as _
 
 
@@ -50,7 +54,7 @@ class CustomerManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
-class Customer(AbstractBaseUser):
+class Customer(AbstractBaseUser, PermissionsMixin):
     """
     Modèle Client personnalisé (remplace Django User).
 
@@ -140,11 +144,6 @@ class Customer(AbstractBaseUser):
         help_text="Accès à l'interface admin (/admin/)"
     )
 
-    is_superuser = models.BooleanField(
-        default=False,
-        help_text="Accès complet à Django admin"
-    )
-
     # Dates
     created_at = models.DateTimeField(
         auto_now_add=True,
@@ -190,7 +189,7 @@ class PasswordResetToken(models.Model):
 
     Sécurité :
     - Token : chaîne aléatoire longue (impossible de deviner)
-    - Expiration : 24h (après c'est invalid)
+    - Expiration : 1h (après c'est invalid)
     - Une seule utilisation (suppression après)
     """
 
@@ -216,9 +215,9 @@ class PasswordResetToken(models.Model):
         help_text="Token aléatoire envoyé par email"
     )
 
-    # Expiration (24h)
+    # Expiration (1h)
     expires_at = models.DateTimeField(
-        help_text="Date d'expiration du token (24h)"
+        help_text="Date d.expiration du token (1h)"
     )
 
     # Création
