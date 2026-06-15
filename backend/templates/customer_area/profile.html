@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My profile" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 640px;">
+  <h1 class="mb-4">{% trans "My profile" %}</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger small">{{ field.errors.0 }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">{% trans "Save changes" %}</button>
+    <a href="{% url 'customer_area:dashboard' %}" class="btn btn-link">{% trans "Cancel" %}</a>
+  </form>
+</div>
+{% endblock %}

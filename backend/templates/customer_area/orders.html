@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My orders" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h1 class="mb-4">{% trans "My orders" %}</h1>
+
+  {% if orders %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>{% trans "Order" %}</th>
+            <th>{% trans "Date" %}</th>
+            <th>{% trans "Status" %}</th>
+            <th class="text-end">{% trans "Total" %}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td><code>{{ order.order_number }}</code></td>
+            <td>{{ order.created_at|date:"d/m/Y" }}</td>
+            <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
+            <td class="text-end">{{ order.total_amount }} {{ order.currency }}</td>
+            <td class="text-end">
+              <a href="{% url 'customer_area:order_detail' order.id %}" class="btn btn-sm btn-outline-primary">
+                {% trans "View" %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info">
+      {% trans "You have no orders yet." %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

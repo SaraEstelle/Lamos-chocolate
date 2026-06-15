@@ -1,29 +1,23 @@
 """
 apps/customer_area/urls.py
-===========================
-Routes de l'espace client (mon compte, historique commandes).
+==========================
+Routes for the authenticated customer area (my-account).
 
-Contenu :
-- Tableau de bord (dashboard)
-- Historique commandes (orders)
-- Détail commande (order_detail)
-- Gestion adresses (addresses)
-- Profil client (profile)
+Note: Order.id is a BigAutoField (int), so order_id uses <int:...>,
+NOT <uuid:...>.
 
-Authentification : REQUISE
-Seul l'utilisateur connecté peut accéder à ses données.
+Authentication: REQUIRED (enforced in the views via @login_required).
 """
 
 from django.urls import path
 
-# Nom de cette app
-app_name = 'customer_area'
+from . import views
 
-# Routes de l'espace client (authentifiées)
+app_name = "customer_area"
+
 urlpatterns = [
-    # path('', views.dashboard_view, name='dashboard'),                              # Tableau de bord
-    # path('orders/', views.orders_view, name='orders'),                            # Historique commandes
-    # path('orders/<uuid:order_id>/', views.order_detail_view, name='order_detail'),# Détail commande
-    # path('addresses/', views.addresses_view, name='addresses'),                   # Gestion adresses
-    # path('profile/', views.profile_view, name='profile'),                         # Profil client
+    path("", views.dashboard_view, name="dashboard"),
+    path("orders/", views.orders_view, name="orders"),
+    path("orders/<int:order_id>/", views.order_detail_view, name="order_detail"),
+    path("profile/", views.profile_view, name="profile"),
 ]
