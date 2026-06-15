@@ -295,3 +295,23 @@ class PasswordResetConfirmForm(forms.Form):
                 )
 
         return cleaned_data
+
+class ProfileForm(forms.ModelForm):
+    """
+    Form to edit a customer's own profile.
+
+    Email is intentionally NOT editable here (changing the login identifier
+    should go through a dedicated, verified flow — out of scope for now).
+    """
+
+    class Meta:
+        model = Customer
+        fields = ("first_name", "last_name", "phone", "preferred_language")
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "phone": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "+41 (XX) XXX XX XX"}
+            ),
+            "preferred_language": forms.Select(attrs={"class": "form-select"}),
+        }
