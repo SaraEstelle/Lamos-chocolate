@@ -1,0 +1,54 @@
+{% extends "base/base.html" %}
+{% load i18n custom_tags %}
+
+{% block title %}{% trans "Shop" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="row">
+    <aside class="col-12 col-md-3 mb-4">
+      {% include "shop/partials/filters.html" %}
+    </aside>
+
+    <section class="col-12 col-md-9">
+      {% if search_query %}
+        <h1 class="h4 mb-3">{% blocktrans %}Results for "{{ search_query }}"{% endblocktrans %}</h1>
+      {% elif category %}
+        <h1 class="h4 mb-3">{{ category|localized:"name" }}</h1>
+      {% else %}
+        <h1 class="h4 mb-3">{% trans "Our chocolates" %}</h1>
+      {% endif %}
+
+      {% if products %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+          {% for product in products %}
+            {% include "shop/partials/product_card.html" %}
+          {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+          <nav class="mt-4" aria-label="{% trans 'Catalog pages' %}">
+            <ul class="pagination justify-content-center">
+              {% if page_obj.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if active_category and not category %}category={{ active_category }}&amp;{% endif %}{% if search_query %}q={{ search_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">&laquo;</a>
+                </li>
+              {% endif %}
+              <li class="page-item disabled">
+                <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+              </li>
+              {% if page_obj.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?{% if active_category and not category %}category={{ active_category }}&amp;{% endif %}{% if search_query %}q={{ search_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">&raquo;</a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        {% endif %}
+      {% else %}
+        <p class="text-muted">{% trans "No products found." %}</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}
