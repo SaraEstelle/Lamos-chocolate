@@ -1,0 +1,58 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Order" %} {{ order.order_number }} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <a href="{% url 'customer_area:orders' %}" class="btn btn-link mb-3">← {% trans "Back to my orders" %}</a>
+
+  <h1 class="mb-1">{% trans "Order" %} <code>{{ order.order_number }}</code></h1>
+  <p class="text-muted">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+
+  <div class="row g-4">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header">{% trans "Items" %}</div>
+        <ul class="list-group list-group-flush">
+          {% for item in order.items.all %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ item.quantity }} × {{ item.sku.sku_code }}</span>
+            <span>{{ item.subtotal }} {{ order.currency }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="card-footer d-flex justify-content-between fw-bold">
+          <span>{% trans "Total" %}</span>
+          <span>{{ order.total_amount }} {{ order.currency }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header">{% trans "Status" %}</div>
+        <div class="card-body">
+          <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+          {% if order.estimated_delivery_days %}
+            <p class="mt-2 mb-0 small text-muted">
+              {% trans "Estimated delivery" %}: {{ order.estimated_delivery_days }} {% trans "days" %}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header">{% trans "Shipping address" %}</div>
+        <div class="card-body small">
+          {{ order.shipping_first_name }} {{ order.shipping_last_name }}<br>
+          {{ order.shipping_address1 }}<br>
+          {% if order.shipping_address2 %}{{ order.shipping_address2 }}<br>{% endif %}
+          {{ order.shipping_postal_code }} {{ order.shipping_city }}<br>
+          {{ order.shipping_country }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
