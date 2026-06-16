@@ -50,14 +50,6 @@ def dashboard_view(request):
 
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
-def orders_view(request):
-    """List all orders belonging to the logged-in customer."""
-    orders = get_customer_orders(request.user)
-    return render(request, "customer_area/orders.html", {"orders": orders})
-
-
-@login_required(login_url="accounts:login")
-@require_http_methods(["GET"])
 def order_detail_view(request, order_id):
     """
     Show one order. Redirect if the order does not belong to the customer
