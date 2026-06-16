@@ -20,4 +20,9 @@ urlpatterns = [
     path("orders/", views.orders_view, name="orders"),
     path("orders/<int:order_id>/", views.order_detail_view, name="order_detail"),
     path("profile/", views.profile_view, name="profile"),
+    # Addresses
+    path("addresses/", views.addresses_view, name="addresses"),
+    path("addresses/new/", views.address_create_view, name="address_create"),
+    path("addresses/<uuid:address_id>/edit/", views.address_edit_view, name="address_edit"),
+    path("addresses/<uuid:address_id>/delete/", views.address_delete_view, name="address_delete"),
 ]
