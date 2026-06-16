@@ -36,6 +36,9 @@
     <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action text-danger">
       🚪 {% trans "Log out" %}
     </a>
+    <a href="{% url 'customer_area:addresses' %}" class="list-group-item list-group-item-action">
+      📍 {% trans "My addresses" %}
+    </a>
   </div>
 </div>
 {% endblock %}

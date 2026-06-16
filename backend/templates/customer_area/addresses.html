@@ -1,0 +1,45 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My addresses" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+  <a href="{% url 'customer_area:dashboard' %}" class="btn btn-link mb-3">← {% trans "Back to my account" %}</a>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">{% trans "My addresses" %}</h1>
+    <a href="{% url 'customer_area:address_create' %}" class="btn btn-primary">+ {% trans "Add address" %}</a>
+  </div>
+
+  {% if addresses %}
+    <div class="row g-3">
+      {% for address in addresses %}
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h6 class="card-title">
+              {{ address.label|default:address.city }}
+              {% if address.is_default %}<span class="badge bg-success">{% trans "Default" %}</span>{% endif %}
+            </h6>
+            <p class="card-text small mb-2">
+              {{ address.full_name }}<br>
+              {{ address.line1 }}<br>
+              {% if address.line2 %}{{ address.line2 }}<br>{% endif %}
+              {{ address.postal_code }} {{ address.city }}<br>
+              {{ address.country }}
+            </p>
+            <a href="{% url 'customer_area:address_edit' address.id %}" class="btn btn-sm btn-outline-secondary">{% trans "Edit" %}</a>
+            <form method="post" action="{% url 'customer_area:address_delete' address.id %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">{% trans "You have no saved addresses yet." %}</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -86,3 +86,26 @@ def sample_admin(db):
     admin.set_password("adminpassword123")
     admin.save()
     return admin
+
+@pytest.fixture
+def customer_factory(db):
+    """
+    Factory fixture: create customers on demand with a known password.
+
+    Usage in a test:
+        def test_x(self, customer_factory):
+            alice = customer_factory(email="alice@test.com")
+            bob = customer_factory(email="bob@test.com")
+    """
+    from apps.accounts.models import Customer
+
+    def _make(email="factory@test.com", password="StrongP@ss123!", **kwargs):
+        return Customer.objects.create_user(
+            email=email,
+            password=password,
+            first_name=kwargs.pop("first_name", "Test"),
+            last_name=kwargs.pop("last_name", "User"),
+            **kwargs,
+        )
+
+    return _make

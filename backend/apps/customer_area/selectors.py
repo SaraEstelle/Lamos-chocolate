@@ -54,3 +54,36 @@ def get_customer_dashboard_stats(customer):
         "total_orders": orders.count(),
         "pending_orders": orders.filter(status="pending").count(),
     }
+def get_customer_addresses(customer):
+    """Return all saved addresses for a customer (default first)."""
+    from apps.customer_area.models import CustomerAddress
+    return CustomerAddress.objects.filter(customer=customer)
+
+
+def get_default_address(customer):
+    """Return the customer's default address, or None."""
+    from apps.customer_area.models import CustomerAddress
+    return (
+        CustomerAddress.objects
+        .filter(customer=customer, is_default=True)
+        .first()
+    )
+
+
+def get_filtered_customer_orders(customer, status=None):
+    """
+    Return the customer's orders, optionally filtered by status.
+
+    Reuses the base scoped query and adds an optional status filter.
+    """
+    from apps.checkout.models import Order
+    qs = (
+        Order.objects
+        .filter(customer=customer)
+        .select_related("shipping_zone", "payment")
+        .prefetch_related("items__sku")
+        .order_by("-created_at")
+    )
+    if status:
+        qs = qs.filter(status=status)
+    return qs

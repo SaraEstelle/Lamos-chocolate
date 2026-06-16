@@ -18,12 +18,21 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
+from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator
 
 from apps.accounts.forms import ProfileForm
 from apps.customer_area.selectors import (
     get_customer_dashboard_stats,
     get_customer_order_or_none,
     get_customer_orders,
+)
+
+from apps.customer_area.forms import AddressForm
+from apps.customer_area.models import CustomerAddress
+from apps.customer_area.selectors import (
+    get_customer_addresses,
+    get_filtered_customer_orders,
 )
 
 
@@ -37,14 +46,6 @@ def dashboard_view(request):
         "stats": stats,
     }
     return render(request, "customer_area/dashboard.html", context)
-
-
-@login_required(login_url="accounts:login")
-@require_http_methods(["GET"])
-def orders_view(request):
-    """List all orders belonging to the logged-in customer."""
-    orders = get_customer_orders(request.user)
-    return render(request, "customer_area/orders.html", {"orders": orders})
 
 
 @login_required(login_url="accounts:login")
@@ -75,3 +76,75 @@ def profile_view(request):
     else:
         form = ProfileForm(instance=request.user)
     return render(request, "customer_area/profile.html", {"form": form})
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def orders_view(request):
+    """List the customer's orders with optional status filter + pagination."""
+    status = request.GET.get("status") or None
+    orders_qs = get_filtered_customer_orders(request.user, status=status)
+
+    paginator = Paginator(orders_qs, 10)  # 10 orders per page
+    page = paginator.get_page(request.GET.get("page"))
+
+    context = {
+        "orders": page,
+        "current_status": status,
+    }
+    return render(request, "customer_area/orders.html", context)
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def addresses_view(request):
+    """List the customer's saved addresses."""
+    addresses = get_customer_addresses(request.user)
+    return render(request, "customer_area/addresses.html", {"addresses": addresses})
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def address_create_view(request):
+    """Create a new saved address."""
+    if request.method == "POST":
+        form = AddressForm(data=request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.customer = request.user
+            address.save()
+            messages.success(request, _("Address saved."))
+            return redirect("customer_area:addresses")
+    else:
+        form = AddressForm()
+    return render(request, "customer_area/address_form.html", {"form": form})
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def address_edit_view(request, address_id):
+    """Edit an existing address (scoped to the customer)."""
+    address = get_object_or_404(
+        CustomerAddress, id=address_id, customer=request.user
+    )
+    if request.method == "POST":
+        form = AddressForm(data=request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Address updated."))
+            return redirect("customer_area:addresses")
+    else:
+        form = AddressForm(instance=address)
+    return render(request, "customer_area/address_form.html", {"form": form})
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["POST"])
+def address_delete_view(request, address_id):
+    """Delete an address (scoped to the customer)."""
+    address = get_object_or_404(
+        CustomerAddress, id=address_id, customer=request.user
+    )
+    address.delete()
+    messages.success(request, _("Address deleted."))
+    return redirect("customer_area:addresses")

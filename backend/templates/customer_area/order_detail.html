@@ -31,7 +31,19 @@
 
     <div class="col-md-4">
       <div class="card shadow-sm mb-3">
-        <div class="card-header">{% trans "Status" %}</div>
+        <div class="card-header">{% trans "Status" %}
+            <!-- Status timeline -->
+            <div class="mt-3">
+            {% with status_order="pending paid processing shipped delivered" %}
+            <ol class="list-unstyled small">
+                <li>{% if order.status == 'pending' %}🔵{% else %}✅{% endif %} {% trans "Pending" %}</li>
+                <li>{% if order.status in 'paid,processing,shipped,delivered' %}✅{% else %}⚪{% endif %} {% trans "Paid" %}</li>
+                <li>{% if order.status in 'shipped,delivered' %}✅{% else %}⚪{% endif %} {% trans "Shipped" %}</li>
+                <li>{% if order.status == 'delivered' %}✅{% else %}⚪{% endif %} {% trans "Delivered" %}</li>
+            </ol>
+            {% endwith %}
+            </div>
+        </div>
         <div class="card-body">
           <span class="badge bg-secondary">{{ order.get_status_display }}</span>
           {% if order.estimated_delivery_days %}
