@@ -1,0 +1,65 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Your cart" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<h1>{% trans "Your cart" %}</h1>
+
+{% if cart_items %}
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>{% trans "Product" %}</th>
+        <th>{% trans "Format" %}</th>
+        <th>{% trans "Unit price" %}</th>
+        <th>{% trans "Quantity" %}</th>
+        <th>{% trans "Subtotal" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart_items %}
+        <tr data-sku-id="{{ item.sku.id }}">
+          <td>{{ item.display_name }}</td>
+          <td>{{ item.sku.format }}</td>
+          <td>{{ item.unit_price }} {{ item.sku.currency }}</td>
+          <td>
+            <form action="{% url 'cart:update' %}" method="post" class="d-flex gap-1">
+              {% csrf_token %}
+              <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
+              <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
+                     class="form-control form-control-sm" style="width: 72px;">
+              <button type="submit" class="btn btn-outline-dark btn-sm">
+                {% trans "Update" %}
+              </button>
+            </form>
+          </td>
+          <td>{{ item.subtotal }} {{ item.sku.currency }}</td>
+          <td>
+            <form action="{% url 'cart:remove' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
+              <button type="submit" class="btn btn-link btn-sm text-danger p-0">
+                {% trans "Remove" %}
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="fs-5">
+    <strong>{% trans "Total" %}:</strong>
+    {{ cart_total }} ({{ cart_count }} {% trans "item(s)" %})
+  </p>
+
+  <a href="{% url 'shop:catalog' %}" class="btn btn-outline-dark">
+    {% trans "Continue shopping" %}
+  </a>
+{% else %}
+  <p>{% trans "Your cart is empty." %}</p>
+  <a href="{% url 'shop:catalog' %}" class="btn btn-dark">{% trans "Browse the shop" %}</a>
+{% endif %}
+{% endblock %}
