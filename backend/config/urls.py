@@ -13,7 +13,7 @@ Responsabilités :
 Structure des URLs :
 - /fr/shop/              → Routes en français
 - /en/shop/             → Routes en anglais
-- /api/cart/add/        → AJAX (pas de langue)
+- /fr/cart/add/         → Panier, préfixé i18n (double mode form POST / AJAX)
 - /checkout/webhook/    → Stripe webhook (pas de langue)
 - /admin/               → Django Admin (pas de langue)
 

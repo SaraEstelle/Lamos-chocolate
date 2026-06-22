@@ -15,6 +15,8 @@ Session layout::
 from dataclasses import dataclass
 from decimal import Decimal
 
+from django.utils.translation import get_language
+
 from apps.shop.models import SKU
 
 CART_SESSION_KEY = "cart"
@@ -26,6 +28,11 @@ class CartItem:
 
     sku: SKU
     quantity: int
+
+    @property
+    def display_name(self) -> str:
+        """Product name in the request's active language (falls back to French)."""
+        return self.sku.product.get_name(get_language() or "fr")
 
     @property
     def unit_price(self) -> Decimal:

@@ -21,7 +21,7 @@
     <tbody>
       {% for item in cart_items %}
         <tr data-sku-id="{{ item.sku.id }}">
-          <td>{{ item.sku.product.get_name }}</td>
+          <td>{{ item.display_name }}</td>
           <td>{{ item.sku.format }}</td>
           <td>{{ item.unit_price }} {{ item.sku.currency }}</td>
           <td>
