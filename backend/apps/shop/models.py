@@ -164,7 +164,7 @@ class Stock(models.Model):
     )
     quantity = models.PositiveIntegerField(default=0)
     threshold_alert = models.PositiveIntegerField(default=5)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     updated_by = models.ForeignKey(
         "backoffice.AdminUser",
         on_delete=models.SET_NULL,
