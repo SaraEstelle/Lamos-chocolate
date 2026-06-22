@@ -12,6 +12,7 @@ from apps.common.constants import (
     PaymentStatusChoices,
 )
 
+from apps.common.constants import ChannelChoices
 
 class Order(models.Model):
     customer = models.ForeignKey(
@@ -56,6 +57,17 @@ class Order(models.Model):
     estimated_delivery_days = models.PositiveIntegerField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    channel = models.CharField(
+        max_length=3,
+        choices=ChannelChoices.choices,
+        default=ChannelChoices.B2C,
+        help_text="Sales channel (b2c/b2b) for cockpit splitting",
+    )
+    campaign_period = models.CharField(
+        max_length=50, blank=True, default="",
+        help_text="Seasonal campaign (e.g. Noel, Saint-Valentin) for seasonality KPI",
+    )
 
     class Meta:
         db_table = "orders"

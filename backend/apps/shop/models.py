@@ -110,6 +110,21 @@ class SKU(models.Model):
     batch_size = models.PositiveIntegerField(default=50)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    cost_chf = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Production cost in CHF (for margin KPI)",
+    )
+    flavor = models.CharField(
+        max_length=100, blank=True, default="",
+        help_text="Flavor variant (e.g. pistache, coffee, caramel)",
+    )
+
+    @property
+    def margin(self):
+        """Return the margin ratio (price - cost) / price, or None."""
+        if self.cost_chf and self.price:
+            return float((self.price - self.cost_chf) / self.price)
+        return None
     class Meta:
         db_table = "skus"
         verbose_name = "SKU"
