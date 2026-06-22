@@ -1,37 +1,12 @@
 [
-  {
-    "model": "shop.stock",
-    "pk": 1,
-    "fields": { "sku": 1, "quantity": 120, "threshold_alert": 20, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 2,
-    "fields": { "sku": 2, "quantity": 200, "threshold_alert": 30, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 3,
-    "fields": { "sku": 3, "quantity": 4, "threshold_alert": 25, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 4,
-    "fields": { "sku": 4, "quantity": 80, "threshold_alert": 20, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 5,
-    "fields": { "sku": 5, "quantity": 45, "threshold_alert": 15, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 6,
-    "fields": { "sku": 6, "quantity": 0, "threshold_alert": 10, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  },
-  {
-    "model": "shop.stock",
-    "pk": 7,
-    "fields": { "sku": 7, "quantity": 18, "threshold_alert": 10, "updated_by": null, "updated_at": "2026-01-01T00:00:00Z" }
-  }
+  {"model": "shop.stock", "pk": 1, "fields": {"sku": 1, "quantity": 320, "threshold_alert": 50}},
+  {"model": "shop.stock", "pk": 2, "fields": {"sku": 2, "quantity": 280, "threshold_alert": 50}},
+  {"model": "shop.stock", "pk": 3, "fields": {"sku": 3, "quantity": 120, "threshold_alert": 40}},
+  {"model": "shop.stock", "pk": 4, "fields": {"sku": 4, "quantity": 90, "threshold_alert": 40}},
+  {"model": "shop.stock", "pk": 5, "fields": {"sku": 5, "quantity": 60, "threshold_alert": 30}},
+  {"model": "shop.stock", "pk": 6, "fields": {"sku": 6, "quantity": 55, "threshold_alert": 30}},
+  {"model": "shop.stock", "pk": 7, "fields": {"sku": 7, "quantity": 25, "threshold_alert": 30}},
+  {"model": "shop.stock", "pk": 8, "fields": {"sku": 8, "quantity": 48, "threshold_alert": 30}},
+  {"model": "shop.stock", "pk": 9, "fields": {"sku": 9, "quantity": 600, "threshold_alert": 100}},
+  {"model": "shop.stock", "pk": 10, "fields": {"sku": 10, "quantity": 580, "threshold_alert": 100}}
 ]

@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0012_alter_user_first_name_max_length'),
+    ('auth', '0012_alter_user_first_name_max_length'),
+    ('contenttypes', '0002_remove_content_type_name'),
     ]
 
     operations = [
@@ -109,7 +110,7 @@ class Migration(migrations.Migration):
 
                 # Permissions
                 ('groups', models.ManyToManyField(
-                    to='auth.group',
+                    to='auth.Group',
                     related_name='user_set',
                     related_query_name='user',
                     blank=True,
@@ -117,7 +118,7 @@ class Migration(migrations.Migration):
                     help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.'
                 )),
                 ('user_permissions', models.ManyToManyField(
-                    to='auth.permission',
+                    to='auth.Permission',
                     related_name='user_set',
                     related_query_name='user',
                     blank=True,
