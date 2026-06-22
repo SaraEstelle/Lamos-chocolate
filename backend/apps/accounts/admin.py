@@ -9,7 +9,7 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 
 from .models import Customer, PasswordResetToken
-
+from apps.accounts.models import B2BAccount  # add near the other imports
 
 @admin.register(Customer)
 class CustomerAdmin(BaseUserAdmin):
@@ -62,6 +62,12 @@ class CustomerAdmin(BaseUserAdmin):
             "fields": ("created_at", "updated_at", "last_login"),
             "classes": ("collapse",),
         }),
+        (_("Segmentation & KPI"), {
+            "fields": ("customer_type", "npa", "canton", "source_acquisition"),
+        }),
+        (_("Consent (nLPD)"), {
+            "fields": ("consent_nlpd", "consent_nlpd_at"),
+        }),
     )
 
     add_fieldsets = (
@@ -89,3 +95,9 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
+@admin.register(B2BAccount)
+class B2BAccountAdmin(admin.ModelAdmin):
+    list_display = ("company_name", "segment", "status", "client_number")
+    list_filter = ("segment", "status")
+    search_fields = ("company_name", "client_number")

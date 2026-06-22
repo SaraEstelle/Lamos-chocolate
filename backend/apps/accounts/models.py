@@ -22,7 +22,8 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.utils.translation import gettext_lazy as _
-
+from apps.common.constants import CustomerTypeChoices, SwissCantonChoices
+from apps.common.constants import B2BSegmentChoices, B2BAccountStatusChoices
 
 class CustomerManager(BaseUserManager):
     """
@@ -131,6 +132,35 @@ class Customer(AbstractBaseUser, PermissionsMixin):
             ('it-ch', 'Italiano (Svizzera)'),
         ],
         help_text="Langue préférée du client"
+    )
+
+    # --- Strategic fields for KPIs and the executive cockpit ---
+    customer_type = models.CharField(
+        max_length=20,
+        choices=CustomerTypeChoices.choices,
+        default=CustomerTypeChoices.B2C,
+        help_text="Segment used across KPIs (B2C / B2B distributor / B2B hospitality)",
+    )
+    npa = models.CharField(
+        max_length=10, blank=True, default="",
+        help_text="Swiss postal code (NPA)",
+    )
+    canton = models.CharField(
+        max_length=2, blank=True, default="",
+        choices=SwissCantonChoices.choices,
+        help_text="Swiss canton (for the sales heatmap)",
+    )
+    source_acquisition = models.CharField(
+        max_length=100, blank=True, default="",
+        help_text="Acquisition source (utm_source or similar)",
+    )
+    consent_nlpd = models.BooleanField(
+        default=False,
+        help_text="Swiss nLPD data-processing consent",
+    )
+    consent_nlpd_at = models.DateTimeField(
+        null=True, blank=True,
+        help_text="When nLPD consent was given",
     )
 
     # Statut
@@ -259,3 +289,39 @@ class PasswordResetToken(models.Model):
             return False
 
         return True
+
+class B2BAccount(models.Model):
+    """
+    Professional account details, one-to-one with a B2B Customer.
+
+    Holds the commercial information used by the B2B portal and the cockpit
+    pipeline (segment, price list, lifecycle status).
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer = models.OneToOneField(
+        "accounts.Customer",
+        on_delete=models.CASCADE,
+        related_name="b2b_account",   # access via customer.b2b_account
+    )
+    company_name = models.CharField(max_length=200)
+    client_number = models.CharField(max_length=50, blank=True, default="")
+    segment = models.CharField(
+        max_length=20,
+        choices=B2BSegmentChoices.choices,
+        default=B2BSegmentChoices.DISTRIBUTOR,
+    )
+    payment_terms = models.CharField(max_length=100, blank=True, default="")
+    status = models.CharField(
+        max_length=20,
+        choices=B2BAccountStatusChoices.choices,
+        default=B2BAccountStatusChoices.PROSPECT,
+    )
+    onboarded_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "b2b_accounts"
+
+    def __str__(self):
+        return f"{self.company_name} ({self.get_segment_display()})"

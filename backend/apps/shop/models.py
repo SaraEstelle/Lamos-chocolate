@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from apps.common.constants import CurrencyChoices
-
+from decimal import Decimal
 
 class Category(models.Model):
     name_fr = models.CharField(max_length=100)
@@ -109,6 +109,26 @@ class SKU(models.Model):
     production_delay_days = models.PositiveIntegerField(default=7)
     batch_size = models.PositiveIntegerField(default=50)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    cost_chf = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Production cost in CHF (for margin KPI)",
+    )
+    flavor = models.CharField(
+        max_length=100, blank=True, default="",
+        help_text="Flavor variant (e.g. pistache, coffee, caramel)",
+    )
+
+    @property
+    def margin(self):
+        """Return the margin ratio (price - cost) / price, or None."""
+        if self.cost_chf is None or self.price is None:
+            return None
+
+        price = Decimal(self.price)
+        cost = Decimal(self.cost_chf)
+
+        return float((price - cost) / price)
 
     class Meta:
         db_table = "skus"
