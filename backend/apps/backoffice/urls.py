@@ -21,6 +21,7 @@ urlpatterns = [
     path("orders/", views.orders_list_view, name="orders"),
     path("orders/<int:order_id>/status/", views.order_update_status_view, name="order_status"),
     path("stock/", views.stock_view, name="stock"),
+    path("forecasting/", views.forecasting_view, name="forecasting"),
     path("b2b/", views.b2b_requests_view, name="b2b_requests"),
     path("b2b/<int:request_id>/status/", views.b2b_update_status_view, name="b2b_status"),
 ]

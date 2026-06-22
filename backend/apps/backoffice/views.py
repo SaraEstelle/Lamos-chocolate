@@ -20,6 +20,7 @@ from apps.backoffice.dashboards import (
     get_top_products,
 )
 from apps.checkout.models import Order
+from apps.forecasting.services import get_production_estimates, get_stockout_risks
 
 
 @staff_member_required
@@ -84,6 +85,17 @@ def b2b_requests_view(request):
         "requests": requests_qs,
         "current_status": status,
     })
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def forecasting_view(request):
+    """Forecasting dashboard: production delays + stockout risks."""
+    context = {
+        "production": get_production_estimates(),
+        "stockout_risks": get_stockout_risks(),
+    }
+    return render(request, "backoffice/forecasting.html", context)
 
 
 @staff_member_required

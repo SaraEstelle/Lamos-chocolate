@@ -26,6 +26,7 @@
   <div class="row g-3 mb-4">
     <div class="col-md-4"><a href="{% url 'backoffice:orders' %}" class="btn btn-outline-dark w-100">📦 {% trans "Manage orders" %} ({{ kpis.pending_orders }} {% trans "pending" %})</a></div>
     <div class="col-md-4"><a href="{% url 'backoffice:stock' %}" class="btn btn-outline-dark w-100">📊 {% trans "Stock" %}</a></div>
+    <div class="col-md-4"><a href="{% url 'backoffice:forecasting' %}" class="btn btn-outline-dark w-100">📈 {% trans "Forecasting" %}</a></div>
     <div class="col-md-4"><a href="{% url 'backoffice:b2b_requests' %}" class="btn btn-outline-dark w-100">🏢 {% trans "B2B requests" %} ({{ kpis.new_b2b_count }} {% trans "new" %})</a></div>
   </div>
 
