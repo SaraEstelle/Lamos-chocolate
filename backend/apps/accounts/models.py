@@ -290,13 +290,13 @@ class PasswordResetToken(models.Model):
 
         return True
 
-    class B2BAccount(models.Model):
-        """
-        Professional account details, one-to-one with a B2B Customer.
+class B2BAccount(models.Model):
+    """
+    Professional account details, one-to-one with a B2B Customer.
 
-        Holds the commercial information used by the B2B portal and the cockpit
-        pipeline (segment, price list, lifecycle status).
-        """
+    Holds the commercial information used by the B2B portal and the cockpit
+    pipeline (segment, price list, lifecycle status).
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     customer = models.OneToOneField(

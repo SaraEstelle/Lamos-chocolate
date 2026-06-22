@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from apps.common.constants import CurrencyChoices
-
+from decimal import Decimal
 
 class Category(models.Model):
     name_fr = models.CharField(max_length=100)
@@ -122,9 +122,14 @@ class SKU(models.Model):
     @property
     def margin(self):
         """Return the margin ratio (price - cost) / price, or None."""
-        if self.cost_chf and self.price:
-            return float((self.price - self.cost_chf) / self.price)
-        return None
+        if self.cost_chf is None or self.price is None:
+            return None
+
+        price = Decimal(self.price)
+        cost = Decimal(self.cost_chf)
+
+        return float((price - cost) / price)
+
     class Meta:
         db_table = "skus"
         verbose_name = "SKU"
