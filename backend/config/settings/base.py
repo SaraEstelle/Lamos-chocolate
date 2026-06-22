@@ -32,6 +32,7 @@ LOCAL_APPS = [
     "apps.b2b",
     "apps.backoffice",
     "apps.forecasting",
+    "apps.analytics",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
