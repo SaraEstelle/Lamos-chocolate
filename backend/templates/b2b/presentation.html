@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Professionals — Corporate Gifting" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width: 920px;">
+  <section class="text-center mb-5">
+    <h1 class="display-5 fw-bold">{% trans "Corporate Gifting & B2B" %}</h1>
+    <p class="lead text-muted">{% trans "Premium Swiss chocolate, fully customisable for hotels, private banks, watchmakers and corporate gifts." %}</p>
+    <a href="{% url 'b2b:request' %}" class="btn btn-primary btn-lg mt-2">{% trans "Request a quote" %}</a>
+    {% if user.is_authenticated and user.b2b_account %}
+      <a href="{% url 'b2b:portal' %}" class="btn btn-outline-dark btn-lg mt-2">{% trans "Pro space" %}</a>
+    {% endif %}
+  </section>
+  <section class="mb-5">
+    <h2 class="h4 mb-3">{% trans "4 axes of personalisation" %}</h2>
+    <div class="row g-3">
+      <div class="col-md-6"><div class="border rounded p-3 h-100"><strong>{% trans "Logo engraved on the chocolate" %}</strong></div></div>
+      <div class="col-md-6"><div class="border rounded p-3 h-100"><strong>{% trans "Inner packaging" %}</strong></div></div>
+      <div class="col-md-6"><div class="border rounded p-3 h-100"><strong>{% trans "Outer packaging" %}</strong></div></div>
+      <div class="col-md-6"><div class="border rounded p-3 h-100"><strong>{% trans "Weight / format" %}</strong></div></div>
+    </div>
+  </section>
+  <section class="text-center">
+    <a href="{% url 'b2b:request' %}" class="btn btn-outline-dark btn-lg">{% trans "Tell us about your project" %}</a>
+  </section>
+</div>
+{% endblock %}

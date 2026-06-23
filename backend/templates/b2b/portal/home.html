@@ -1,0 +1,22 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Pro space" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width: 960px;">
+  <h1 class="mb-1">{% trans "Welcome" %}, {{ account.company_name }}</h1>
+  <p class="text-muted mb-4">{% trans "Your professional space" %} — {{ account.get_segment_display }}</p>
+  <div class="d-flex gap-2 mb-4">
+    <a href="{% url 'b2b:catalogue' %}" class="btn btn-primary">{% trans "Pro catalogue" %}</a>
+    <a href="{% url 'b2b:configurator' %}" class="btn btn-outline-dark">{% trans "Configurator" %}</a>
+    <a href="{% url 'b2b:history' %}" class="btn btn-outline-dark">{% trans "Order history" %}</a>
+  </div>
+  <h2 class="h5">{% trans "Recent orders" %}</h2>
+  {% if orders %}
+    <ul class="list-group">
+      {% for o in orders %}<li class="list-group-item d-flex justify-content-between">
+        <span>{{ o.order_number }}</span><span>{{ o.total_amount }} {{ o.currency }}</span>
+      </li>{% endfor %}
+    </ul>
+  {% else %}<p class="text-muted">{% trans "No order yet." %}</p>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Request sent" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5 text-center" style="max-width: 640px;">
+  <h1 class="mb-3">{% trans "Request sent" %}</h1>
+  <p class="lead">{% trans "Thank you! We'll get back to you shortly." %}</p>
+  <a href="/" class="btn btn-outline-dark mt-3">{% trans "Back to home" %}</a>
+</div>
+{% endblock %}

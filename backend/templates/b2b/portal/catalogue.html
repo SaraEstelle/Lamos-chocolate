@@ -1,0 +1,35 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Pro catalogue" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width: 960px;">
+  <h1 class="mb-4">{% trans "Pro catalogue" %}</h1>
+  <table class="table align-middle">
+    <thead><tr>
+      <th>{% trans "Product" %}</th><th>{% trans "Format" %}</th>
+      <th>{% trans "Pro price" %}</th><th>{% trans "MOQ" %}</th>
+      <th>{% trans "Stock" %}</th><th></th>
+    </tr></thead>
+    <tbody>
+    {% for info in catalogue %}
+      <tr>
+        <td>{{ info.sku.product.name_fr }}
+          {% if info.availability_status == "new" %}<span class="badge bg-success">{% trans "New" %}</span>{% endif %}
+          {% if info.availability_status == "coming_soon" %}<span class="badge bg-secondary">{% trans "Coming soon" %}</span>{% endif %}
+        </td>
+        <td>{{ info.sku.format }}</td>
+        <td>{{ info.effective_price }} CHF</td>
+        <td>{{ info.moq }}</td>
+        <td>
+          {{ info.sku.stock.quantity }}
+          {% if info.sku.stock.is_low %}<span class="badge bg-warning text-dark">{% trans "Low" %}</span>{% endif %}
+        </td>
+        <td><a href="{% url 'b2b:configurator' %}" class="btn btn-sm btn-outline-primary">{% trans "Configure" %}</a></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="text-muted">{% trans "No product available." %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
