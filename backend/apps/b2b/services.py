@@ -12,6 +12,8 @@ from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
+from decimal import Decimal
+from apps.b2b.models import DEFAULT_B2B_MOQ, QuoteSimulation
 
 from apps.analytics.services import track_event
 
@@ -86,3 +88,52 @@ def create_b2b_request(form, *, request):
     track_event("b2b_request_submitted", channel="b2b",
                 company=b2b_request.company_name)
     return b2b_request
+
+def simulate_quote(account, *, sku, quantity):
+    """
+    Compute the estimated value + MOQ status for one configured SKU and persist
+    a QuoteSimulation (this is what the "% simulations >= MOQ" KPI counts).
+
+    Returns a dict with the numbers the template needs.
+    """
+    info = getattr(sku, "b2b_info", None)
+    moq = info.moq if info else DEFAULT_B2B_MOQ
+    unit_price = info.effective_price if info else sku.price
+    estimated = Decimal(unit_price) * quantity
+    moq_reached = quantity >= moq
+    lines = [{"sku": sku.sku_code, "qty": quantity, "price": str(unit_price)}]
+
+    sim = QuoteSimulation.objects.create(
+        account=account, cart_json=lines,
+        estimated_value=estimated, moq_reached=moq_reached,
+    )
+    return {
+        "sim": sim, "moq": moq, "moq_reached": moq_reached,
+        "unit_price": unit_price, "estimated": estimated,
+    }
+
+
+def notify_quote_request(account, customization, estimated):
+    """Email the sales team that a pro requested a formal quote. Never raises."""
+    try:
+        send_mail(
+            subject=f"B2B quote requested —{account.company_name}",
+            message=(
+                f"Account:{account.company_name}\n"
+                f"SKU:{customization.sku.sku_code}\n"
+                f"Quantity:{customization.quantity}\n"
+                f"Logo engraved:{customization.logo_engraved}\n"
+                f"Inner packaging:{customization.inner_packaging}\n"
+                f"Outer packaging:{customization.outer_packaging}\n"
+                f"Grammage:{customization.grammage}\n"
+                f"Estimated value:{estimated} CHF\n"
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.DEFAULT_FROM_EMAIL],
+            fail_silently=True,
+        )
+        return True
+    except Exception:  # noqa: BLE001
+        logger.exception("Failed to send B2B quote-request email")
+        return False
+

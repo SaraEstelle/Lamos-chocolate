@@ -17,6 +17,10 @@ from apps.b2b.forms import B2BRequestForm
 from apps.b2b.selectors import has_recent_duplicate
 from apps.b2b.services import create_b2b_request, get_client_ip, is_rate_limited
 
+from apps.b2b.models import QuoteSimulation
+from apps.b2b.selectors import get_b2b_orders, get_pro_catalogue
+from apps.b2b.services import notify_quote_request, simulate_quote
+from apps.checkout.models import Order
 
 # ----------------------------------------------------------------------------
 # L0 — Public funnel (no login)
@@ -57,3 +61,71 @@ def request_form_view(request):
 def success_view(request):
     """Confirmation page after submission."""
     return render(request, "b2b/success.html")
+
+
+# ----------------------------------------------------------------------------
+# L1 — Pro space (login + B2BAccount required)
+# ----------------------------------------------------------------------------
+@b2b_account_required
+@require_http_methods(["GET"])
+def portal_home_view(request):
+    """Pro portal home: greeting + a few recent orders + catalogue preview."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/home.html", {
+        "account": account,
+        "catalogue": get_pro_catalogue()[:6],
+        "orders": get_b2b_orders(account, limit=5),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def portal_catalogue_view(request):
+    """Pro catalogue with real-time stock per SKU."""
+    account = request.b2b_account
+    # The pro consulted live stock → track it (feeds B2B engagement KPIs).
+    track_event("b2b_stock_viewed", customer=request.user, channel="b2b",
+                account=str(account.id))
+    return render(request, "b2b/portal/catalogue.html", {
+        "account": account, "catalogue": get_pro_catalogue(),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def portal_history_view(request):
+    """Pro order history (scoped to the account owner)."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/history.html", {
+        "account": account, "orders": get_b2b_orders(account),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["POST"])
+def reorder_view(request, order_id):
+    """
+    1-click reorder: build a draft quote from a past B2B order.
+
+    Decoupled from the cart (still in progress): a prior order is, by definition,
+    above MOQ, so we create a ready-to-confirm QuoteSimulation and let sales
+    validate pricing (matches the PRD's human-validated B2B flow).
+    """
+    account = request.b2b_account
+    # Order.id is a BigAutoField (int). Scope to the owner to prevent IDOR.
+    order = get_object_or_404(
+        Order, id=order_id, customer=account.customer, channel="b2b",
+    )
+    lines = [
+        {"sku": it.sku.sku_code, "qty": it.quantity, "price": str(it.unit_price)}
+        for it in order.items.all()
+    ]
+    estimated = sum(Decimal(line["price"]) * line["qty"] for line in lines)
+    QuoteSimulation.objects.create(
+        account=account, cart_json=lines, estimated_value=estimated, moq_reached=True,
+    )
+    track_event("reorder_clicked", customer=request.user, channel="b2b",
+                order_id=order.order_number, value_chf=estimated)
+    messages.success(request, _("Reorder prepared. Our team will confirm pricing."))
+    return redirect("b2b:history")
+
