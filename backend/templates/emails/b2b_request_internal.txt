@@ -1,0 +1,13 @@
+{% load i18n %}{% autoescape off %}New B2B request
+
+Company:   {{ req.company_name }}
+Contact:   {{ req.contact_name }} <{{ req.contact_email }}>
+Phone:     {{ req.contact_phone }}
+Sector:    {{ req.sector }}
+Est. qty:  {{ req.estimated_qty }}
+Occasion:  {{ req.occasion }}
+Marketing opt-in: {% if wants_marketing %}YES{% else %}no{% endif %}
+
+Message:
+{{ req.message }}
+{% endautoescape %}

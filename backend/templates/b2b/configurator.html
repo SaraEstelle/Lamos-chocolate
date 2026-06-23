@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Configurator" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width: 760px;">
+  <h1 class="mb-3">{% trans "Personalisation configurator" %}</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+      </div>
+    {% endfor %}
+    <div class="d-flex gap-2">
+      <button type="submit" name="action" value="simulate" class="btn btn-outline-primary">{% trans "Simulate" %}</button>
+      <button type="submit" name="action" value="request_quote" class="btn btn-primary">{% trans "Request a quote" %}</button>
+    </div>
+  </form>
+
+  {% if simulation %}
+    <div class="alert {% if simulation.moq_reached %}alert-success{% else %}alert-warning{% endif %} mt-4">
+      <p class="mb-1"><strong>{% trans "Estimated value" %}:</strong> {{ simulation.estimated }} CHF</p>
+      <p class="mb-1"><strong>{% trans "Unit price" %}:</strong> {{ simulation.unit_price }} CHF</p>
+      <p class="mb-0">
+        {% if simulation.moq_reached %}
+          ✅ {% trans "Minimum order quantity reached" %} ({% trans "MOQ" %} {{ simulation.moq }})
+        {% else %}
+          ⚠️ {% blocktrans with moq=simulation.moq %}Below the minimum order quantity (MOQ {{ moq }}){% endblocktrans %}
+        {% endif %}
+      </p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
