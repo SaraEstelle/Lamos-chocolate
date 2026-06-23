@@ -23,23 +23,52 @@ class B2BAvailabilityChoices(models.TextChoices):
 # Default minimum order quantity when a SKU has no explicit B2B MOQ.
 DEFAULT_B2B_MOQ = 24
 
-
+class B2BRequestStatusChoices(models.TextChoices):
+    """Lifecycle of a B2B lead, managed from the backoffice."""
+    NEW = "new", "Nouveau"
+    IN_PROGRESS = "in_progress", "En cours"
+    CONVERTED = "converted", "Converti"
+    REFUSED = "refused", "Refusé"
 # ============================================================
 # Existing model — B2BRequest (completed with consent fields)
 # ============================================================
 
 class B2BRequest(models.Model):
     """
-    Initial B2B contact request (lead). Already existed, now extended
-    with nLPD marketing consent fields.
+    Initial B2B contact request (a sales lead) sent from the public funnel.
+
+    Contact/qualification fields are filled by B2BRequestForm.
+    `ip_address`/`language` are set server-side (anti-abuse + i18n).
+    `status`/`processed_at` are managed by the staff backoffice.
     """
 
-    email = models.EmailField()
+    # --- Company & contact -------------------------------------------------
     company_name = models.CharField(max_length=120)
+    contact_name = models.CharField(max_length=120, blank=True, default="")
+    contact_email = models.EmailField()                     # was: "email"
+    contact_phone = models.CharField(max_length=40, blank=True, default="")
+
+    # --- Qualification of the lead ----------------------------------------
+    sector = models.CharField(max_length=120, blank=True, default="")
+    estimated_qty = models.PositiveIntegerField(null=True, blank=True)
+    occasion = models.CharField(max_length=120, blank=True, default="")
     message = models.TextField(blank=True, default="")
+
+    # --- Set server-side (never trust the client) -------------------------
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    language = models.CharField(max_length=5, blank=True, default="fr")
+
+    # --- Lead lifecycle (managed in the backoffice) -----------------------
+    status = models.CharField(
+        max_length=20,
+        choices=B2BRequestStatusChoices.choices,
+        default=B2BRequestStatusChoices.NEW,
+    )
+    processed_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # --- Marketing consent (nLPD): optional opt-in, stored with timestamp.
+    # --- Marketing consent (nLPD): optional opt-in, stored with a timestamp.
     wants_marketing = models.BooleanField(default=False)
     marketing_consent_at = models.DateTimeField(null=True, blank=True)
 
@@ -48,8 +77,7 @@ class B2BRequest(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"B2BRequest {self.email} ({self.company_name})"
-
+        return f"B2BRequest{self.contact_email} ({self.company_name})"
 
 # ============================================================
 # 4.1 — New models

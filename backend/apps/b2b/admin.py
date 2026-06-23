@@ -11,13 +11,15 @@ from .models import (
 class B2BRequestAdmin(admin.ModelAdmin):
     list_display = (
         "company_name",
-        "email",
+        "contact_name",     # now available
+        "contact_email",    # was "email"
+        "status",
         "created_at",
         "wants_marketing",
     )
-    list_filter = ("wants_marketing",)
-    search_fields = ("company_name", "email")
-    readonly_fields = ("ip_address","created_at", "marketing_consent_at")
+    list_filter = ("status", "wants_marketing",)
+    search_fields = ("company_name", "contact_email")   # was "email"
+    readonly_fields = ("ip_address", "created_at", "processed_at", "marketing_consent_at")
 
 @admin.register(B2BProductInfo)
 class B2BProductInfoAdmin(admin.ModelAdmin):
