@@ -1,39 +1,26 @@
 """
 apps/backoffice/urls.py
 =======================
-Routes de l'admin personnalisé (backoffice).
+Staff-only backoffice routes.
 
-Contenu :
-- Tableau de bord admin (dashboard)
-- Gestion produits (products)
-- Gestion stocks (stocks)
-- Gestion commandes (orders)
-- Gestion clients (customers)
-- Analytics et reports
+Difference with /admin/:
+- /admin/         → Django Admin (generic)
+- /backoffice/    → Custom staff dashboard (KPIs, orders, stock, B2B)
 
-Authentification : REQUISE (superuser/staff seulement)
-@login_required + @staff_member_required
-
-Différence avec /admin/ :
-- /admin/         → Interface Django Admin (générique)
-- /backoffice/    → Interface personnalisée (custom)
-
-Cette interface est réservée au personnel Lamos Chocolate.
+Access is restricted to staff users (is_staff=True) at the view level.
 """
 
 from django.urls import path
 
-# Nom de cette app
-app_name = 'backoffice'
+from . import views
 
-# Routes du backoffice (staff/superuser seulement)
+app_name = "backoffice"
+
 urlpatterns = [
-    # path('', views.dashboard_view, name='dashboard'),                         # Tableau de bord
-    # path('products/', views.products_view, name='products'),                 # Gestion produits
-    # path('products/create/', views.create_product_view, name='create_product'), # Créer produit
-    # path('products/<uuid:product_id>/edit/', views.edit_product_view, name='edit_product'), # Éditer
-    # path('stocks/', views.stocks_view, name='stocks'),                       # Gestion stocks
-    # path('orders/', views.orders_view, name='orders'),                       # Gestion commandes
-    # path('customers/', views.customers_view, name='customers'),             # Gestion clients
-    # path('analytics/', views.analytics_view, name='analytics'),             # Analytics
+    path("", views.dashboard_view, name="dashboard"),
+    path("orders/", views.orders_list_view, name="orders"),
+    path("orders/<int:order_id>/status/", views.order_update_status_view, name="order_status"),
+    path("stock/", views.stock_view, name="stock"),
+    path("b2b/", views.b2b_requests_view, name="b2b_requests"),
+    path("b2b/<int:request_id>/status/", views.b2b_update_status_view, name="b2b_status"),
 ]
