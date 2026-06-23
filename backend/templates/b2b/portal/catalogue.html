@@ -14,6 +14,7 @@
     {% for info in catalogue %}
       <tr>
         <td>{{ info.sku.product.name_fr }}
+          <div class="small text-muted">{{ info.sku.sku_code }}</div>
           {% if info.availability_status == "new" %}<span class="badge bg-success">{% trans "New" %}</span>{% endif %}
           {% if info.availability_status == "coming_soon" %}<span class="badge bg-secondary">{% trans "Coming soon" %}</span>{% endif %}
         </td>
