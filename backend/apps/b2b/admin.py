@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from .models import B2BRequest
 
 
@@ -7,11 +6,10 @@ from .models import B2BRequest
 class B2BRequestAdmin(admin.ModelAdmin):
     list_display = (
         "company_name",
-        "contact_email",
-        "status",
+        "email",
         "created_at",
-        "processed_by",
+        "wants_marketing",
     )
-    list_filter = ("status",)
-    search_fields = ("company_name", "contact_email", "contact_name")
-    readonly_fields = ("ip_address", "created_at")
+    list_filter = ("wants_marketing",)
+    search_fields = ("company_name", "email")
+    readonly_fields = ("created_at", "marketing_consent_at")
