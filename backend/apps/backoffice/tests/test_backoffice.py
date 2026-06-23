@@ -51,3 +51,16 @@ class TestOrderStatusUpdate:
         assert resp.status_code == 302
         order.refresh_from_db()
         assert order.status == "shipped"
+
+
+@pytest.mark.integration
+class TestForecastingView:
+    def test_forecasting_denied_for_non_staff(self, client, customer_factory):
+        client.force_login(customer_factory())
+        resp = client.get(reverse("backoffice:forecasting"))
+        assert resp.status_code in (302, 403)
+
+    def test_forecasting_ok_for_staff(self, client, staff_customer):
+        client.force_login(staff_customer)
+        resp = client.get(reverse("backoffice:forecasting"))
+        assert resp.status_code == 200
