@@ -13,6 +13,8 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.b2b.models import B2BRequest
 
+from apps.b2b.models import CustomizationRequest
+from apps.shop.models import SKU
 
 class B2BRequestForm(forms.ModelForm):
     """Public form for a professional to request a quote / bulk order."""
@@ -54,6 +56,37 @@ class B2BRequestForm(forms.ModelForm):
 
     def clean_estimated_qty(self):
         qty = self.cleaned_data.get("estimated_qty")
+        if qty is not None and qty < 1:
+            raise forms.ValidationError(_("Quantity must be at least 1."))
+        return qty
+
+class ConfiguratorForm(forms.ModelForm):
+    """4-axis personalisation form (logo / inner / outer packaging / grammage)."""
+
+    class Meta:
+        model = CustomizationRequest
+        fields = (
+            "sku", "logo_engraved", "inner_packaging",
+            "outer_packaging", "grammage", "quantity",
+        )
+        widgets = {
+            "sku": forms.Select(attrs={"class": "form-select"}),
+            "logo_engraved": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "inner_packaging": forms.TextInput(attrs={"class": "form-control"}),
+            "outer_packaging": forms.TextInput(attrs={"class": "form-control"}),
+            "grammage": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+            "quantity": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Only B2B-available SKUs can be configured.
+        self.fields["sku"].queryset = SKU.objects.filter(
+            is_active=True, b2b_info__is_b2b_available=True,
+        )
+
+    def clean_quantity(self):
+        qty = self.cleaned_data.get("quantity")
         if qty is not None and qty < 1:
             raise forms.ValidationError(_("Quantity must be at least 1."))
         return qty

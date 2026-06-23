@@ -22,6 +22,9 @@ from apps.b2b.selectors import get_b2b_orders, get_pro_catalogue
 from apps.b2b.services import notify_quote_request, simulate_quote
 from apps.checkout.models import Order
 
+from apps.b2b.forms import ConfiguratorForm
+
+
 # ----------------------------------------------------------------------------
 # L0 — Public funnel (no login)
 # ----------------------------------------------------------------------------
@@ -129,3 +132,54 @@ def reorder_view(request, order_id):
     messages.success(request, _("Reorder prepared. Our team will confirm pricing."))
     return redirect("b2b:history")
 
+
+# ----------------------------------------------------------------------------
+# L2 — Configurator (4 axes) + MOQ simulator + quote request
+# ----------------------------------------------------------------------------
+@b2b_account_required
+@require_http_methods(["GET", "POST"])
+def configurator_view(request):
+    """
+    4-axis configurator with a MOQ-aware quote simulator.
+
+    Two POST actions (via the submit button's name="action"):
+    - "simulate"      → compute value + MOQ status, persist a QuoteSimulation
+    - "request_quote" → also create the CustomizationRequest and email sales
+    """
+    account = request.b2b_account
+    simulation = None
+
+    if request.method == "POST":
+        form = ConfiguratorForm(data=request.POST)
+        if form.is_valid():
+            sku = form.cleaned_data["sku"]
+            qty = form.cleaned_data["quantity"]
+            simulation = simulate_quote(account, sku=sku, quantity=qty)
+            track_event(
+                "quote_simulated", customer=request.user, channel="b2b",
+                value_chf=simulation["estimated"],
+                moq_reached=simulation["moq_reached"], sku=sku.sku_code,
+            )
+
+            if request.POST.get("action") == "request_quote":
+                customization = form.save(commit=False)
+                customization.account = account
+                customization.status = "quote"
+                customization.save()
+                simulation["sim"].converted = True
+                simulation["sim"].save(update_fields=["converted"])
+                notify_quote_request(account, customization, simulation["estimated"])
+                track_event(
+                    "quote_requested", customer=request.user, channel="b2b",
+                    value_chf=simulation["estimated"], sku=sku.sku_code,
+                )
+                messages.success(request, _("Quote requested. Our team will contact you."))
+                return redirect("b2b:configurator")
+    else:
+        form = ConfiguratorForm()
+        # Opening the configurator is the start of a customization journey.
+        track_event("customization_started", customer=request.user, channel="b2b")
+
+    return render(request, "b2b/configurator.html", {
+        "account": account, "form": form, "simulation": simulation,
+    })
