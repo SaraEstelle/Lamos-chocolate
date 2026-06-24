@@ -1,0 +1,42 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}Lamos Chocolate — {% trans "Swiss artisan chocolate" %}{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="bg-dark text-light text-center py-5">
+  <div class="container py-5">
+    <h1 class="display-4 fw-bold">🍫 Lamos Chocolate</h1>
+    <p class="lead">{% trans "Swiss artisan chocolate, crafted with passion." %}</p>
+    <a href="{% url 'shop:catalog' %}" class="btn btn-light btn-lg mt-3">
+      {% trans "Discover our products" %}
+    </a>
+  </div>
+</section>
+
+<!-- Featured products -->
+<section class="container my-5">
+  <h2 class="text-center mb-4">{% trans "Featured products" %}</h2>
+  <div class="row g-4">
+    {% for product in featured %}
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm">
+        {% if product.primary_image_url %}
+          <img src="{{ product.primary_image_url }}" class="card-img-top" alt="{{ product.name_fr }}">
+        {% endif %}
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ product.name_fr }}</h5>
+          <p class="card-text text-muted small flex-grow-1">{{ product.description_fr|truncatewords:15 }}</p>
+          <a href="{% url 'shop:product_detail' product.slug %}" class="btn btn-outline-dark mt-2">
+            {% trans "View" %}
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+      <p class="text-center text-muted">{% trans "No products available yet." %}</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

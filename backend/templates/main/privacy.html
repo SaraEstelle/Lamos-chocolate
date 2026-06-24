@@ -1,0 +1,32 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Privacy policy" %} — Lamos Chocolate{% endblock %}
+{% block content %}
+<div class="container my-5" style="max-width: 820px;">
+  <h1 class="mb-4">{% trans "Privacy policy" %}</h1>
+  <p class="text-muted">{% trans "Last updated:" %} [[YYYY-MM-DD]]</p>
+
+  <p>{% trans "This policy explains how Lamos Chocolate processes personal data, in accordance with the Swiss Federal Act on Data Protection (nLPD / FADP) and, where applicable, the EU GDPR." %}</p>
+
+  <h2 class="h4 mt-4">1. {% trans "Data controller" %}</h2>
+  <p>[[Company legal name, address, email, and (if applicable) representative]]</p>
+
+  <h2 class="h4 mt-4">2. {% trans "What data we collect" %}</h2>
+  <p>{% trans "Account data (name, email), order data (address, purchases), and technical data (IP address, language) needed to operate the shop." %}</p>
+
+  <h2 class="h4 mt-4">3. {% trans "Why we process it (purpose & legal basis)" %}</h2>
+  <p>{% trans "To create and manage your account, process orders and payments, provide support, and meet legal obligations. Marketing emails are sent only with your explicit consent." %}</p>
+
+  <h2 class="h4 mt-4">4. {% trans "Cookies" %}</h2>
+  <p>{% trans "We use strictly necessary cookies (session, security). Any analytics or marketing cookies are set only after your consent and can be withdrawn at any time." %}</p>
+
+  <h2 class="h4 mt-4">5. {% trans "Retention" %}</h2>
+  <p>{% trans "We keep personal data only as long as necessary for the purposes above or as required by law." %}</p>
+
+  <h2 class="h4 mt-4">6. {% trans "Your rights" %}</h2>
+  <p>{% trans "You can request access, correction, deletion, or restriction of your data, and withdraw consent at any time, by contacting us." %}</p>
+
+  <h2 class="h4 mt-4">7. {% trans "Contact" %}</h2>
+  <p>[[Privacy contact email]] — <a href="{% url 'main:contact' %}">{% trans "Contact us" %}</a></p>
+</div>
+{% endblock %}
