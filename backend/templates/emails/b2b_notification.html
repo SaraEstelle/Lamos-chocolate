@@ -1,0 +1,15 @@
+{% extends "emails/base_email.html" %}
+{% load i18n %}
+
+{% block subject %}{% trans "Request received" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<h2 style="color: #6f4e37;">{% trans "We received your request" %}</h2>
+<p>{% trans "Hello" %} {{ request.contact_name }},</p>
+<p>{% trans "Thank you for your interest in Lamos Chocolate for" %} {{ request.company_name }}.</p>
+<p>{% trans "Our team will review your request and get back to you shortly." %}</p>
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: #f9f9f9;">
+    <tr><td style="padding: 8px;">{% trans "Estimated quantity" %}</td><td style="padding: 8px;">{{ request.estimated_qty|default:"—" }}</td></tr>
+    <tr><td style="padding: 8px;">{% trans "Occasion" %}</td><td style="padding: 8px;">{{ request.occasion|default:"—" }}</td></tr>
+</table>
+{% endblock %}
