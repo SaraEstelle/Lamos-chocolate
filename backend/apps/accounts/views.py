@@ -189,7 +189,7 @@ def logout_view(request):
     messages.success(request, "You have been logged out. See you! 👋")
 
     # Redirect to home
-    return redirect('main:home')
+    return redirect('accounts:login')
 
 
 @require_http_methods(["GET", "POST"])
