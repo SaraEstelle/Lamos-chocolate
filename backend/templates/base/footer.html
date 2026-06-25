@@ -1,11 +1,31 @@
-{% load i18n %}
-<footer class="bg-dark text-light py-4 mt-5">
-  <div class="container text-center">
-    <p class="mb-1">© 2026 Lamos Chocolate — {% trans "All rights reserved." %}</p>
-        <p class="small mb-0">
-      <a href="{% url 'main:privacy' %}" class="text-light">{% trans "Privacy policy" %}</a> ·
-      <a href="{% url 'main:terms' %}" class="text-light">{% trans "Terms of service" %}</a> ·
-      <a href="{% url 'main:contact' %}" class="text-light">{% trans "Contact" %}</a>
-    </p>
+{% load i18n static %}
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+      <p class="footer-logo">Lamos Chocolate</p>
+      <p class="footer-tagline">{% trans "The spirit of Dubai, the nobility of Swiss chocolate." %}</p>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">{% trans "Navigation" %}</p>
+      <a href="{% url 'main:about' %}">{% trans "About Us" %}</a>
+      <a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a>
+      <a href="{% url 'b2b:presentation' %}">{% trans "B2B Space" %}</a>
+      <a href="{% url 'main:contact' %}">{% trans "Contact" %}</a>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">{% trans "Legal" %}</p>
+      <a href="{% url 'main:terms' %}">{% trans "Terms & Conditions" %}</a>
+      <a href="{% url 'main:privacy' %}">{% trans "Privacy Policy" %}</a>
+      <a href="mailto:contact@lamos-chocolate.ch">contact@lamos-chocolate.ch</a>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>&copy; 2026 Lamos Chocolate — {% trans "All rights reserved." %}</span>
+    <span>Dubai · Switzerland · Since 2021</span>
   </div>
 </footer>
