@@ -34,6 +34,9 @@ from apps.customer_area.selectors import (
     get_customer_addresses,
     get_filtered_customer_orders,
 )
+from django.contrib.auth import update_session_auth_hash
+from apps.accounts.forms import PasswordChangeForm
+from apps.checkout.models import Order
 
 
 @login_required(login_url="accounts:login")
@@ -148,3 +151,35 @@ def address_delete_view(request, address_id):
     address.delete()
     messages.success(request, _("Address deleted."))
     return redirect("customer_area:addresses")
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET", "POST"])
+def password_change_view(request):
+    """Let a logged-in customer change their password (keeps them logged in)."""
+    if request.method == "POST":
+        form = PasswordChangeForm(request.POST, user=request.user)
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data["new_password"])
+            request.user.save(update_fields=["password"])
+            update_session_auth_hash(request, request.user)  # avoid logout
+            messages.success(request, _("Your password has been updated."))
+            return redirect("customer_area:password_change")
+    else:
+        form = PasswordChangeForm(user=request.user)
+    return render(request, "customer_area/password_change.html", {"form": form})
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def invoices_view(request):
+    """List the customer's billable orders (paid)."""
+    orders = (Order.objects
+              .filter(customer=request.user, status__in=["paid", "shipped", "delivered"])
+              .order_by("-created_at"))
+    return render(request, "customer_area/invoices.html", {"orders": orders})
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def invoice_detail_view(request, order_id):
+    """Printable invoice, scoped to the owner (prevents IDOR)."""
+    order = get_object_or_404(Order, id=order_id, customer=request.user)
+    return render(request, "customer_area/invoice_detail.html", {"order": order})
