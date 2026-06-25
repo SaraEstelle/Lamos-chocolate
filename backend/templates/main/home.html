@@ -1,42 +1,61 @@
 {% extends "base/base.html" %}
-{% load i18n %}
+{% load i18n custom_tags static %}
 
-{% block title %}Lamos Chocolate — {% trans "Swiss artisan chocolate" %}{% endblock %}
+{% block title %}Lamos Chocolate — {% trans "The spirit of Dubai" %}{% endblock %}
 
 {% block content %}
-<!-- Hero -->
-<section class="bg-dark text-light text-center py-5">
-  <div class="container py-5">
-    <h1 class="display-4 fw-bold">🍫 Lamos Chocolate</h1>
-    <p class="lead">{% trans "Swiss artisan chocolate, crafted with passion." %}</p>
-    <a href="{% url 'shop:catalog' %}" class="btn btn-light btn-lg mt-3">
-      {% trans "Discover our products" %}
-    </a>
+<!-- HERO -->
+<section class="hero">
+  <span class="eyebrow">Dubai · Switzerland · Since 2021</span>
+  <h1 class="h-display">LAMO'S <em>Chocolate</em></h1>
+  <p class="hero__tagline">
+    {% trans "The spirit of Dubai, the nobility of Swiss chocolate. An artisan manufacture born at the crossroads of East and West." %}
+  </p>
+  <div class="d-flex justify-content-center gap-3">
+    <a href="{% url 'shop:catalog' %}" class="btn btn-gold btn-lg">{% trans "Discover our creations" %}</a>
+    <a href="{% url 'main:about' %}" class="btn btn-outline btn-lg">{% trans "Our story" %}</a>
   </div>
 </section>
 
-<!-- Featured products -->
-<section class="container my-5">
-  <h2 class="text-center mb-4">{% trans "Featured products" %}</h2>
-  <div class="row g-4">
+<!-- FEATURED PRODUCTS -->
+<section class="section container">
+  <div class="text-center reveal">
+    <span class="gold-line" style="margin-inline:auto;"></span>
+    <span class="eyebrow">{% trans "Signature creations" %}</span>
+    <h2 class="h-display">{% trans "The art of" %} <em>{% trans "exceptional chocolate" %}</em></h2>
+  </div>
+
+  <div class="grid-3" style="margin-top:2.5rem;">
     {% for product in featured %}
-    <div class="col-md-4">
-      <div class="card h-100 shadow-sm">
-        {% if product.primary_image_url %}
-          <img src="{{ product.primary_image_url }}" class="card-img-top" alt="{{ product.name_fr }}">
-        {% endif %}
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title">{{ product.name_fr }}</h5>
-          <p class="card-text text-muted small flex-grow-1">{{ product.description_fr|truncatewords:15 }}</p>
-          <a href="{% url 'shop:product_detail' product.slug %}" class="btn btn-outline-dark mt-2">
-            {% trans "View" %}
-          </a>
-        </div>
+    <article class="card reveal">
+      {% if product.primary_image_url %}
+        <img src="{{ product.primary_image_url }}" alt="{{ product|localized:'name' }}" class="card__img">
+      {% endif %}
+      <div class="card__body">
+        <h3 class="card__title">{{ product|localized:"name" }}</h3>
+        <p class="muted small">{{ product|localized:"description"|truncatewords:16 }}</p>
+        {% with sku=product.skus.all|dictsort:"price"|first %}
+          {% if sku %}<p class="card__price">{% trans "From" %} {{ sku.price }} CHF</p>{% endif %}
+        {% endwith %}
+        <a href="{% url 'shop:product_detail' slug=product.slug %}" class="btn btn-outline mt-3">{% trans "View" %}</a>
       </div>
-    </div>
+    </article>
     {% empty %}
-      <p class="text-center text-muted">{% trans "No products available yet." %}</p>
+      <p class="muted text-center">{% trans "No products available yet." %}</p>
     {% endfor %}
+  </div>
+</section>
+
+<!-- INGREDIENTS -->
+<section class="section section--alt">
+  <div class="container text-center reveal">
+    <span class="eyebrow">{% trans "Ingredients as a statement of faith" %}</span>
+    <h2 class="h-display">{% trans "The ingredients" %} <em>{% trans "are the story" %}</em></h2>
+    <div class="grid-3" style="margin-top:2.5rem;">
+      <div class="card"><div class="card__body"><h3 class="card__title">Carma 🇨🇭</h3><p class="muted small">{% trans "One of the most respected couvertures in the world, the Swiss benchmark." %}</p></div></div>
+      <div class="card"><div class="card__body"><h3 class="card__title">Callebaut 🇧🇪</h3><p class="muted small">{% trans "An incomparable cream, the favourite of the world's great pastry chefs." %}</p></div></div>
+      <div class="card"><div class="card__body"><h3 class="card__title">Rafsanjan 🇮🇷</h3><p class="muted small">{% trans "The most sought-after pistachios in the world — deep green, rare sweetness." %}</p></div></div>
+    </div>
   </div>
 </section>
 {% endblock %}
