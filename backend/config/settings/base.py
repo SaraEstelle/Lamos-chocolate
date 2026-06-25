@@ -11,6 +11,10 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1", cast=Csv())
 
+# ============================================================================
+# INSTALLED_APPS
+# ============================================================================
+
 DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -19,6 +23,15 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.postgres",
+    "django.contrib.sites",  # REQUIRED by allauth
+]
+
+THIRD_PARTY_APPS = [
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.facebook",  # configured but OFF until reviewed
 ]
 
 LOCAL_APPS = [
@@ -35,14 +48,18 @@ LOCAL_APPS = [
     "apps.analytics",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+SITE_ID = 1
 
 # ============================================================================
 # AUTH — Custom user model
 # ============================================================================
-# Customer replaces Django's default User model. Must be set BEFORE the first
-# migration that references settings.AUTH_USER_MODEL (accounts.PasswordResetToken).
 AUTH_USER_MODEL = "accounts.Customer"
+
+# ============================================================================
+# MIDDLEWARE
+# ============================================================================
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -51,11 +68,16 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",  # <-- ADDED
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
+
+# ============================================================================
+# TEMPLATES
+# ============================================================================
 
 TEMPLATES = [
     {
@@ -75,8 +97,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
 ASGI_APPLICATION = "config.asgi.application"
+
+# ============================================================================
+# DATABASE
+# ============================================================================
 
 DATABASES = {
     "default": {
@@ -89,24 +114,22 @@ DATABASES = {
     }
 }
 
+# ============================================================================
+# PASSWORD VALIDATION
+# ============================================================================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation."
-        "UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation." "MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation." "CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation." "NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr")
+# ============================================================================
+# INTERNATIONALIZATION
+# ============================================================================
 
+LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr")
 TIME_ZONE = config("TIME_ZONE", default="Europe/Paris")
 
 LANGUAGES = [
@@ -117,22 +140,25 @@ LANGUAGES = [
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
 USE_I18N = True
-
 USE_TZ = True
 
+# ============================================================================
+# STATIC & MEDIA
+# ============================================================================
+
 STATIC_URL = "/static/"
-
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
-
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# --- Email ---
+# ============================================================================
+# EMAIL
+# ============================================================================
+
 EMAIL_HOST = config("EMAIL_HOST", default="")
 EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
@@ -142,12 +168,68 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="noreply@lamos-chocola
 
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
-# --- Stripe ---
+# ============================================================================
+# STRIPE
+# ============================================================================
+
 STRIPE_PUBLIC_KEY = config("STRIPE_PUBLIC_KEY", default="")
 STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY", default="")
 STRIPE_WEBHOOK_SECRET = config("STRIPE_WEBHOOK_SECRET", default="")
 
-# --- Logging ---
+# ============================================================================
+# AUTHENTICATION BACKENDS (allauth)
+# ============================================================================
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
+# ============================================================================
+# ALLAUTH SETTINGS (v0.64+)
+# ============================================================================
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+# New API (replaces deprecated settings)
+ACCOUNT_LOGIN_METHODS = {"email"}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+LOGIN_REDIRECT_URL = "customer_area:dashboard"
+ACCOUNT_LOGOUT_REDIRECT_URL = "main:home"
+
+# ============================================================================
+# SOCIAL PROVIDERS
+# ============================================================================
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": config("GOOGLE_CLIENT_ID", default=""),
+            "secret": config("GOOGLE_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    },
+    "facebook": {
+        "APP": {
+            "client_id": config("FACEBOOK_CLIENT_ID", default=""),
+            "secret": config("FACEBOOK_CLIENT_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["email", "public_profile"],
+    },
+}
+
+SOCIALACCOUNT_ADAPTER = "apps.accounts.adapters.LamosSocialAccountAdapter"
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+
 LOGS_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOGS_DIR, exist_ok=True)
 
@@ -170,11 +252,7 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "DEBUG",
-            "formatter": "simple",
-        },
+        "console": {"class": "logging.StreamHandler", "level": "DEBUG", "formatter": "simple"},
         "file_error": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(LOGS_DIR, "django_errors.log"),
@@ -201,29 +279,10 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {
-            "handlers": ["console", "file_all", "file_error"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.request": {
-            "handlers": ["file_access", "console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.db.backends": {
-            "handlers": ["console"],
-            "level": "DEBUG" if DEBUG else "INFO",
-            "propagate": False,
-        },
-        "apps": {
-            "handlers": ["console", "file_all", "file_error"],
-            "level": "DEBUG",
-            "propagate": False,
-        },
+        "django": {"handlers": ["console", "file_all", "file_error"], "level": "INFO", "propagate": False},
+        "django.request": {"handlers": ["file_access", "console"], "level": "INFO", "propagate": False},
+        "django.db.backends": {"handlers": ["console"], "level": "DEBUG" if DEBUG else "INFO", "propagate": False},
+        "apps": {"handlers": ["console", "file_all", "file_error"], "level": "DEBUG", "propagate": False},
     },
-    "root": {
-        "handlers": ["console", "file_all", "file_error"],
-        "level": "INFO",
-    },
+    "root": {"handlers": ["console", "file_all", "file_error"], "level": "INFO"},
 }
