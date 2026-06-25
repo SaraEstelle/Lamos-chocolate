@@ -95,18 +95,6 @@
                             {% endif %}
                         </div>
 
-                        <!-- Phone (optional) -->
-                        <div class="mb-3">
-                            <label for="{{ form.phone.id_for_label }}" class="form-label">
-                                {{ form.phone.label }}
-                                {% if form.phone.field.required %}<span class="text-danger">*</span>{% endif %}
-                            </label>
-                            {{ form.phone }}
-                            {% if form.phone.errors %}
-                                <div class="invalid-feedback d-block">⚠️ {{ form.phone.errors.0 }}</div>
-                            {% endif %}
-                        </div>
-
                         <!-- Preferred language -->
                         <div class="mb-3">
                             <label for="{{ form.preferred_language.id_for_label }}" class="form-label">
