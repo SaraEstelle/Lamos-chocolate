@@ -45,6 +45,29 @@
                             {% endif %}
                         </div>
 
+                        {% load socialaccount i18n %}
+
+                        <div class="social-auth" style="margin-top:2rem;text-align:center;">
+                        <p class="eyebrow">{% trans "Or continue with" %}</p>
+
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline" style="width:100%;margin-bottom:.75rem;">
+                            {% trans "Continue with Google" %}
+                        </a>
+
+                        {# Facebook: only show when configured (env vars set) #}
+                        {% if FACEBOOK_ENABLED %}
+                            <a href="{% provider_login_url 'facebook' %}" class="btn btn-outline" style="width:100%;margin-bottom:.75rem;">
+                            {% trans "Continue with Facebook" %}
+                            </a>
+                        {% endif %}
+
+                        {# Instagram: NOT available as a login method (Meta shut it down). #}
+                        <button type="button" class="btn btn-outline" style="width:100%;opacity:.5;cursor:not-allowed;"
+                                title="{% trans 'Instagram login is no longer supported by Meta.' %}" disabled>
+                            {% trans "Instagram (unavailable)" %}
+                        </button>
+                        </div>
+
                         <div class="mb-3 form-check">
                             {{ form.remember_me }}
                             {{ form.remember_me.label_tag }}

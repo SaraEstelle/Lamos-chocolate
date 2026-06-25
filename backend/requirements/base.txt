@@ -13,3 +13,4 @@ python-decouple==3.8
 
 # Stripe payment integration
 stripe==11.1.0
+django-allauth[socialaccount]>=64,<66
