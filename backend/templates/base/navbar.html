@@ -1,22 +1,37 @@
-{% load i18n %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-        <a class="navbar-brand" href="{% url 'main:home' %}">🍫 Lamos Chocolate</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navMain">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item"><a class="nav-link" href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
-      </ul>
-      <ul class="navbar-nav">
-        {% if request.user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a></li>
-        {% else %}
-          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:login' %}">{% trans "Log in" %}</a></li>
-          <li class="nav-item"><a class="nav-link" href="{% url 'accounts:register' %}">{% trans "Sign up" %}</a></li>
-        {% endif %}
-      </ul>
+{% load i18n static %}
+<header class="site-header" role="banner">
+  <nav class="nav-inner" aria-label="{% trans 'Main navigation' %}">
+
+    <a href="{% url 'main:home' %}" class="nav-logo" aria-label="Lamos Chocolate — {% trans 'Home' %}">
+      {# If you ported the logo image, prefer it over text: #}
+      {# <img src="{% static 'images/logo.webp' %}" alt="Lamos Chocolate"> #}
+      Lamos <span>Chocolate</span>
+    </a>
+
+    <ul class="nav-links" id="primary-nav" role="list">
+      <li><a href="{% url 'main:home' %}">{% trans "Home" %}</a></li>
+      <li><a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
+      <li><a href="{% url 'main:about' %}">{% trans "About Us" %}</a></li>
+      <li><a href="{% url 'main:contact' %}">{% trans "Contact" %}</a></li>
+
+      {# B2B / B2C spaces — clearly differentiated as pills #}
+      <li><a href="{% url 'b2b:presentation' %}" class="nav-pill nav-pill--b2b">{% trans "B2B Space" %}</a></li>
+      {% if request.user.is_authenticated %}
+        <li><a href="{% url 'customer_area:dashboard' %}" class="nav-pill nav-pill--b2c">{% trans "B2C Space" %}</a></li>
+        <li><a href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a></li>
+      {% else %}
+        <li><a href="{% url 'accounts:login' %}" class="nav-pill nav-pill--b2c">{% trans "B2C Space" %}</a></li>
+        <li><a href="{% url 'accounts:login' %}">{% trans "Login" %}</a></li>
+      {% endif %}
+    </ul>
+
+    <div class="nav-actions">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-gold">{% trans "Order Now" %}</a>
+      <button class="nav-burger" type="button" aria-controls="primary-nav"
+              aria-expanded="false" aria-label="{% trans 'Open menu' %}">
+        <span></span><span></span><span></span>
+      </button>
     </div>
-  </div>
-</nav>
+
+  </nav>
+</header>
