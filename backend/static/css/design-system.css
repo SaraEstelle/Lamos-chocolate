@@ -1,0 +1,234 @@
+/* ============================================================================
+   LAMOS CHOCOLATE — Design System "White Marble"
+   Pure CSS. No framework. Loaded as the single source of truth for styling.
+   Sections: tokens · reset · base · layout · navbar · footer · buttons ·
+             cards · forms · badges · hero · sections · reveal · responsive
+   ============================================================================ */
+
+/* ---- 1. Design tokens ---------------------------------------------------- */
+:root {
+  /* Surfaces (light marble) */
+  --c-marble:    #f4f1ec;
+  --c-marble-2:  #ece7df;
+  --c-ivory:     #faf8f4;
+  --c-ivory-2:   #fffdf9;
+  --c-line:      #e3ddd1;
+
+  /* Ink (text on light) */
+  --c-ink:       #1c1814;
+  --c-text:      #3a342c;
+  --c-text-2:    #6b6256;
+  --c-text-3:    #9a9082;
+
+  /* Gold accent (kept) */
+  --c-gold:      #b0892f;
+  --c-gold-2:    #caa24a;
+  --c-gold-3:    #8a6a1f;          /* AA-safe gold for links/small text */
+  --c-gold-soft: rgba(176, 137, 47, 0.10);
+
+  /* Dark island (hero band / footer) */
+  --c-island:    #14110d;
+  --c-island-ink:#efe7d6;
+
+  /* State colors */
+  --c-success: #2f7d4f;
+  --c-warning: #9a6b16;
+  --c-danger:  #b23a3a;
+  --c-info:    #3a6ea5;
+
+  /* Fonts */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-title:   'Cinzel', 'Times New Roman', serif;
+  --font-body:    'Lato', 'Helvetica Neue', sans-serif;
+
+  /* Motion */
+  --dur-fast: 0.25s;
+  --dur-mid:  0.45s;
+  --ease:     cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Radius / shadow / layout */
+  --radius:   2px;
+  --shadow-1: 0 1px 2px rgba(28, 24, 20, 0.04);
+  --shadow-2: 0 8px 30px rgba(28, 24, 20, 0.08);
+  --maxw:     1180px;
+  --nav-h:    72px;
+}
+
+/* ---- 2. Reset ------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+img, svg { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; }
+ul { list-style: none; }
+
+/* ---- 3. Base ------------------------------------------------------------- */
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--c-text);
+  /* CSS-only marble background: soft veined gradients (works without an image). */
+  background-color: var(--c-marble);
+  background-image:
+    radial-gradient(1200px 800px at 15% -10%, #ffffff 0%, transparent 55%),
+    radial-gradient(1000px 700px at 110% 10%, #fbf9f5 0%, transparent 50%),
+    linear-gradient(115deg, transparent 0%, rgba(199, 168, 76, 0.04) 40%, transparent 41%),
+    linear-gradient(160deg, transparent 0%, rgba(28, 24, 20, 0.03) 70%, transparent 71%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  /* Optional: drop a real texture at static/images/marble.png and uncomment:
+     background-image: url("/static/images/marble.png"); background-size: cover; */
+}
+main { flex: 1 0 auto; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 400; color: var(--c-ink); line-height: 1.18; }
+p { color: var(--c-text); }
+
+.eyebrow {
+  font-family: var(--font-title); font-size: 0.62rem; letter-spacing: 0.4em;
+  text-transform: uppercase; color: var(--c-gold-3); display: inline-block; margin-bottom: 0.9rem;
+}
+.h-display { font-family: var(--font-display); font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 300; }
+.h-display em { font-style: italic; color: var(--c-gold-3); }
+.gold-line { display: block; width: 52px; height: 1px; background: linear-gradient(90deg, transparent, var(--c-gold), transparent); margin-bottom: 1rem; }
+.text-center { text-align: center; }
+.muted { color: var(--c-text-2); }
+
+/* ---- 4. Layout ----------------------------------------------------------- */
+.container { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: 1.5rem; }
+.section { padding-block: clamp(3rem, 7vw, 6rem); }
+.section--alt { background: var(--c-marble-2); }
+
+/* ---- 5. Navbar (sticky, accessible) ------------------------------------- */
+.site-header {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(250, 248, 244, 0.82);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--c-line);
+}
+.nav-inner { max-width: var(--maxw); margin-inline: auto; height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between; padding-inline: 1.5rem; gap: 1.5rem; }
+.nav-logo { font-family: var(--font-title); font-size: 1.05rem; font-weight: 600; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--c-ink); white-space: nowrap; }
+.nav-logo span { color: var(--c-gold-3); }
+.nav-logo img { height: 38px; width: auto; }
+
+.nav-links { display: flex; align-items: center; gap: 1.9rem; }
+.nav-links a { position: relative; font-family: var(--font-title); font-size: 0.7rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--c-text-2); padding-block: 0.4rem; transition: color var(--dur-fast) var(--ease); }
+.nav-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: var(--c-gold); transform: scaleX(0); transform-origin: left; transition: transform var(--dur-fast) var(--ease); }
+.nav-links a:hover, .nav-links a.is-active { color: var(--c-gold-3); }
+.nav-links a:hover::after, .nav-links a.is-active::after { transform: scaleX(1); }
+
+/* B2B / B2C pills — clearly differentiated */
+.nav-pill { border: 1px solid var(--c-line); border-radius: 999px; padding: 0.35rem 0.9rem !important; }
+.nav-pill::after { display: none; }
+.nav-pill--b2b { color: var(--c-gold-3); border-color: rgba(176, 137, 47, 0.45); }
+.nav-pill--b2c { color: var(--c-text); }
+.nav-pill:hover { background: var(--c-gold-soft); }
+
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.nav-burger { display: none; background: none; border: 0; width: 28px; height: 22px; position: relative; }
+.nav-burger span { position: absolute; left: 0; width: 100%; height: 2px; background: var(--c-ink); transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast); }
+.nav-burger span:nth-child(1) { top: 0; }
+.nav-burger span:nth-child(2) { top: 10px; }
+.nav-burger span:nth-child(3) { top: 20px; }
+.nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+.nav-burger[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-burger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+
+/* ---- 6. Footer ----------------------------------------------------------- */
+.site-footer { background: var(--c-island); color: var(--c-island-ink); margin-top: 4rem; }
+.footer-inner { max-width: var(--maxw); margin-inline: auto; padding: 3rem 1.5rem 1.5rem;
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 2.5rem; }
+.footer-brand .footer-logo { font-family: var(--font-title); font-size: 1.1rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-gold-2); margin-bottom: 0.75rem; }
+.footer-tagline { font-family: var(--font-display); font-style: italic; color: var(--c-cream3, #d4c09a); max-width: 32ch; }
+.footer-col-title { font-family: var(--font-title); font-size: 0.6rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--c-gold-2); margin-bottom: 1rem; }
+.footer-col a { display: block; font-size: 0.85rem; color: var(--c-island-ink); opacity: 0.8; padding-block: 0.3rem; transition: opacity var(--dur-fast), color var(--dur-fast); }
+.footer-col a:hover { opacity: 1; color: var(--c-gold-2); }
+.footer-bottom { border-top: 1px solid rgba(239, 231, 214, 0.12); max-width: var(--maxw); margin-inline: auto;
+  padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; font-size: 0.72rem; opacity: 0.7; }
+
+/* ---- 7. Buttons ---------------------------------------------------------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  font-family: var(--font-title); font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.85rem 2rem; border: 1px solid transparent; border-radius: var(--radius); transition: all var(--dur-fast) var(--ease); }
+.btn-gold { background: var(--c-gold); color: #fff; border-color: var(--c-gold); }
+.btn-gold:hover { background: var(--c-gold-2); border-color: var(--c-gold-2); }
+.btn-outline { background: transparent; color: var(--c-gold-3); border-color: rgba(176, 137, 47, 0.45); }
+.btn-outline:hover { background: var(--c-gold-soft); border-color: var(--c-gold); color: var(--c-ink); }
+.btn-lg { padding: 1rem 2.6rem; font-size: 0.72rem; }
+.btn:focus-visible { outline: 2px solid var(--c-gold); outline-offset: 2px; }
+
+/* ---- 8. Cards ------------------------------------------------------------ */
+.card { background: var(--c-ivory); border: 1px solid var(--c-line); border-radius: var(--radius); box-shadow: var(--shadow-1); overflow: hidden; transition: box-shadow var(--dur-fast), transform var(--dur-fast); }
+.card:hover { box-shadow: var(--shadow-2); transform: translateY(-3px); }
+.card__img { width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.card__body { padding: 1.25rem 1.4rem 1.5rem; }
+.card__title { font-family: var(--font-display); font-size: 1.4rem; color: var(--c-ink); margin-bottom: 0.25rem; }
+.card__price { font-family: var(--font-title); font-size: 0.8rem; letter-spacing: 0.1em; color: var(--c-gold-3); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
+
+/* ---- 9. Forms ------------------------------------------------------------ */
+.field { margin-bottom: 1.1rem; }
+.field label { display: block; font-family: var(--font-title); font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-text-2); margin-bottom: 0.4rem; }
+.field input, .field textarea, .field select {
+  width: 100%; background: var(--c-ivory-2); border: 1px solid var(--c-line); border-radius: var(--radius);
+  padding: 0.75rem 0.9rem; color: var(--c-ink); font-family: var(--font-body); transition: border-color var(--dur-fast), box-shadow var(--dur-fast); }
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none; border-color: var(--c-gold); box-shadow: 0 0 0 3px var(--c-gold-soft); }
+
+/* ---- 10. Badges ---------------------------------------------------------- */
+.badge { display: inline-block; font-family: var(--font-title); font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.25rem 0.6rem; border-radius: 999px; }
+.badge--new { background: var(--c-success); color: #fff; }
+.badge--soon { background: var(--c-line); color: var(--c-text-2); }
+.badge--gold { background: var(--c-gold-soft); color: var(--c-gold-3); }
+
+/* ---- 11. Hero ------------------------------------------------------------ */
+.hero { position: relative; background: var(--c-island); color: var(--c-island-ink); text-align: center; padding: clamp(4rem, 10vw, 7rem) 1.5rem; }
+.hero .h-display { color: #f3ead8; }
+.hero .eyebrow { color: var(--c-gold-2); }
+.hero__tagline { max-width: 56ch; margin: 1.25rem auto 2rem; color: #cdbfa3; font-family: var(--font-display); font-size: 1.2rem; font-style: italic; }
+
+/* ---- 12. Reveal-on-scroll ----------------------------------------------- */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+/* ---- 13. Responsive ------------------------------------------------------ */
+@media (max-width: 900px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 768px) {
+  .nav-burger { display: block; }
+  .nav-links {
+    position: fixed; inset: var(--nav-h) 0 auto 0;
+    flex-direction: column; align-items: flex-start; gap: 0.25rem;
+    background: var(--c-ivory); border-bottom: 1px solid var(--c-line);
+    padding: 1rem 1.5rem 1.5rem; transform: translateY(-120%); transition: transform var(--dur-mid) var(--ease);
+  }
+  .nav-links.is-open { transform: translateY(0); }
+  .nav-links a { width: 100%; font-size: 0.78rem; }
+}
+@media (max-width: 600px) {
+  .grid-3 { grid-template-columns: 1fr; }
+  .footer-inner { grid-template-columns: 1fr; }
+}
+
+/* ---- 14. Account / dashboard layout (shared B2C + B2B) ------------------- */
+.account-layout { display: grid; grid-template-columns: 240px 1fr; gap: 2.5rem; }
+.account-sidebar { border-right: 1px solid var(--c-line); padding-right: 1.5rem; }
+.account-nav { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 1rem; }
+.account-nav a { font-family: var(--font-title); font-size: 0.72rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--c-text-2); padding: 0.6rem 0.4rem; border-left: 2px solid transparent; }
+.account-nav a:hover, .account-nav a.is-active { color: var(--c-gold-3); border-left-color: var(--c-gold); }
+@media (max-width: 768px) {
+  .account-layout { grid-template-columns: 1fr; }
+  .account-sidebar { border-right: 0; border-bottom: 1px solid var(--c-line); padding: 0 0 1rem; }
+  .account-nav { flex-direction: row; flex-wrap: wrap; }
+}
