@@ -1,9 +1,9 @@
-{% extends "base/base.html" %}
+{% extends "customer_area/base_account.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "My account" %} — Lamos Chocolate{% endblock %}
 
-{% block content %}
+{% block account_content %}
 <div class="container my-5">
   <h1 class="mb-4">{% trans "Hello" %}, {{ customer.first_name|default:customer.email }} 👋</h1>
 
