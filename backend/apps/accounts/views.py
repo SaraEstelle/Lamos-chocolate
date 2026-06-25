@@ -72,7 +72,6 @@ def register_view(request):
                     password=form.cleaned_data['password'],
                     first_name=form.cleaned_data['first_name'],
                     last_name=form.cleaned_data['last_name'],
-                    phone=form.cleaned_data.get('phone', ''),
                     preferred_language=form.cleaned_data.get('preferred_language', 'fr')
                 )
 
