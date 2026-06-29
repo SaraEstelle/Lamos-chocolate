@@ -61,8 +61,10 @@ class CustomerAddress(models.Model):
         super().save(*args, **kwargs)
 
         # Denormalize canton + npa onto the customer for fast heatmap KPIs.
+        # Resolve the model from the FK (self.customer may be a lazy request.user).
         if self.is_default:
-            type(self.customer).objects.filter(pk=self.customer_id).update(
+            customer_model = self._meta.get_field("customer").related_model
+            customer_model.objects.filter(pk=self.customer_id).update(
                 canton=self.canton,
                 npa=self.postal_code,
             )

@@ -16,12 +16,17 @@ class TestAddresses:
             "line1": "1 rue du Test",
             "city": "Genève",
             "postal_code": "1200",
+            "canton": "GE",
             "country": "Suisse",
             "is_default": "on",
         })
         assert resp.status_code == 302
         from apps.customer_area.models import CustomerAddress
         assert CustomerAddress.objects.filter(customer=customer).count() == 1
+        # The default address denormalizes canton/npa onto the customer.
+        customer.refresh_from_db()
+        assert customer.canton == "GE"
+        assert customer.npa == "1200"
 
     def test_only_one_default_address(self, client, customer_factory):
         customer = customer_factory()
