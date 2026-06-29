@@ -132,6 +132,26 @@ p { color: var(--c-text); }
 .nav-pill:hover { background: var(--c-gold-soft); }
 
 .nav-actions { display: flex; align-items: center; gap: 1rem; }
+
+/* Cart link + count badge (visible to guests too) */
+.nav-cart { position: relative; display: inline-flex; align-items: center; color: var(--c-text);
+  padding: 0.2rem; transition: color var(--dur-fast) var(--ease); }
+.nav-cart:hover { color: var(--c-gold-3); }
+.nav-cart-badge { position: absolute; top: -6px; right: -8px; min-width: 18px; height: 18px;
+  padding: 0 5px; border-radius: 999px; background: var(--c-gold); color: #fff;
+  font-size: 0.62rem; font-weight: 700; line-height: 18px; text-align: center; }
+.nav-cart-badge[hidden] { display: none; }
+
+/* Toasts (add-to-cart feedback) */
+.toast-host { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 1100;
+  display: flex; flex-direction: column; gap: 0.5rem; }
+.toast { background: var(--c-ink); color: var(--c-island-ink); padding: 0.7rem 1rem;
+  border-radius: 8px; font-size: 0.82rem; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+  opacity: 0; transform: translateY(8px); transition: opacity var(--dur-fast) var(--ease),
+  transform var(--dur-fast) var(--ease); }
+.toast.is-visible { opacity: 1; transform: translateY(0); }
+.toast--error { background: var(--c-danger); color: #fff; }
+
 .nav-burger { display: none; background: none; border: 0; width: 28px; height: 22px; position: relative; }
 .nav-burger span { position: absolute; left: 0; width: 100%; height: 2px; background: var(--c-ink); transition: transform var(--dur-fast) var(--ease), opacity var(--dur-fast); }
 .nav-burger span:nth-child(1) { top: 0; }

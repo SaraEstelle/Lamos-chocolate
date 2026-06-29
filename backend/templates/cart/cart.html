@@ -25,7 +25,8 @@
           <td>{{ item.sku.format }}</td>
           <td>{{ item.unit_price }} {{ item.sku.currency }}</td>
           <td>
-            <form action="{% url 'cart:update' %}" method="post" class="d-flex gap-1">
+            <form action="{% url 'cart:update' %}" method="post" class="d-flex gap-1"
+                  data-cart-update data-updated-label="{% trans 'Cart updated.' %}">
               {% csrf_token %}
               <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
               <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
@@ -35,9 +36,10 @@
               </button>
             </form>
           </td>
-          <td>{{ item.subtotal }} {{ item.sku.currency }}</td>
+          <td data-subtotal>{{ item.subtotal }} {{ item.sku.currency }}</td>
           <td>
-            <form action="{% url 'cart:remove' %}" method="post">
+            <form action="{% url 'cart:remove' %}" method="post"
+                  data-cart-remove data-removed-label="{% trans 'Item removed from your cart.' %}">
               {% csrf_token %}
               <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
               <button type="submit" class="btn btn-link btn-sm text-danger p-0">
@@ -52,12 +54,18 @@
 
   <p class="fs-5">
     <strong>{% trans "Total" %}:</strong>
-    {{ cart_total }} ({{ cart_count }} {% trans "item(s)" %})
+    <span data-cart-total>{{ cart_total }}</span>
+    (<span data-cart-count-text>{{ cart_count }}</span> {% trans "item(s)" %})
   </p>
 
-  <a href="{% url 'shop:catalog' %}" class="btn btn-outline-dark">
-    {% trans "Continue shopping" %}
-  </a>
+  <div class="d-flex gap-2">
+    <a href="{% url 'shop:catalog' %}" class="btn btn-outline-dark">
+      {% trans "Continue shopping" %}
+    </a>
+    <a href="{% url 'checkout:checkout' %}" class="btn btn-gold">
+      {% trans "Proceed to checkout" %}
+    </a>
+  </div>
 {% else %}
   <p>{% trans "Your cart is empty." %}</p>
   <a href="{% url 'shop:catalog' %}" class="btn btn-dark">{% trans "Browse the shop" %}</a>
