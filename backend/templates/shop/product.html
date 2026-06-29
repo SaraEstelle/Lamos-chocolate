@@ -78,7 +78,8 @@
               </div>
               <div>
                 {% if cart_add_url %}
-                  <form action="{{ cart_add_url }}" method="post" class="d-flex gap-1">
+                  <form action="{{ cart_add_url }}" method="post" class="d-flex gap-1"
+                        data-cart-add data-added-label="{% trans 'Added to your cart.' %}">
                     {% csrf_token %}
                     <input type="hidden" name="sku_id" value="{{ sku.id }}">
                     <input type="number" name="quantity" value="1" min="1"
