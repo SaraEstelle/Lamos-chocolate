@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment received" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5 text-center">
+  <h1 class="h3 mb-3">{% trans "Thank you for your order!" %}</h1>
+  <p class="lead">
+    {% trans "Your payment was successful. We are preparing your confirmation email." %}
+  </p>
+  <p class="text-muted">
+    {% trans "You will receive your order details by email shortly." %}
+  </p>
+  <a href="{% url 'shop:catalog' %}" class="btn btn-dark mt-3">
+    {% trans "Continue shopping" %}
+  </a>
+</div>
+{% endblock %}
