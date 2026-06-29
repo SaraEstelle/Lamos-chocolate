@@ -1,0 +1,190 @@
+{% extends "cockpit/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Pilotage" %}{% endblock %}
+{% block heading %}{% trans "Pilotage" %}{% endblock %}
+{% block meta %}{% trans "Objectifs Direction" %} · {% trans "réel sur" %} {{ pilotage.days }} {% trans "jours" %}{% endblock %}
+
+{% block extra_css %}
+    .obj-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+    .field input { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; font-variant-numeric: tabular-nums; background: var(--cream); }
+    .field input:focus { outline: none; border-color: var(--gold); background: #fff; }
+    .field .unit { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .actions { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+    .btn { background: var(--ink); color: #fff; border: 0; border-radius: 8px; padding: 11px 22px; font: inherit; font-weight: 500; cursor: pointer; }
+    .btn:hover { background: #000; }
+    .flash { padding: 11px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+    .flash.success { background: rgba(46,125,50,.1); color: #2e7d32; border: 1px solid rgba(46,125,50,.25); }
+    .target-input { width: 92px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 6px; font: inherit; text-align: right; font-variant-numeric: tabular-nums; }
+    .target-input:focus { outline: none; border-color: var(--gold); }
+    .fill { display: inline-flex; align-items: center; gap: 8px; min-width: 120px; }
+    .fill .bar { flex: 1; height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; margin: 0; }
+    .fill .bar > span { display: block; height: 100%; background: var(--gold); }
+    .fill .pct { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--muted); min-width: 44px; text-align: right; }
+    .gap-pos { color: #2e7d32; }
+    .gap-neg { color: #b3261e; }
+{% endblock %}
+
+{% block content %}
+  {% for message in messages %}
+    <div class="flash {{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Company-wide objectives -->
+    <div class="card" style="margin-bottom: 24px;">
+      <h3>{% trans "Objectifs globaux" %}</h3>
+      <div class="obj-grid">
+        <div class="field">
+          <label for="id_daily">{% trans "CA / jour" %}</label>
+          <input type="number" min="0" step="100" id="id_daily" name="daily_revenue_chf" value="{{ pilotage.objective.daily_revenue_chf }}">
+          <div class="unit">CHF</div>
+        </div>
+        <div class="field">
+          <label for="id_monthly">{% trans "CA / mois" %}</label>
+          <input type="number" min="0" step="1000" id="id_monthly" name="monthly_revenue_chf" value="{{ pilotage.objective.monthly_revenue_chf }}">
+          <div class="unit">CHF</div>
+        </div>
+        <div class="field">
+          <label for="id_capacity">{% trans "Capacité usine" %}</label>
+          <input type="number" min="0" step="500" id="id_capacity" name="monthly_capacity_units" value="{{ pilotage.objective.monthly_capacity_units }}">
+          <div class="unit">{% trans "unités / mois" %}</div>
+        </div>
+        <div class="field">
+          <label for="id_margin">{% trans "Marge cible" %}</label>
+          <input type="number" min="0" max="100" step="0.5" id="id_margin" name="target_margin_pct" value="{{ pilotage.objective.target_margin_pct }}">
+          <div class="unit">% {% trans "marge brute" %}</div>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn">{% trans "Enregistrer les objectifs" %}</button>
+        {% if pilotage.objective.updated_at %}
+        <span class="meta" style="color: var(--muted); font-size: 12px;">{% trans "Dernière mise à jour" %} {{ pilotage.objective.updated_at|date:"d/m/Y H:i" }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Per-product unit objectives vs actuals -->
+    <h2 class="section">{% trans "Objectifs de quantité par produit" %}</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>{% trans "Produit" %}</th>
+            <th class="num">{% trans "Vendu (période)" %}</th>
+            <th class="num">{% trans "Objectif (u/mois)" %}</th>
+            <th>{% trans "Remplissage" %}</th>
+            <th class="num">{% trans "Marge réelle" %}</th>
+            <th class="num">{% trans "Écart marge" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pilotage.products %}
+          <tr>
+            <td>{{ p.name }}</td>
+            <td class="num">{{ p.actual_units }}</td>
+            <td class="num">
+              <input type="number" min="0" step="10" class="target-input" name="target_{{ p.id }}" value="{{ p.target_units }}">
+            </td>
+            <td>
+              {% if p.fill_pct is not None %}
+              <span class="fill">
+                <span class="bar"><span style="width: {% if p.fill_pct > 100 %}100{% else %}{{ p.fill_pct|floatformat:0 }}{% endif %}%;"></span></span>
+                <span class="pct">{{ p.fill_pct|floatformat:0 }}%</span>
+              </span>
+              {% else %}
+              <span class="meta" style="color: var(--muted); font-size: 12px;">{% trans "aucun objectif" %}</span>
+              {% endif %}
+            </td>
+            <td class="num">{{ p.margin_pct|floatformat:1 }}%</td>
+            <td class="num {% if p.margin_gap >= 0 %}gap-pos{% else %}gap-neg{% endif %}">
+              {% if p.margin_gap >= 0 %}+{% endif %}{{ p.margin_gap|floatformat:1 }}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="empty">{% trans "Aucun produit actif." %}</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if pilotage.products %}
+        <tfoot>
+          <tr style="font-weight: 600; border-top: 2px solid var(--line);">
+            <td>{% trans "Total ciblé" %}</td>
+            <td class="num">{{ pilotage.total_actual_units }}</td>
+            <td class="num">{{ pilotage.total_target_units }}</td>
+            <td>
+              {% if pilotage.total_fill_pct is not None %}
+              <span class="fill">
+                <span class="bar"><span style="width: {% if pilotage.total_fill_pct > 100 %}100{% else %}{{ pilotage.total_fill_pct|floatformat:0 }}{% endif %}%;"></span></span>
+                <span class="pct">{{ pilotage.total_fill_pct|floatformat:0 }}%</span>
+              </span>
+              {% endif %}
+            </td>
+            <td></td><td></td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+    </div>
+
+    <!-- Per-canton revenue objectives vs actuals -->
+    <h2 class="section">{% trans "Objectifs de CA par canton" %}</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>{% trans "Canton" %}</th>
+            <th class="num">{% trans "CA réel (période)" %}</th>
+            <th class="num">{% trans "Objectif (CHF/mois)" %}</th>
+            <th>{% trans "Remplissage" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in pilotage.cantons %}
+          <tr>
+            <td>{{ c.label }} <span class="meta" style="color: var(--muted); font-size: 12px;">{{ c.code }}</span></td>
+            <td class="num">{{ c.actual_revenue|floatformat:0 }}</td>
+            <td class="num">
+              <input type="number" min="0" step="500" class="target-input" name="canton_{{ c.code }}" value="{{ c.target_revenue }}">
+            </td>
+            <td>
+              {% if c.fill_pct is not None %}
+              <span class="fill">
+                <span class="bar"><span style="width: {% if c.fill_pct > 100 %}100{% else %}{{ c.fill_pct|floatformat:0 }}{% endif %}%;"></span></span>
+                <span class="pct">{{ c.fill_pct|floatformat:0 }}%</span>
+              </span>
+              {% else %}
+              <span class="meta" style="color: var(--muted); font-size: 12px;">{% trans "aucun objectif" %}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="empty">{% trans "Aucun canton." %}</td></tr>
+          {% endfor %}
+        </tbody>
+        {% if pilotage.cantons %}
+        <tfoot>
+          <tr style="font-weight: 600; border-top: 2px solid var(--line);">
+            <td>{% trans "Total ciblé" %}</td>
+            <td class="num">{{ pilotage.total_canton_actual|floatformat:0 }}</td>
+            <td class="num">{{ pilotage.total_canton_target|floatformat:0 }}</td>
+            <td>
+              {% if pilotage.total_canton_fill_pct is not None %}
+              <span class="fill">
+                <span class="bar"><span style="width: {% if pilotage.total_canton_fill_pct > 100 %}100{% else %}{{ pilotage.total_canton_fill_pct|floatformat:0 }}{% endif %}%;"></span></span>
+                <span class="pct">{{ pilotage.total_canton_fill_pct|floatformat:0 }}%</span>
+              </span>
+              {% endif %}
+            </td>
+          </tr>
+        </tfoot>
+        {% endif %}
+      </table>
+      <div class="actions" style="margin-top: 18px;">
+        <button type="submit" class="btn">{% trans "Enregistrer les objectifs" %}</button>
+      </div>
+    </div>
+  </form>
+{% endblock %}

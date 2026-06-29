@@ -1,0 +1,134 @@
+{% extends "cockpit/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Produits" %}{% endblock %}
+{% block heading %}{% trans "Études par produit" %}{% endblock %}
+{% block meta %}{{ products.days }} {% trans "derniers jours" %} · {% trans "marge brute" %} · CHF{% endblock %}
+
+{% block extra_css %}
+    .summary-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .heat-row td:first-child a { color: var(--ink); text-decoration: none; font-weight: 500; border-bottom: 1px solid var(--gold); }
+    .heat-row td:first-child a:hover { color: var(--gold); }
+    .pill { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--cream); border: 1px solid var(--line); color: var(--muted); }
+    .hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+{% endblock %}
+
+{% block content %}
+    <!-- Summary cards -->
+    <div class="summary-4">
+      <div class="kpi">
+        <div class="label">{% trans "Produits actifs" %}</div>
+        <div class="value">{{ products.product_count }}</div>
+        <div class="target">{% trans "avec ventes sur la période" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "CA produits" %}</div>
+        <div class="value">{{ products.total|floatformat:0 }} <small>CHF</small></div>
+        <div class="target">{{ products.days }} {% trans "jours" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Marge brute moyenne" %}</div>
+        <div class="value">{{ products.avg_margin_pct }}<small>%</small></div>
+        <div class="target">{% trans "hors transport" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Produit n°1" %}</div>
+        {% with top=products.rows.0 %}
+        <div class="value" style="font-size: 22px;">{{ top.name|default:"—" }}</div>
+        <div class="target">{{ top.share }}% {% trans "du CA" %}</div>
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Margin vs revenue study -->
+    <div class="card">
+      <h3>{% trans "Positionnement marge × CA" %}</h3>
+      {% if products.rows %}
+      <canvas id="marginChart" height="120"></canvas>
+      <div class="hint">{% trans "Haut-droite = produits stratégiques (fort CA, forte marge). Taille des bulles = unités vendues." %}</div>
+      {% else %}
+      <div class="empty">{% trans "Aucune vente sur la période." %}</div>
+      {% endif %}
+    </div>
+
+    <!-- Product table -->
+    <h2 class="section">{% trans "Détail par produit" %}</h2>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>{% trans "Produit" %}</th>
+            <th>{% trans "Catégorie" %}</th>
+            <th class="num">{% trans "Unités" %}</th>
+            <th class="num">CA (CHF)</th>
+            <th class="num">{% trans "Part" %}</th>
+            <th class="num">{% trans "Marge brute" %}</th>
+            <th class="num">{% trans "Stock" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in products.rows %}
+          <tr class="heat-row">
+            <td><a href="{% url 'cockpit:product_detail' row.id %}">{{ row.name }}</a></td>
+            <td><span class="pill">{{ row.category }}</span></td>
+            <td class="num">{{ row.units }}</td>
+            <td class="num">{{ row.revenue|floatformat:0 }}</td>
+            <td class="num">{{ row.share }}%</td>
+            <td class="num">{{ row.margin_pct }}%</td>
+            <td class="num">{{ row.stock }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="empty">{% trans "Aucune vente sur la période." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ products.rows|json_script:"product-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const productData = JSON.parse(document.getElementById("product-data").textContent);
+    const el = document.getElementById("marginChart");
+    if (el && productData.length) {
+      const maxUnits = Math.max(...productData.map(d => d.units), 1);
+      const points = productData.map(d => ({
+        x: d.revenue,
+        y: d.margin_pct,
+        r: 6 + (d.units / maxUnits) * 22,
+        label: d.name,
+        units: d.units,
+        share: d.share,
+      }));
+      new Chart(el, {
+        type: "bubble",
+        data: {
+          datasets: [{
+            data: points,
+            backgroundColor: "rgba(200,169,110,0.55)",
+            borderColor: "#1A1A1A",
+            borderWidth: 1,
+          }],
+        },
+        options: {
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const p = ctx.raw;
+                  return `${p.label}: ${Number(p.x).toLocaleString("fr-CH")} CHF · marge ${p.y}% · ${p.units} u.`;
+                },
+              },
+            },
+          },
+          scales: {
+            x: { title: { display: true, text: "CA (CHF)" }, beginAtZero: true },
+            y: { title: { display: true, text: "{% trans "Marge brute %" %}" }, beginAtZero: true },
+          },
+        },
+      });
+    }
+  </script>
+{% endblock %}
