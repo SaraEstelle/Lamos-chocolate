@@ -1,0 +1,149 @@
+{% extends "cockpit/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Étude" %}{% endblock %}
+{% block heading %}{% trans "Étude comportementale" %}{% endblock %}
+{% block meta %}{% trans "Commandes par jour · tunnel de conversion · sur" %} {{ funnel.days }} {% trans "jours" %}{% endblock %}
+
+{% block extra_css %}
+    .study-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; margin-bottom: 24px; }
+    .funnel-stage { margin-bottom: 12px; }
+    .funnel-stage .head { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; margin-bottom: 5px; }
+    .funnel-stage .name { font-weight: 500; }
+    .funnel-stage .count { font-variant-numeric: tabular-nums; }
+    .funnel-stage .conv { color: var(--muted); font-size: 12px; margin-left: 8px; }
+    .funnel-bar { height: 30px; background: var(--line); border-radius: 6px; overflow: hidden; }
+    .funnel-bar > span { display: flex; align-items: center; justify-content: flex-end; height: 100%; padding-right: 10px; color: #fff; font-size: 12px; font-variant-numeric: tabular-nums; background: var(--gold); border-radius: 6px; min-width: 2px; }
+    .conv-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+    .conv-note strong { color: var(--ink); }
+    .rank { color: var(--muted); font-variant-numeric: tabular-nums; width: 28px; }
+{% endblock %}
+
+{% block content %}
+    <div class="study-2">
+      <!-- Orders by weekday -->
+      <div class="card">
+        <h3>{% trans "Commandes par jour de la semaine" %}</h3>
+        <canvas id="weekdayChart" height="150"></canvas>
+      </div>
+
+      <!-- Conversion funnel -->
+      <div class="card">
+        <h3>{% trans "Tunnel de conversion" %}</h3>
+        {% for s in funnel.stages %}
+        <div class="funnel-stage">
+          <div class="head">
+            <span class="name">{{ s.label }}
+              {% if not forloop.first and s.pct_from_prev is not None %}<span class="conv">→ {{ s.pct_from_prev|floatformat:0 }}%</span>{% endif %}
+            </span>
+            <span class="count">{{ s.count }} <span class="conv">{{ s.pct_of_top|floatformat:0 }}%</span></span>
+          </div>
+          <div class="funnel-bar">
+            <span style="width: {% if s.pct_of_top < 4 %}4{% else %}{{ s.pct_of_top|floatformat:0 }}{% endif %}%;"></span>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="conv-note">
+          {% trans "Conversion globale" %} : <strong>{{ funnel.overall_conversion|floatformat:1 }}%</strong>
+          ({% trans "utilisateurs → achat" %})
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders by hour — peak hours -->
+    <div class="card" style="margin-bottom: 24px;">
+      <h3>{% trans "Commandes par heure" %}
+        {% if hourly.peak_hour %}<span class="conv" style="text-transform:none; letter-spacing:0;">· {% trans "pic à" %} <strong style="color:var(--ink);">{{ hourly.peak_hour }}</strong> ({{ hourly.peak_count }} {% trans "commandes" %})</span>{% endif %}
+      </h3>
+      <canvas id="hourChart" height="90"></canvas>
+    </div>
+
+    <!-- Top 5 viewed / ordered -->
+    <div class="study-2">
+      <div class="card">
+        <h3>{% trans "Top 5 articles vus" %}</h3>
+        <table>
+          <thead>
+            <tr><th class="rank">#</th><th>{% trans "Produit" %}</th><th class="num">{% trans "Vues" %}</th></tr>
+          </thead>
+          <tbody>
+            {% for p in top_viewed %}
+            <tr><td class="rank">{{ forloop.counter }}</td><td>{{ p.name }}</td><td class="num">{{ p.views }}</td></tr>
+            {% empty %}
+            <tr><td colspan="3" class="empty">{% trans "Aucune vue enregistrée." %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>{% trans "Top 5 articles commandés" %}</h3>
+        <table>
+          <thead>
+            <tr><th class="rank">#</th><th>{% trans "Produit" %}</th><th class="num">{% trans "Unités" %}</th><th class="num">CA</th></tr>
+          </thead>
+          <tbody>
+            {% for p in top_ordered %}
+            <tr>
+              <td class="rank">{{ forloop.counter }}</td>
+              <td>{{ p.sku__product__name_fr }}</td>
+              <td class="num">{{ p.units }}</td>
+              <td class="num">{{ p.revenue|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">{% trans "Aucune commande." %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ weekday.bars|json_script:"weekday-data" }}
+  {{ hourly.bars|json_script:"hour-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const barOpts = {
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } },
+    };
+
+    const wd = JSON.parse(document.getElementById("weekday-data").textContent);
+    const wdEl = document.getElementById("weekdayChart");
+    if (wdEl) {
+      new Chart(wdEl, {
+        type: "bar",
+        data: {
+          labels: wd.map(b => b.label),
+          datasets: [{
+            label: "{% trans "Commandes" %}",
+            data: wd.map(b => b.count),
+            backgroundColor: "#C8A96E", borderWidth: 0, borderRadius: 4,
+          }],
+        },
+        options: barOpts,
+      });
+    }
+
+    const hr = JSON.parse(document.getElementById("hour-data").textContent);
+    const hrEl = document.getElementById("hourChart");
+    if (hrEl) {
+      const peak = Math.max(...hr.map(b => b.count));
+      new Chart(hrEl, {
+        type: "bar",
+        data: {
+          labels: hr.map(b => b.label),
+          datasets: [{
+            label: "{% trans "Commandes" %}",
+            data: hr.map(b => b.count),
+            // Highlight the peak hour(s) in ink, the rest in gold.
+            backgroundColor: hr.map(b => b.count === peak ? "#1A1A1A" : "#C8A96E"),
+            borderWidth: 0, borderRadius: 3,
+          }],
+        },
+        options: barOpts,
+      });
+    }
+  </script>
+{% endblock %}

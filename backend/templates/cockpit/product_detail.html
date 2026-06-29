@@ -1,0 +1,138 @@
+{% extends "cockpit/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ detail.product.name }}{% endblock %}
+{% block heading %}{{ detail.product.name }}{% endblock %}
+{% block meta %}{{ detail.product.category }} · {{ detail.days }} {% trans "derniers jours" %} · {% trans "marge brute" %} · CHF{% endblock %}
+
+{% block extra_css %}
+    .summary-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .backlink { display: inline-block; margin-bottom: 18px; color: var(--muted); text-decoration: none; font-size: 13px; }
+    .backlink:hover { color: var(--gold); }
+    .badge-low { display: inline-block; font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 999px; background: #b3261e; color: #fff; margin-left: 6px; }
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'cockpit:products' %}" class="backlink">← {% trans "Tous les produits" %}</a>
+
+    <!-- KPIs -->
+    <div class="summary-4">
+      <div class="kpi">
+        <div class="label">{% trans "CA (période)" %}</div>
+        <div class="value">{{ detail.kpis.revenue|floatformat:0 }} <small>CHF</small></div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Unités vendues" %}</div>
+        <div class="value">{{ detail.kpis.units }}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Commandes" %}</div>
+        <div class="value">{{ detail.kpis.orders }}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Marge brute" %}</div>
+        <div class="value">{{ detail.kpis.margin_pct }}<small>%</small></div>
+        <div class="target">{% trans "hors transport" %}</div>
+      </div>
+    </div>
+
+    <!-- Channel split + SKU breakdown -->
+    <div class="grid-2">
+      <div class="card">
+        <h3>{% trans "Répartition canal" %}</h3>
+        {% if detail.channel %}
+        <canvas id="channelChart" height="220"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background: var(--b2c)"></span> B2C</span>
+          <span><span class="dot" style="background: var(--b2b)"></span> B2B</span>
+        </div>
+        {% else %}
+        <div class="empty">{% trans "Aucune vente sur la période." %}</div>
+        {% endif %}
+      </div>
+      <div class="card">
+        <h3>{% trans "Déclinaisons (SKU / saveurs)" %}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th><th>{% trans "Format" %}</th><th>{% trans "Saveur" %}</th>
+              <th class="num">{% trans "Unités" %}</th><th class="num">CA</th>
+              <th class="num">{% trans "Marge" %}</th><th class="num">{% trans "Stock" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in detail.sku_rows %}
+            <tr>
+              <td>{{ s.code }}</td>
+              <td>{{ s.format }}</td>
+              <td>{{ s.flavor|default:"—" }}</td>
+              <td class="num">{{ s.units }}</td>
+              <td class="num">{{ s.revenue|floatformat:0 }}</td>
+              <td class="num">{{ s.margin_pct }}%</td>
+              <td class="num">{{ s.stock }}{% if s.is_low %}<span class="badge-low">{% trans "bas" %}</span>{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" class="empty">{% trans "Aucune vente sur la période." %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Revenue trend -->
+    <h2 class="section">{% trans "Chiffre d'affaires — évolution" %}</h2>
+    <div class="card">
+      {% if detail.trend %}
+      <canvas id="trendChart" height="90"></canvas>
+      {% else %}
+      <div class="empty">{% trans "Aucune vente sur la période." %}</div>
+      {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ detail.channel|json_script:"channel-data" }}
+  {{ detail.trend|json_script:"trend-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const channelData = JSON.parse(document.getElementById("channel-data").textContent);
+    const trendData = JSON.parse(document.getElementById("trend-data").textContent);
+    const labelByChannel = { b2c: "B2C", b2b: "B2B" };
+    const colorByChannel = { b2c: "#C8A96E", b2b: "#1A1A1A" };
+
+    const cEl = document.getElementById("channelChart");
+    if (cEl && channelData.length) {
+      new Chart(cEl, {
+        type: "doughnut",
+        data: {
+          labels: channelData.map(d => labelByChannel[d.channel] || d.channel || "—"),
+          datasets: [{
+            data: channelData.map(d => Number(d.revenue)),
+            backgroundColor: channelData.map(d => colorByChannel[d.channel] || "#8a8174"),
+            borderWidth: 0,
+          }],
+        },
+        options: { plugins: { legend: { display: false } }, cutout: "62%" },
+      });
+    }
+
+    const tEl = document.getElementById("trendChart");
+    if (tEl && trendData.length) {
+      new Chart(tEl, {
+        type: "line",
+        data: {
+          labels: trendData.map(d => d.day),
+          datasets: [{
+            label: "CA (CHF)",
+            data: trendData.map(d => Number(d.total)),
+            borderColor: "#C8A96E",
+            backgroundColor: "rgba(200,169,110,0.12)",
+            fill: true, tension: 0.3, pointRadius: 0,
+          }],
+        },
+        options: { responsive: true, plugins: { legend: { display: false } },
+                   scales: { y: { beginAtZero: true } } },
+      });
+    }
+  </script>
+{% endblock %}
