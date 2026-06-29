@@ -1,0 +1,63 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Checkout" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<h1>{% trans "Checkout" %}</h1>
+
+<div class="row">
+  <div class="col-md-7">
+    <h2 class="h5">{% trans "Shipping address" %}</h2>
+    <form method="post" action="{% url 'checkout:create_session' %}">
+      {% csrf_token %}
+      {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <div class="form-text">{{ field.help_text }}</div>
+          {% endif %}
+          {% for error in field.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-dark">
+        {% trans "Proceed to payment" %}
+      </button>
+    </form>
+  </div>
+
+  <div class="col-md-5">
+    <h2 class="h5">{% trans "Order summary" %}</h2>
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>{% trans "Product" %}</th>
+          <th>{% trans "Qty" %}</th>
+          <th>{% trans "Subtotal" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+          <tr>
+            <td>{{ item.display_name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.subtotal }} {{ item.sku.currency }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">{% trans "Total" %}</th>
+          <th>{{ cart_total }}</th>
+        </tr>
+      </tfoot>
+    </table>
+    <a href="{% url 'cart:view' %}" class="btn btn-outline-secondary btn-sm">
+      {% trans "Back to cart" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

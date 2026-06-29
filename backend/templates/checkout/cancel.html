@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment cancelled" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<div class="container my-5 text-center">
+  <h1 class="h3 mb-3">{% trans "Payment cancelled" %}</h1>
+  <p class="lead">
+    {% trans "Your payment was cancelled and you have not been charged." %}
+  </p>
+  <p class="text-muted">
+    {% trans "Your cart has been kept — you can review it and try again." %}
+  </p>
+  <a href="{% url 'cart:view' %}" class="btn btn-dark mt-3">
+    {% trans "Back to cart" %}
+  </a>
+</div>
+{% endblock %}

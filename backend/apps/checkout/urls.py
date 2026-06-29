@@ -22,13 +22,16 @@ Règulation Suisse (RGPD) :
 
 from django.urls import path
 
+from . import views
+
 # Nom de cette app
 app_name = 'checkout'
 
 # Routes du paiement
 urlpatterns = [
-    # path('', views.checkout_view, name='checkout'),           # Page de paiement
-    # path('success/', views.success_view, name='success'),     # Paiement réussi
-    # path('cancel/', views.cancel_view, name='cancel'),        # Paiement annulé
-    # path('webhook/', views.webhook_view, name='webhook'),     # Webhook Stripe (sans CSRF)
+    path('', views.checkout_view, name='checkout'),
+    path('create-session/', views.create_checkout_session_view, name='create_session'),
+    path('success/', views.success_view, name='success'),
+    path('cancel/', views.cancel_view, name='cancel'),
+    # Webhook Stripe : routé hors i18n dans config/urls.py (sans CSRF)
 ]
