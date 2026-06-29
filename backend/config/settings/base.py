@@ -91,6 +91,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                "apps.common.context_processors.feature_flags",
+                "apps.common.context_processors.cart_summary",
             ],
         },
     },

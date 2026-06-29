@@ -26,6 +26,17 @@
     </ul>
 
     <div class="nav-actions">
+      <a href="{% url 'cart:view' %}" class="nav-cart" aria-label="{% trans 'View cart' %}">
+        <svg class="nav-cart-icon" viewBox="0 0 24 24" width="22" height="22" fill="none"
+             stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="9" cy="20" r="1.4"></circle>
+          <circle cx="18" cy="20" r="1.4"></circle>
+          <path d="M2 3h2.2l2.3 12.3a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.6-1.3L21 7H5.5"></path>
+        </svg>
+        <span class="nav-cart-badge" data-cart-count
+              {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+      </a>
       <a href="{% url 'shop:catalog' %}" class="btn btn-gold">{% trans "Order Now" %}</a>
       <button class="nav-burger" type="button" aria-controls="primary-nav"
               aria-expanded="false" aria-label="{% trans 'Open menu' %}">
