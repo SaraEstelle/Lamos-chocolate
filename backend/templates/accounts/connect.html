@@ -1,0 +1,95 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{# ===========================================================================
+   CONNECT — page "Choisissez votre espace" (B2C / B2B).
+   À placer dans backend/templates/accounts/connect.html
+   Atteinte via le bouton compte de la navbar (accounts:connect).
+   Portée depuis ta maquette connect.html, recolorée marbre, adaptée LAMOS.
+   =========================================================================== #}
+
+{% block title %}{% trans "Sign in" %} · Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="connect">
+
+  <!-- Hero -->
+  <div class="connect-hero reveal">
+    <p class="eyebrow">{% trans "Welcome" %}</p>
+    <h1 class="h-display">{% trans "Choose your" %} <em>{% trans "space" %}</em></h1>
+    <span class="gold-line"></span>
+    <p class="muted">{% trans "Access the world of Lamos Chocolate according to your profile — individual or professional partner." %}</p>
+  </div>
+
+  <!-- Two profiles -->
+  <div class="profile-grid">
+
+    <!-- B2C -->
+    <article class="profile-card reveal-left">
+      <div class="card-icon" aria-hidden="true">🛍️</div>
+      <span class="card-badge">{% trans "Individual" %}</span>
+      <h2 class="card-title">{% trans "Consumer" %}</h2>
+      <p class="card-tagline">{% trans "Order our artisan creations and discover the excellence of Swiss-Dubai chocolate." %}</p>
+      <div class="card-divider" aria-hidden="true"></div>
+      <ul class="card-features">
+        <li>{% trans "Online orders & real-time tracking" %}</li>
+        <li>{% trans "Personalized boxes & gifts" %}</li>
+        <li>{% trans "Access to limited editions" %}</li>
+      </ul>
+      <a href="{% url 'accounts:register' %}" class="btn btn-gold">{% trans "Create my account" %} →</a>
+      <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+        {% trans "Already a member?" %} <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
+      </p>
+    </article>
+
+    <!-- B2B -->
+    <article class="profile-card reveal-right">
+      <div class="card-icon" aria-hidden="true">🏢</div>
+      <span class="card-badge">{% trans "Professional" %}</span>
+      <h2 class="card-title">{% trans "Business" %}</h2>
+      <p class="card-tagline">{% trans "Bespoke corporate solutions for your business gifts and events." %}</p>
+      <div class="card-divider" aria-hidden="true"></div>
+      <ul class="card-features">
+        <li>{% trans "Volume pricing & B2B terms" %}</li>
+        <li>{% trans "Logo & packaging customization" %}</li>
+        <li>{% trans "Online quotes & pro invoicing" %}</li>
+        <li>{% trans "Dedicated account manager" %}</li>
+      </ul>
+      {# NB: l'inscription pro complète (b2b:register) arrive avec le Guide 2.
+         En attendant, on dirige vers la présentation + demande d'accès B2B. #}
+      <a href="{% url 'b2b:presentation' %}" class="btn btn-outline">{% trans "Discover the B2B space" %} →</a>
+      <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+        {% trans "Already a partner?" %} <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
+      </p>
+    </article>
+
+  </div>
+
+  <!-- Quick login (email + Google) -->
+  <div class="connect-login reveal">
+    <div class="connect-or">{% trans "Quick sign in" %}</div>
+    <form method="post" action="{% url 'accounts:login' %}" novalidate>
+      {% csrf_token %}
+      <div class="field">
+        <label for="id_email">Email</label>
+        <input type="email" name="email" id="id_email" placeholder="your@email.ch" required>
+      </div>
+      <div class="field">
+        <label for="id_password">{% trans "Password" %}</label>
+        <input type="password" name="password" id="id_password" required>
+      </div>
+      <button type="submit" class="btn btn-gold" style="width:100%;">{% trans "Sign in" %}</button>
+    </form>
+
+
+    {% load socialaccount %}
+    <a href="{% provider_login_url 'google' %}" class="btn btn-outline" style="width:100%;margin-top:.75rem;">
+      {% trans "Continue with Google" %}
+    </a>
+
+    <p class="muted" style="font-size:.78rem;margin-top:1rem;">
+      <a href="{% url 'accounts:password_reset' %}" style="color:var(--c-gold-3)">{% trans "Forgot your password?" %}</a>
+    </p>
+  </div>
+
+</section>
+{% endblock %}
