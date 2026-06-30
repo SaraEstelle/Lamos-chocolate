@@ -24,6 +24,8 @@ def b2b_account_required(view_func):
         account = getattr(request.user, "b2b_account", None)
         if account is None:
             return redirect("b2b:presentation")
+        if account.status != "active":
+            return redirect("b2b:pending")
         request.b2b_account = account
         return view_func(request, *args, **kwargs)
 
