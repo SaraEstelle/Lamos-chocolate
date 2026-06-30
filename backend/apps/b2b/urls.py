@@ -24,4 +24,11 @@ urlpatterns = [
 
     # L2 — configurator
     path("configurator/", views.configurator_view, name="configurator"),
+
+    path("register/account/", views.register_view, name="register"),
+    path("pending/", views.pending_view, name="pending"),
+
+    path("portal/documents/", views.documents_view, name="documents"),
+    path("portal/notifications/", views.notifications_view, name="notifications"),
+    path("portal/profile/", views.company_profile_view, name="profile"),
 ]
