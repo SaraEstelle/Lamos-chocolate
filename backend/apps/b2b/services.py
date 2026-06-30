@@ -137,3 +137,22 @@ def notify_quote_request(account, customization, estimated):
         logger.exception("Failed to send B2B quote-request email")
         return False
 
+def notify_b2b_account_pending(account):
+    """Notify staff a new pro account awaits validation (+ ack to applicant)."""
+    send_mail(
+        subject="[Lamos B2B] New pro account pending validation",
+        message=f"Company:{account.company_name}\nEmail:{account.customer.email}",
+        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@lamos.ch"),
+        recipient_list=[getattr(settings, "B2B_NOTIFY_EMAIL", "contact@lamos-chocolate.ch")],
+        fail_silently=True,
+    )
+
+def notify_b2b_account_validated(account):
+    """Tell the pro their account is active."""
+    send_mail(
+        subject="[Lamos B2B] Your professional account is active",
+        message="Welcome! Your Lamos professional account has been validated.",
+        from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@lamos.ch"),
+        recipient_list=[account.customer.email],
+        fail_silently=True,
+    )
