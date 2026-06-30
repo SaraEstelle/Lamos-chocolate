@@ -17,6 +17,8 @@ from . import views
 app_name = 'accounts'
 
 urlpatterns = [
+    path("connect/", views.connect_view, name="connect"),
+
     # Registration
     path('register/', views.register_view, name='register'),
 
