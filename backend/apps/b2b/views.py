@@ -23,8 +23,34 @@ from apps.b2b.services import notify_quote_request, simulate_quote
 from apps.checkout.models import Order
 
 from apps.b2b.forms import ConfiguratorForm
+from django.contrib.auth import login
+from apps.b2b.forms import B2BRegisterForm
+from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
+
+@require_http_methods(["GET", "POST"])
+def register_view(request):
+    """Method 1: a professional creates their own (pending) account."""
+    if request.method == "POST":
+        form = B2BRegisterForm(request.POST)
+        if form.is_valid():
+            customer, account = form.save()
+            notify_b2b_account_pending(account)      # email staff + applicant
+            login(request, customer,
+                  backend="django.contrib.auth.backends.ModelBackend")
+            return redirect("b2b:pending")
+    else:
+        form = B2BRegisterForm()
+    return render(request, "b2b/register.html", {"form": form})
 
 
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def pending_view(request):
+    """Shown while a pro account awaits validation."""
+    account = getattr(request.user, "b2b_account", None)
+    if account and account.status == "active":
+        return redirect("b2b:portal")          # already validated
+    return render(request, "b2b/pending.html", {"account": account})
 # ----------------------------------------------------------------------------
 # L0 — Public funnel (no login)
 # ----------------------------------------------------------------------------
@@ -183,3 +209,32 @@ def configurator_view(request):
     return render(request, "b2b/configurator.html", {
         "account": account, "form": form, "simulation": simulation,
     })
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def documents_view(request):
+    """Pro documents (invoices/quotes). Reuses orders + quote simulations."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/documents.html", {
+        "account": account,
+        "orders": get_b2b_orders(account),
+        "quotes": account.quote_simulations.all()[:20],
+    })
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def notifications_view(request):
+    """Account-level notifications (validation, quote status…)."""
+    return render(request, "b2b/portal/notifications.html", {"account": request.b2b_account})
+
+@b2b_account_required
+@require_http_methods(["GET", "POST"])
+def company_profile_view(request):
+    """Edit company info (name, payment terms read-only for the pro)."""
+    account = request.b2b_account
+    if request.method == "POST":
+        account.company_name = request.POST.get("company_name", account.company_name).strip()
+        account.save(update_fields=["company_name"])
+        messages.success(request, _("Company profile updated."))
+        return redirect("b2b:profile")
+    return render(request, "b2b/portal/profile.html", {"account": account})
