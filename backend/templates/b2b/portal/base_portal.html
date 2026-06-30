@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block content %}
+<section class="section container">
+  <div class="account-layout">      {# réutilise le layout du Guide 1/Partie B #}
+    <aside class="account-sidebar">
+      <p class="eyebrow">{% trans "Pro space" %}</p>
+      <p class="muted small">{{ account.company_name }}</p>
+      <nav class="account-nav" aria-label="{% trans 'Pro navigation' %}">
+        <a href="{% url 'b2b:portal' %}">{% trans "Overview" %}</a>
+        <a href="{% url 'b2b:catalogue' %}">{% trans "Pro catalogue" %}</a>
+        <a href="{% url 'b2b:history' %}">{% trans "Orders" %}</a>
+        <a href="{% url 'b2b:documents' %}">{% trans "Documents" %}</a>
+        <a href="{% url 'b2b:notifications' %}">{% trans "Notifications" %}</a>
+        <a href="{% url 'b2b:profile' %}">{% trans "Company profile" %}</a>
+        <a href="{% url 'b2b:configurator' %}">{% trans "Configurator" %}</a>
+        <a href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a>
+      </nav>
+    </aside>
+    <div class="account-content">
+      {% block portal_content %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}
