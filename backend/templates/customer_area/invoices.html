@@ -1,0 +1,37 @@
+{% extends "customer_area/base_account.html" %}
+{% load i18n %}
+{# backend/templates/customer_area/invoices.html
+   Nécessite la vue invoices_view (Guide 2 §B.3) qui passe `orders`. #}
+
+{% block account_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Invoices" %}</h1>
+
+  {% if orders %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Order" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Total" %}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+          <tr>
+            <td>{{ order.order_number|default:order.id }}</td>
+            <td>{{ order.created_at|date:"d M Y" }}</td>
+            <td>{{ order.get_status_display|default:order.status }}</td>
+            <td>{{ order.total }} CHF</td>
+            <td>
+              <a href="{% url 'customer_area:invoice_detail' order.id %}" class="btn btn-sm btn-outline">{% trans "View invoice" %}</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">{% trans "You have no invoices yet." %}</p>
+  {% endif %}
+{% endblock %}
