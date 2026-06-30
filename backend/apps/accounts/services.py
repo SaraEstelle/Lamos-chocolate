@@ -71,7 +71,7 @@ def create_customer(email: str, password: str, first_name: str, last_name: str,
         password=password,
         first_name=first_name,
         last_name=last_name,
-        phone=phone,
+        phone="",
         preferred_language=preferred_language,
         is_active=True  # Customer is active immediately
     )

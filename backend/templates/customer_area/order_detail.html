@@ -1,9 +1,9 @@
-{% extends "base/base.html" %}
+{% extends "customer_area/base_account.html" %}
 {% load i18n %}
 
 {% block title %}{% trans "Order" %} {{ order.order_number }} — Lamos Chocolate{% endblock %}
 
-{% block content %}
+{% block account_content %}
 <div class="container my-5">
   <a href="{% url 'customer_area:orders' %}" class="btn btn-link mb-3">← {% trans "Back to my orders" %}</a>
 

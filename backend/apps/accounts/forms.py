@@ -61,27 +61,22 @@ class RegisterForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ('email', 'first_name', 'last_name', 'phone', 'preferred_language')
+        fields = ('email', 'first_name', 'last_name', 'preferred_language')
         widgets = {
             'email': forms.EmailInput(attrs={
-                'class': 'form-control',
+                'class': 'field-input',
                 'placeholder': 'your@email.ch'
             }),
             'first_name': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'field-input',
                 'placeholder': 'John'
             }),
             'last_name': forms.TextInput(attrs={
-                'class': 'form-control',
+                'class': 'field-input',
                 'placeholder': 'Doe'
             }),
-            'phone': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': '+41 (XX) XXX XX XX',
-                'required': False
-            }),
             'preferred_language': forms.Select(attrs={
-                'class': 'form-control'
+                'class': 'field-input'
             })
         }
 
@@ -306,12 +301,53 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ("first_name", "last_name", "phone", "preferred_language")
+        fields = ("first_name", "last_name", "phone", "npa", "canton", "preferred_language")
         widgets = {
-            "first_name": forms.TextInput(attrs={"class": "form-control"}),
-            "last_name": forms.TextInput(attrs={"class": "form-control"}),
-            "phone": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "+41 (XX) XXX XX XX"}
-            ),
-            "preferred_language": forms.Select(attrs={"class": "form-select"}),
+            "first_name": forms.TextInput(attrs={"class": "field-input"}),
+            "last_name":  forms.TextInput(attrs={"class": "field-input"}),
+            "phone":      forms.TextInput(attrs={"class": "field-input", "placeholder": "+41 (XX) XXX XX XX"}),
+            "npa":        forms.TextInput(attrs={"class": "field-input", "placeholder": "1201"}),
+            "canton":     forms.Select(attrs={"class": "field-input"}),
+            "preferred_language": forms.Select(attrs={"class": "field-input"}),
         }
+
+class PasswordChangeForm(forms.Form):
+    """Logged-in password change: requires the current password."""
+    current_password = forms.CharField(
+        label="Current password",
+        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "current-password"}),
+    )
+    new_password = forms.CharField(
+        label="New password", min_length=12,
+        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "new-password"}),
+    )
+    new_password_confirm = forms.CharField(
+        label="Confirm new password",
+        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "new-password"}),
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    def clean_current_password(self):
+        pwd = self.cleaned_data["current_password"]
+        if not self.user or not self.user.check_password(pwd):
+            raise forms.ValidationError("Your current password is incorrect.")
+        return pwd
+
+    def clean_new_password(self):
+        p = self.cleaned_data.get("new_password", "")
+        checks = [any(c.isupper() for c in p), any(c.islower() for c in p),
+                  any(c.isdigit() for c in p), any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p)]
+        if not all(checks):
+            raise forms.ValidationError(
+                "Password must contain uppercase, lowercase, digit and special character.")
+        return p
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("new_password") and cleaned.get("new_password_confirm"):
+            if cleaned["new_password"] != cleaned["new_password_confirm"]:
+                raise forms.ValidationError("The two new passwords do not match.")
+        return cleaned
