@@ -24,6 +24,7 @@ from apps.checkout.models import Order
 
 from apps.b2b.forms import ConfiguratorForm
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
 from apps.b2b.forms import B2BRegisterForm
 from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
 
