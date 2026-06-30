@@ -33,9 +33,17 @@ from apps.accounts.services import (
 from apps.accounts.tokens import create_reset_token, verify_reset_token, mark_token_as_used
 from apps.accounts.models import Customer
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import render, redirect
 
 logger = logging.getLogger('apps.accounts')
 
+@require_http_methods(["GET"])
+def connect_view(request):
+    """Profile chooser (B2C / B2B) + quick login entry point."""
+    if request.user.is_authenticated:
+        return redirect("customer_area:dashboard")
+    return render(request, "accounts/connect.html")
 
 @require_http_methods(["GET", "POST"])
 @csrf_protect
