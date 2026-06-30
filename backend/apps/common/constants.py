@@ -96,6 +96,8 @@ class B2BSegmentChoices(models.TextChoices):
 
 class B2BAccountStatusChoices(models.TextChoices):
     """Lifecycle status of a B2B account."""
+    PENDING  = "pending", "En attente de validation"
     PROSPECT = "prospect", "Prospect"
     ACTIVE = "active", "Actif"
     DORMANT = "dormant", "Dormant"
+
