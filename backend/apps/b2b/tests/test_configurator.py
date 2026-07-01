@@ -20,7 +20,7 @@ def pro_with_sku(sample_product):
     c = Customer.objects.create_user(
         email="conf@test.com", password="StrongP@ss1!", customer_type="b2b_hospitality",
     )
-    account = B2BAccount.objects.create(customer=c, company_name="Hotel X")
+    account = B2BAccount.objects.create(customer=c, company_name="Hotel X", status="active",)
     return c, account, sku
 
 

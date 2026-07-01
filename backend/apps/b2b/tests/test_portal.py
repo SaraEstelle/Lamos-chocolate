@@ -16,7 +16,7 @@ def make_b2b_customer(email="pro@test.com"):
     c = Customer.objects.create_user(
         email=email, password="StrongP@ss1!", customer_type="b2b_distributor",
     )
-    account = B2BAccount.objects.create(customer=c, company_name="Dubno SA")
+    account = B2BAccount.objects.create(customer=c, company_name="Dubno SA", status="active",)
     return c, account
 
 
