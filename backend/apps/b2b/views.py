@@ -27,6 +27,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from apps.b2b.forms import B2BRegisterForm
 from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
+from apps.b2b.decorators import b2b_account_required, b2b_login_required
 
 @require_http_methods(["GET", "POST"])
 def register_view(request):
@@ -116,8 +117,10 @@ def portal_catalogue_view(request):
     # The pro consulted live stock → track it (feeds B2B engagement KPIs).
     track_event("b2b_stock_viewed", customer=request.user, channel="b2b",
                 account=str(account.id))
+    can_order = account.status == "active"
     return render(request, "b2b/portal/catalogue.html", {
         "account": account, "catalogue": get_pro_catalogue(),
+        "can_order": can_order,
     })
 
 

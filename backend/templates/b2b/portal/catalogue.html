@@ -1,8 +1,15 @@
 {% extends "b2b/portal/base_portal.html" %}
+{% load static %}
 {% load i18n %}
 {% block title %}{% trans "Pro catalogue" %} — Lamos Chocolate{% endblock %}
 {% block portal_content %}
 <div class="container my-5" style="max-width: 960px;">
+    <a class="btn btn-gold mb-4"
+        href="{% static 'catalogue/lamos-b2b-catalogue.pdf' %}"
+        download>
+        {% trans "Download the full B2B catalogue (PDF)" %}
+    </a>
+
   <h1 class="mb-4">{% trans "Pro catalogue" %}</h1>
   <table class="table align-middle">
     <thead><tr>

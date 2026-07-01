@@ -62,3 +62,18 @@ class TestCatalogueAndReorder:
         resp = client.post(reverse("b2b:reorder", args=[order.id]))
         assert resp.status_code == 302
         assert QuoteSimulation.objects.filter(account=account).count() == 1
+
+@pytest.mark.django_db
+class TestPendingCatalogueAccess:
+    def test_pending_pro_can_view_catalogue(self, client, sample_product):
+        product, sku, _stock = sample_product
+        B2BProductInfo.objects.create(sku=sku, moq=24, is_b2b_available=True)
+        c = Customer.objects.create_user(
+            email="pending@test.com", password="StrongP@ss1!",
+            customer_type="b2b_distributor",
+        )
+        # status left to default (prospect) → NOT active, but must still read.
+        B2BAccount.objects.create(customer=c, company_name="Prospect SA")
+        client.force_login(c)
+        resp = client.get(reverse("b2b:catalogue"))
+        assert resp.status_code == 200  # visible even before validation
