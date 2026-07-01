@@ -1,36 +1,51 @@
-{% extends "base/base.html" %}
+{% extends "b2b/portal/base_portal.html" %}
 {% load i18n %}
+
 {% block title %}{% trans "Configurator" %} — Lamos Chocolate{% endblock %}
-{% block content %}
-<div class="container my-5" style="max-width: 760px;">
-  <h1 class="mb-3">{% trans "Personalisation configurator" %}</h1>
-  <form method="post" novalidate>
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Personalisation" %}</span>
+  <h1 class="h-display" style="margin-bottom:.5rem;">{% trans "Configurator & quote" %}</h1>
+  <p class="muted" style="margin-bottom:1.75rem;">{% trans "Configure your product on 4 axes, simulate the price against the MOQ, then request a quote." %}</p>
+
+  <form method="post" novalidate style="max-width:620px;">
     {% csrf_token %}
     {% for field in form %}
-      <div class="mb-3">
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
-      </div>
+      {% if field.field.widget.input_type == "checkbox" %}
+        <label style="display:flex;align-items:center;gap:.5rem;margin-bottom:1.1rem;font-size:.85rem;color:var(--c-text-2);">
+          {{ field }} {{ field.label }}
+        </label>
+      {% else %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<p class="small" style="color:var(--c-danger)">{{ field.errors|striptags }}</p>{% endif %}
+        </div>
+      {% endif %}
     {% endfor %}
-    <div class="d-flex gap-2">
-      <button type="submit" name="action" value="simulate" class="btn btn-outline-primary">{% trans "Simulate" %}</button>
-      <button type="submit" name="action" value="request_quote" class="btn btn-primary">{% trans "Request a quote" %}</button>
+
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.5rem;">
+      <button type="submit" name="action" value="simulate" class="btn btn-outline">{% trans "Simulate" %}</button>
+      <button type="submit" name="action" value="request_quote" class="btn btn-gold">{% trans "Request a quote" %}</button>
     </div>
   </form>
 
   {% if simulation %}
-    <div class="alert {% if simulation.moq_reached %}alert-success{% else %}alert-warning{% endif %} mt-4">
-      <p class="mb-1"><strong>{% trans "Estimated value" %}:</strong> {{ simulation.estimated }} CHF</p>
-      <p class="mb-1"><strong>{% trans "Unit price" %}:</strong> {{ simulation.unit_price }} CHF</p>
-      <p class="mb-0">
+    <div style="max-width:620px;margin-top:1.75rem;border:1px solid var(--c-line);border-radius:var(--radius);
+                padding:1.5rem;background:var(--c-ivory);
+                border-left:3px solid {% if simulation.moq_reached %}var(--c-success){% else %}var(--c-gold){% endif %};">
+      <p class="eyebrow" style="margin-bottom:.75rem;">{% trans "Estimation" %}</p>
+      <p style="margin:.15rem 0;">{% trans "Unit price" %} : <strong>{{ simulation.unit_price }} CHF</strong></p>
+      <p style="margin:.15rem 0;">{% trans "Estimated value" %} : <strong>{{ simulation.estimated }} CHF</strong></p>
+      <p style="margin:.6rem 0 0;">
         {% if simulation.moq_reached %}
-          ✅ {% trans "Minimum order quantity reached" %} ({% trans "MOQ" %} {{ simulation.moq }})
+          <span class="badge badge--new">{% trans "MOQ reached" %}</span>
+          {% blocktrans with moq=simulation.moq %}Minimum order quantity reached (MOQ {{ moq }}).{% endblocktrans %}
         {% else %}
-          ⚠️ {% blocktrans with moq=simulation.moq %}Below the minimum order quantity (MOQ {{ moq }}){% endblocktrans %}
+          <span class="badge">{% trans "Below MOQ" %}</span>
+          {% blocktrans with moq=simulation.moq %}Below the minimum order quantity (MOQ {{ moq }}).{% endblocktrans %}
         {% endif %}
       </p>
     </div>
   {% endif %}
-</div>
 {% endblock %}
