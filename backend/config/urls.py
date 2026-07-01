@@ -130,9 +130,9 @@ urlpatterns += i18n_patterns(
 # Exemple : si un utilisateur accède à /invalid-path/,
 # Django appelle handler404 qui affiche une page custom 404.html
 # ============================================================================
-# handler404 = "apps.main.views.page_not_found"          # 404 - Page non trouvée
-# handler500 = "apps.main.views.server_error"            # 500 - Erreur serveur
-# handler403 = "apps.main.views.permission_denied"       # 403 - Accès refusé
+handler404 = "apps.main.views.page_not_found"          # 404 - Page non trouvée
+handler500 = "apps.main.views.server_error"            # 500 - Erreur serveur
+handler403 = "apps.main.views.permission_denied"       # 403 - Accès refusé
 
 # ============================================================================
 # FICHIERS STATIQUES ET MÉDIA (images, uploads, CSS, JS)
