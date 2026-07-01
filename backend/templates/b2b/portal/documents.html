@@ -1,0 +1,99 @@
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n %}
+
+{# =========================================================================
+   B2B portal — Documents (orders + quote simulations)
+   -------------------------------------------------------------------------
+   Context (from documents_view):
+     - account : B2BAccount
+     - orders  : recent B2B orders (channel="b2b"), scoped to the account
+     - quotes  : up to 20 QuoteSimulation rows for this account
+   ========================================================================= #}
+
+{% block title %}{% trans "Documents" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Pro space" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Documents" %}</h1>
+
+  {# ---- Orders / invoices ------------------------------------------------ #}
+  <h2 class="eyebrow">{% trans "Orders & invoices" %}</h2>
+  {% if orders %}
+    <table class="table" style="margin-bottom:2.5rem;">
+      <thead>
+        <tr>
+          <th>{% trans "Order" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Total" %}</th>
+          <th>{% trans "Status" %}</th>
+          <th>{% trans "Invoice" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td>{{ o.order_number }}</td>
+            <td>{{ o.created_at|date:"d.m.Y" }}</td>
+            <td>{{ o.total_amount }} {{ o.currency }}</td>
+            <td>{{ o.get_status_display|default:o.status }}</td>
+            <td>
+              {# PDF invoice generation (reportlab) is not wired yet.
+                 [[ Replace this disabled button with a real link to the PDF
+                    route once it exists, e.g.:
+                    <a class="btn btn-sm btn-outline"
+                       href="{% url 'customer_area:invoice_pdf' o.id %}">
+                      {% trans "Download" %}</a>
+                 ]] #}
+              <button type="button" class="btn btn-sm btn-outline"
+                      disabled
+                      title="{% trans 'PDF invoices coming soon' %}">
+                {% trans "Soon" %}
+              </button>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted" style="margin-bottom:2.5rem;">{% trans "No order yet." %}</p>
+  {% endif %}
+
+  {# ---- Quote simulations ------------------------------------------------ #}
+  <h2 class="eyebrow">{% trans "Quote simulations" %}</h2>
+  {% if quotes %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Estimated value" %}</th>
+          <th>{% trans "MOQ" %}</th>
+          <th>{% trans "Status" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for q in quotes %}
+          <tr>
+            <td>{{ q.created_at|date:"d.m.Y" }}</td>
+            <td>{{ q.estimated_value }} CHF</td>
+            <td>
+              {% if q.moq_reached %}
+                <span class="badge badge--new">{% trans "Reached" %}</span>
+              {% else %}
+                <span class="badge">{% trans "Below MOQ" %}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if q.converted %}
+                {% trans "Converted" %}
+              {% else %}
+                {% trans "Pending" %}
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">{% trans "No quote simulation yet." %}</p>
+  {% endif %}
+{% endblock %}
