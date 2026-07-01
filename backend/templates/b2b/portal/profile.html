@@ -1,0 +1,81 @@
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n %}
+
+{# =========================================================================
+   B2B portal — Company profile
+   -------------------------------------------------------------------------
+   Context (from company_profile_view):
+     - account : the B2BAccount of the logged-in pro user
+   The view updates ONLY `company_name` on POST. All other commercial fields
+   (segment, status, client number, payment terms) are managed internally and
+   shown read-only here.
+   ========================================================================= #}
+
+{% block title %}{% trans "Company profile" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Pro space" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Company profile" %}</h1>
+
+  {# ---- Editable part: company name -------------------------------------- #}
+  <form method="post" novalidate style="max-width:520px;margin-bottom:2.5rem;">
+    {% csrf_token %}
+
+    <div class="field">
+      <label for="company_name">{% trans "Company name" %}</label>
+      <input type="text"
+             id="company_name"
+             name="company_name"
+             class="field-input"
+             value="{{ account.company_name }}"
+             maxlength="200"
+             required>
+    </div>
+
+    <button type="submit" class="btn btn-gold mt-3">
+      {% trans "Save changes" %}
+    </button>
+  </form>
+
+  {# ---- Read-only part: commercial information --------------------------- #}
+  <h2 class="eyebrow">{% trans "Account information" %}</h2>
+  <table class="table" style="max-width:640px;">
+    <tbody>
+      <tr>
+        <th>{% trans "Contact email" %}</th>
+        <td>{{ request.user.email }}</td>
+      </tr>
+      <tr>
+        <th>{% trans "Segment" %}</th>
+        <td>{{ account.get_segment_display }}</td>
+      </tr>
+      <tr>
+        <th>{% trans "Status" %}</th>
+        <td>
+          {# A small Marbre badge reflecting the account lifecycle status. #}
+          {% if account.status == "active" %}
+            <span class="badge badge--new">{{ account.get_status_display }}</span>
+          {% else %}
+            <span class="badge">{{ account.get_status_display }}</span>
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>{% trans "Client number" %}</th>
+        <td>{{ account.client_number|default:"—" }}</td>
+      </tr>
+      <tr>
+        <th>{% trans "Payment terms" %}</th>
+        <td>{{ account.payment_terms|default:"—" }}</td>
+      </tr>
+      <tr>
+        <th>{% trans "Member since" %}</th>
+        <td>{{ account.created_at|date:"d M Y" }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted small" style="margin-top:1rem;max-width:640px;">
+    {% trans "To change your segment, payment terms or any other commercial detail, please contact our team." %}
+  </p>
+{% endblock %}
