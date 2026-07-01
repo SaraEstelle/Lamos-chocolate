@@ -1,0 +1,68 @@
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n %}
+
+{# =========================================================================
+   B2B portal — Notifications
+   -------------------------------------------------------------------------
+   Context (from notifications_view): account only.
+   There is no Notification model yet, so we derive a couple of status-based
+   messages from the account state. When a real Notification model is added,
+   pass a `notifications` queryset and replace the static block by a loop.
+   ========================================================================= #}
+
+{% block title %}{% trans "Notifications" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Pro space" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Notifications" %}</h1>
+
+  <div class="notif-list" style="max-width:680px;display:flex;flex-direction:column;gap:.75rem;">
+
+    {# --- Account status notification ------------------------------------ #}
+    {% if account.status == "active" %}
+      <div class="notif-item"
+           style="border:1px solid var(--c-line);border-left:3px solid var(--c-success);
+                  border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+        <p style="margin:0;font-weight:700;">{% trans "Your pro account is active" %}</p>
+        <p class="muted small" style="margin:.25rem 0 0;">
+          {% trans "You have full access to the pro catalogue and the configurator." %}
+        </p>
+      </div>
+    {% elif account.status == "pending" %}
+      <div class="notif-item"
+           style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);
+                  border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+        <p style="margin:0;font-weight:700;">{% trans "Account under validation" %}</p>
+        <p class="muted small" style="margin:.25rem 0 0;">
+          {% trans "Our team is reviewing your request. You will be notified by email within 24–48h." %}
+        </p>
+      </div>
+    {% else %}
+      <div class="notif-item"
+           style="border:1px solid var(--c-line);border-left:3px solid var(--c-text-3);
+                  border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+        <p style="margin:0;font-weight:700;">{{ account.get_status_display }}</p>
+      </div>
+    {% endif %}
+
+    {# --- Onboarding notification (only if the date is known) ------------- #}
+    {% if account.onboarded_at %}
+      <div class="notif-item"
+           style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);
+                  border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+        <p style="margin:0;font-weight:700;">{% trans "Welcome on board" %}</p>
+        <p class="muted small" style="margin:.25rem 0 0;">
+          {% blocktrans with date=account.onboarded_at|date:"d M Y" %}
+            Your account was activated on {{ date }}.
+          {% endblocktrans %}
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <p class="muted small" style="margin-top:1.5rem;max-width:680px;">
+    {# Honest note to the user: this is a status summary, not a message inbox. #}
+    {% trans "Real-time notifications (quote updates, shipping…) will appear here soon." %}
+  </p>
+{% endblock %}
