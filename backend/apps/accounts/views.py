@@ -32,6 +32,7 @@ from apps.accounts.services import (
 )
 from apps.accounts.tokens import create_reset_token, verify_reset_token, mark_token_as_used
 from apps.accounts.models import Customer
+from apps.accounts.redirects import post_auth_redirect_target
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect
@@ -42,7 +43,7 @@ logger = logging.getLogger('apps.accounts')
 def connect_view(request):
     """Profile chooser (B2C / B2B) + quick login entry point."""
     if request.user.is_authenticated:
-        return redirect("customer_area:dashboard")
+        return redirect(post_auth_redirect_target(request.user))
     return render(request, "accounts/connect.html")
 
 @require_http_methods(["GET", "POST"])
@@ -167,7 +168,7 @@ def login_view(request):
                 require_https=request.is_secure(),
             ):
                 return redirect(next_url)
-            return redirect('customer_area:dashboard')
+            return redirect(post_auth_redirect_target(customer))
 
         else:
             # Form is invalid (incorrect email/password)
