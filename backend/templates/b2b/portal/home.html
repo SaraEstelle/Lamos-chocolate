@@ -1,22 +1,84 @@
 {% extends "b2b/portal/base_portal.html" %}
 {% load i18n %}
+
+{# =========================================================================
+   B2B portal — Home / dashboard
+   -------------------------------------------------------------------------
+   Context (from portal_home_view):
+     - account   : B2BAccount
+     - catalogue : first 6 pro catalogue rows (B2BProductInfo)
+     - orders    : last 5 B2B orders
+   ========================================================================= #}
+
 {% block title %}{% trans "Pro space" %} — Lamos Chocolate{% endblock %}
+
 {% block portal_content %}
-<div class="container my-5" style="max-width: 960px;">
-  <h1 class="mb-1">{% trans "Welcome" %}, {{ account.company_name }}</h1>
-  <p class="text-muted mb-4">{% trans "Your professional space" %} — {{ account.get_segment_display }}</p>
-  <div class="d-flex gap-2 mb-4">
-    <a href="{% url 'b2b:catalogue' %}" class="btn btn-primary">{% trans "Pro catalogue" %}</a>
-    <a href="{% url 'b2b:configurator' %}" class="btn btn-outline-dark">{% trans "Configurator" %}</a>
-    <a href="{% url 'b2b:history' %}" class="btn btn-outline-dark">{% trans "Order history" %}</a>
+  <span class="eyebrow">{% trans "Pro space" %}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">
+    {% blocktrans with company=account.company_name %}Welcome, {{ company }}{% endblocktrans %}
+  </h1>
+  <p class="muted" style="margin-bottom:2rem;">{{ account.get_segment_display }}</p>
+
+  {# ---- Quick actions ---------------------------------------------------- #}
+  <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.5rem;">
+    <a href="{% url 'b2b:catalogue' %}" class="btn btn-gold btn-sm">{% trans "Pro catalogue" %}</a>
+    <a href="{% url 'b2b:configurator' %}" class="btn btn-outline btn-sm">{% trans "Configurator" %}</a>
+    <a href="{% url 'b2b:history' %}" class="btn btn-outline btn-sm">{% trans "Order history" %}</a>
+    <a href="{% url 'b2b:documents' %}" class="btn btn-outline btn-sm">{% trans "Documents" %}</a>
   </div>
-  <h2 class="h5">{% trans "Recent orders" %}</h2>
+
+  {# ---- Recent orders ---------------------------------------------------- #}
+  <h2 class="eyebrow">{% trans "Recent orders" %}</h2>
   {% if orders %}
-    <ul class="list-group">
-      {% for o in orders %}<li class="list-group-item d-flex justify-content-between">
-        <span>{{ o.order_number }}</span><span>{{ o.total_amount }} {{ o.currency }}</span>
-      </li>{% endfor %}
-    </ul>
-  {% else %}<p class="text-muted">{% trans "No order yet." %}</p>{% endif %}
-</div>
+    <table class="table" style="margin-bottom:2.5rem;">
+      <thead>
+        <tr>
+          <th>{% trans "Order" %}</th>
+          <th>{% trans "Date" %}</th>
+          <th>{% trans "Total" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+          <tr>
+            <td>{{ o.order_number }}</td>
+            <td>{{ o.created_at|date:"d.m.Y" }}</td>
+            <td>{{ o.total_amount }} {{ o.currency }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted" style="margin-bottom:2.5rem;">{% trans "No order yet." %}</p>
+  {% endif %}
+
+  {# ---- Catalogue preview ------------------------------------------------ #}
+  <h2 class="eyebrow">{% trans "Catalogue preview" %}</h2>
+  {% if catalogue %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Product" %}</th>
+          <th>{% trans "Pro price" %}</th>
+          <th>{% trans "MOQ" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for info in catalogue %}
+          <tr>
+            <td>{{ info.sku.product.name_fr }}
+              <div class="muted small">{{ info.sku.sku_code }}</div>
+            </td>
+            <td>{{ info.effective_price }} CHF</td>
+            <td>{{ info.moq }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'b2b:catalogue' %}" class="btn btn-outline btn-sm mt-3">
+      {% trans "See full catalogue" %}
+    </a>
+  {% else %}
+    <p class="muted">{% trans "No product available." %}</p>
+  {% endif %}
 {% endblock %}
