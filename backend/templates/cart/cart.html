@@ -4,70 +4,70 @@
 {% block title %}{% trans "Your cart" %} — Lamos Chocolate{% endblock %}
 
 {% block content %}
-<h1>{% trans "Your cart" %}</h1>
+<section class="section container" style="max-width:960px;">
+  <span class="eyebrow">{% trans "Your order" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.75rem;">{% trans "Your cart" %}</h1>
 
-{% if cart_items %}
-  <table class="table align-middle">
-    <thead>
-      <tr>
-        <th>{% trans "Product" %}</th>
-        <th>{% trans "Format" %}</th>
-        <th>{% trans "Unit price" %}</th>
-        <th>{% trans "Quantity" %}</th>
-        <th>{% trans "Subtotal" %}</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in cart_items %}
-        <tr data-sku-id="{{ item.sku.id }}">
-          <td>{{ item.display_name }}</td>
-          <td>{{ item.sku.format }}</td>
-          <td>{{ item.unit_price }} {{ item.sku.currency }}</td>
-          <td>
-            <form action="{% url 'cart:update' %}" method="post" class="d-flex gap-1"
-                  data-cart-update data-updated-label="{% trans 'Cart updated.' %}">
-              {% csrf_token %}
-              <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
-              <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
-                     class="form-control form-control-sm" style="width: 72px;">
-              <button type="submit" class="btn btn-outline-dark btn-sm">
-                {% trans "Update" %}
-              </button>
-            </form>
-          </td>
-          <td data-subtotal>{{ item.subtotal }} {{ item.sku.currency }}</td>
-          <td>
-            <form action="{% url 'cart:remove' %}" method="post"
-                  data-cart-remove data-removed-label="{% trans 'Item removed from your cart.' %}">
-              {% csrf_token %}
-              <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
-              <button type="submit" class="btn btn-link btn-sm text-danger p-0">
-                {% trans "Remove" %}
-              </button>
-            </form>
-          </td>
+  {% if cart_items %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>{% trans "Product" %}</th>
+          <th>{% trans "Format" %}</th>
+          <th>{% trans "Unit price" %}</th>
+          <th>{% trans "Quantity" %}</th>
+          <th style="text-align:right;">{% trans "Subtotal" %}</th>
+          <th></th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+          <tr data-sku-id="{{ item.sku.id }}">
+            <td>{{ item.display_name }}</td>
+            <td class="muted">{{ item.sku.format }}</td>
+            <td>{{ item.unit_price }} {{ item.sku.currency }}</td>
+            <td>
+              <form action="{% url 'cart:update' %}" method="post"
+                    style="display:flex;gap:.4rem;align-items:center;"
+                    data-cart-update data-updated-label="{% trans 'Cart updated.' %}">
+                {% csrf_token %}
+                <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
+                <input type="number" name="quantity" value="{{ item.quantity }}" min="0"
+                       class="field-input" style="width:72px;">
+                <button type="submit" class="btn btn-outline btn-sm">{% trans "Update" %}</button>
+              </form>
+            </td>
+            <td style="text-align:right;" data-subtotal>{{ item.subtotal }} {{ item.sku.currency }}</td>
+            <td style="text-align:right;">
+              <form action="{% url 'cart:remove' %}" method="post"
+                    data-cart-remove data-removed-label="{% trans 'Item removed from your cart.' %}">
+                {% csrf_token %}
+                <input type="hidden" name="sku_id" value="{{ item.sku.id }}">
+                <button type="submit" class="btn btn-sm btn-outline"
+                        style="border-color:transparent;color:var(--c-danger);">
+                  {% trans "Remove" %}
+                </button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <p class="fs-5">
-    <strong>{% trans "Total" %}:</strong>
-    <span data-cart-total>{{ cart_total }}</span>
-    (<span data-cart-count-text>{{ cart_count }}</span> {% trans "item(s)" %})
-  </p>
+    <div style="display:flex;justify-content:flex-end;align-items:baseline;gap:.75rem;margin:1.5rem 0 2rem;">
+      <span class="muted">{% trans "Total" %}
+        (<span data-cart-count-text>{{ cart_count }}</span> {% trans "item(s)" %})
+      </span>
+      <span class="h-display" style="font-size:1.9rem;" data-cart-total>{{ cart_total }}</span>
+    </div>
 
-  <div class="d-flex gap-2">
-    <a href="{% url 'shop:catalog' %}" class="btn btn-outline-dark">
-      {% trans "Continue shopping" %}
-    </a>
-    <a href="{% url 'checkout:checkout' %}" class="btn btn-gold">
-      {% trans "Proceed to checkout" %}
-    </a>
-  </div>
-{% else %}
-  <p>{% trans "Your cart is empty." %}</p>
-  <a href="{% url 'shop:catalog' %}" class="btn btn-dark">{% trans "Browse the shop" %}</a>
-{% endif %}
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-outline">{% trans "Continue shopping" %}</a>
+      <a href="{% url 'checkout:checkout' %}" class="btn btn-gold">{% trans "Proceed to checkout" %} &rarr;</a>
+    </div>
+  {% else %}
+    <p class="muted" style="margin-bottom:1.5rem;">{% trans "Your cart is empty." %}</p>
+    <a href="{% url 'shop:catalog' %}" class="btn btn-gold">{% trans "Browse the shop" %}</a>
+  {% endif %}
+</section>
 {% endblock %}
