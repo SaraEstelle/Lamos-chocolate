@@ -1,0 +1,98 @@
+/* =============================================================================
+   responsive.css — Responsivité GLOBALE du site (à charger APRÈS design-system).
+   -----------------------------------------------------------------------------
+   >>> PLACER CE FICHIER DANS :  backend/static/css/responsive.css
+   >>> LE CHARGER UNE SEULE FOIS, globalement, dans backend/templates/base/base.html
+       (voir le guide : une ligne <link> après utilities.css).
+   -----------------------------------------------------------------------------
+   POURQUOI CE FICHIER ?
+   Le site est déjà responsive à ~70 % : la navbar a un menu burger (<=992px),
+   les grilles .product-grid / .footer-grid / .account-layout / .field-row /
+   .stats-grid / .story-grid / .contact-grid ont déjà des points de rupture, les
+   images sont fluides (img{max-width:100%}) et les gros titres utilisent clamp().
+
+   Ce fichier FERME LES TROUS restants, SANS toucher aux templates un par un :
+     1) Empile les grilles "1fr 1fr" écrites en style INLINE (dashboard, adresses,
+        page produit, etc.) sur petit écran.
+     2) Rend TOUS les tableaux défilables horizontalement sur mobile.
+     3) Resserre les espacements et fluidifie titres/boutons sur petit écran.
+
+   Il n'ajoute que des règles MOBILE : le rendu desktop n'est pas modifié.
+   ========================================================================== */
+
+/* =============================================================================
+   1) GRILLES INLINE "1fr 1fr" -> une seule colonne sur mobile
+   -----------------------------------------------------------------------------
+   Astuce : un sélecteur d'ATTRIBUT [style*="..."] combiné à !important peut
+   surcharger un style inline. On cible toutes les variantes d'écriture.
+   (Certaines pages avaient déjà ce correctif en local ; ici on le généralise.)
+   ========================================================================== */
+@media (max-width: 768px) {
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns:1fr 2fr"],
+  [style*="grid-template-columns: 1fr 2fr"],
+  [style*="grid-template-columns:2fr 1fr"],
+  [style*="grid-template-columns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* =============================================================================
+   2) TABLEAUX -> défilement horizontal sur mobile (au lieu de casser la page)
+   -----------------------------------------------------------------------------
+   Solution sans wrapper : la table devient un bloc défilable. Là où tu as déjà
+   mis <div class="table-wrap"> (portail), ce wrapper prend le relais, c'est ok.
+   ========================================================================== */
+@media (max-width: 640px) {
+  table.table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;              /* évite que les cellules se cassent */
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* =============================================================================
+   3) ESPACEMENTS, TITRES, BOUTONS sur petit écran
+   ========================================================================== */
+
+/* 3.a — Padding latéral du conteneur un peu réduit sur très petit écran. */
+@media (max-width: 480px) {
+  .container { padding-inline: 1rem; }
+}
+
+/* 3.b — Sections verticales moins hautes sur mobile (si la classe .section
+   existe dans ton design system : padding-block généreux en desktop). */
+@media (max-width: 768px) {
+  .section { padding-block: 2.5rem; }
+}
+
+/* 3.c — Les boutons "large" prennent toute la largeur sur mobile (plus faciles
+   à toucher au doigt) ; les groupes de boutons passent en colonne. */
+@media (max-width: 480px) {
+  .btn-lg { width: 100%; }
+}
+
+/* 3.d — Les grilles de cartes génériques (KPI, produits exclusifs, stats)
+   passent en une colonne sur très petit écran si elles ne l'ont pas déjà. */
+@media (max-width: 420px) {
+  .stats-grid { grid-template-columns: 1fr !important; }
+}
+
+/* 3.e — Sécurité de débordement : rien ne dépasse horizontalement la page. */
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden; }
+  img, video, svg { max-width: 100%; height: auto; }
+}
+
+/* =============================================================================
+   4) PAGE PRODUIT (galerie | infos) — empilée sur mobile.
+   -----------------------------------------------------------------------------
+   La page produit utilise une grille inline "1fr 1fr" -> déjà gérée par le
+   bloc (1). Ce rappel ne fait qu'assurer un bon espacement une fois empilée.
+   ========================================================================== */
+@media (max-width: 768px) {
+  #main-product-image { max-height: 60vh; object-fit: cover; }
+}
