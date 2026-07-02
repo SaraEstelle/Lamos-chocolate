@@ -24,4 +24,9 @@ urlpatterns = [
     path("forecasting/", views.forecasting_view, name="forecasting"),
     path("b2b/", views.b2b_requests_view, name="b2b_requests"),
     path("b2b/<int:request_id>/status/", views.b2b_update_status_view, name="b2b_status"),
+    # B2B pro-account validation (self-registered pending accounts).
+    # B2BAccount.id is a UUID -> <uuid:...>.
+    path("b2b-accounts/", views.b2b_accounts_view, name="b2b_accounts"),
+    path("b2b-accounts/<uuid:account_id>/decision/",
+         views.b2b_account_decision_view, name="b2b_account_decision"),
 ]

@@ -14,11 +14,10 @@ from django.db.models.functions import TruncDate
 from django.utils import timezone
 
 from apps.b2b.models import B2BRequest
+from apps.backoffice.selectors import count_pending_b2b_accounts
 from apps.checkout.models import Order, OrderItem
+from apps.checkout.selectors import PAID_STATUSES, channel_revenue
 from apps.shop.models import Stock
-
-# Statuses that count as actual (paid) revenue.
-PAID_STATUSES = ["paid", "processing", "shipped", "delivered"]
 
 
 def get_kpis():
@@ -37,6 +36,12 @@ def get_kpis():
         # Stock.is_low is a @property, so no parentheses.
         "low_stock_count": sum(1 for s in Stock.objects.all() if s.is_low),
         "new_b2b_count": B2BRequest.objects.filter(status="new").count(),
+        # --- B2B KPIs (feed the pro-validation workflow + cockpit parity) ---
+        # Both read canonical sources shared with the cockpit: B2BAccount.status
+        # (via the backoffice selector) and Order.channel="b2b" (via
+        # checkout.selectors.channel_revenue) -> the two dashboards can't diverge.
+        "pending_b2b_accounts": count_pending_b2b_accounts(),
+        "b2b_revenue": channel_revenue("b2b"),
     }
 
 
