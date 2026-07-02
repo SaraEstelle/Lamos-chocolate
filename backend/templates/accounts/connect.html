@@ -35,10 +35,11 @@
         <li>{% trans "Personalized boxes & gifts" %}</li>
         <li>{% trans "Access to limited editions" %}</li>
       </ul>
-      <a href="{% url 'accounts:register' %}" class="btn btn-gold">{% trans "Create my account" %} →</a>
-      <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
-        {% trans "Already a member?" %} <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
-      </p>
+      <a href="{% url 'accounts:access' %}?mode=register" class="btn btn-gold">{% trans "Create my account" %} →</a>
+        <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+        {% trans "Already a member?" %}
+        <a href="{% url 'accounts:access' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
+        </p>
     </article>
 
     <!-- B2B -->
@@ -55,13 +56,11 @@
         <li>{% trans "Dedicated account manager" %}</li>
       </ul>
 
-      <a href="{% url 'b2b:register' %}" class="btn btn-gold">{% trans "Create my pro account" %} →</a>
-      <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
-      <a href="{% url 'b2b:presentation' %}" style="color:var(--c-gold-3);font-size:.8rem;display:inline-block;margin-top:.5rem;">
-      {% trans "or discover the B2B space" %} →
-      </a>
-        {% trans "Already a partner?" %} <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
-      </p>
+      <a href="{% url 'b2b:presentation' %}" class="btn btn-gold">{% trans "Discover the B2B space" %} →</a>
+        <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+        {% trans "Already a partner?" %}
+        <a href="{% url 'b2b:access' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
+        </p>
     </article>
 
   </div>
