@@ -7,20 +7,28 @@
 <div class="container my-5">
   <h1 class="mb-4">{% trans "Backoffice dashboard" %}</h1>
 
-  <!-- KPIs -->
-  <div class="row g-3 mb-4">
-    <div class="col-md-3"><div class="card text-center shadow-sm"><div class="card-body">
+  {% comment %}
+    KPIs — responsive auto-fit grid so the 5 cards stay on one row on wide
+    screens and wrap cleanly on narrow ones (the marble grid has no 5-up
+    class, so we use a self-contained CSS grid instead of touching it).
+  {% endcomment %}
+  <div class="mb-4"
+       style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+    <div class="card text-center shadow-sm"><div class="card-body">
       <h3>{{ kpis.revenue }} €</h3><p class="text-muted mb-0">{% trans "Revenue" %}</p>
-    </div></div></div>
-    <div class="col-md-3"><div class="card text-center shadow-sm"><div class="card-body">
+    </div></div>
+    <div class="card text-center shadow-sm"><div class="card-body">
       <h3>{{ kpis.order_count }}</h3><p class="text-muted mb-0">{% trans "Paid orders" %}</p>
-    </div></div></div>
-    <div class="col-md-3"><div class="card text-center shadow-sm"><div class="card-body">
+    </div></div>
+    <div class="card text-center shadow-sm"><div class="card-body">
       <h3>{{ kpis.avg_basket }} €</h3><p class="text-muted mb-0">{% trans "Avg. basket" %}</p>
-    </div></div></div>
-    <div class="col-md-3"><div class="card text-center shadow-sm"><div class="card-body">
+    </div></div>
+    <div class="card text-center shadow-sm"><div class="card-body">
       <h3 class="text-warning">{{ kpis.low_stock_count }}</h3><p class="text-muted mb-0">{% trans "Low stock" %}</p>
-    </div></div></div>
+    </div></div>
+    <div class="card text-center shadow-sm"><div class="card-body">
+      <h3>{{ kpis.b2b_revenue }} €</h3><p class="text-muted mb-0">{% trans "B2B revenue" %}</p>
+    </div></div>
   </div>
 
   <div class="row g-3 mb-4">
@@ -28,6 +36,7 @@
     <div class="col-md-4"><a href="{% url 'backoffice:stock' %}" class="btn btn-outline-dark w-100">📊 {% trans "Stock" %}</a></div>
     <div class="col-md-4"><a href="{% url 'backoffice:forecasting' %}" class="btn btn-outline-dark w-100">📈 {% trans "Forecasting" %}</a></div>
     <div class="col-md-4"><a href="{% url 'backoffice:b2b_requests' %}" class="btn btn-outline-dark w-100">🏢 {% trans "B2B requests" %} ({{ kpis.new_b2b_count }} {% trans "new" %})</a></div>
+    <div class="col-md-4"><a href="{% url 'backoffice:b2b_accounts' %}" class="btn btn-outline-dark w-100">🧾 {% trans "Validate pro accounts" %} ({{ kpis.pending_b2b_accounts }} {% trans "pending" %})</a></div>
   </div>
 
   <!-- Revenue chart -->
