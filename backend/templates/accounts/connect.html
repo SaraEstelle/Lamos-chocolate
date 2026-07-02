@@ -54,10 +54,12 @@
         <li>{% trans "Online quotes & pro invoicing" %}</li>
         <li>{% trans "Dedicated account manager" %}</li>
       </ul>
-      {# NB: l'inscription pro complète (b2b:register) arrive avec le Guide 2.
-         En attendant, on dirige vers la présentation + demande d'accès B2B. #}
-      <a href="{% url 'b2b:presentation' %}" class="btn btn-outline">{% trans "Discover the B2B space" %} →</a>
+
+      <a href="{% url 'b2b:register' %}" class="btn btn-gold">{% trans "Create my pro account" %} →</a>
       <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+      <a href="{% url 'b2b:presentation' %}" style="color:var(--c-gold-3);font-size:.8rem;display:inline-block;margin-top:.5rem;">
+      {% trans "or discover the B2B space" %} →
+      </a>
         {% trans "Already a partner?" %} <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Sign in" %}</a>
       </p>
     </article>
@@ -65,7 +67,7 @@
   </div>
 
   <!-- Already registered → go to the real login page -->
-  <div class="connect-login reveal" style="text-align:center;">
+  <div class="connect-login reveal" style="text-align:center">
     <span class="gold-line" aria-hidden="true"></span>
     <p class="muted" style="margin:1rem 0 .75rem;">{% trans "Already have an account?" %}</p>
     <a href="{% url 'accounts:login' %}" class="btn btn-outline">{% trans "Sign in" %}</a>
