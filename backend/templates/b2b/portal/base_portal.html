@@ -1,21 +1,34 @@
 {% extends "base/base.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{# Load the portal-only light stylesheet. #}
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="section container">
-  <div class="account-layout">      {# réutilise le layout du Guide 1/Partie B #}
+  <div class="account-layout">
     <aside class="account-sidebar">
       <p class="eyebrow">{% trans "Pro space" %}</p>
-      <p class="muted small">{{ account.company_name }}</p>
+      <p class="muted small" style="margin-bottom:.25rem;">{{ account.company_name }}</p>
+      {% if account.status != "active" %}
+        <span class="badge" style="margin-bottom:.75rem;">{% trans "Pending validation" %}</span>
+      {% endif %}
+
+      {# `url_name` lets us mark the current tab as active (is-active). #}
+      {% with cur=request.resolver_match.url_name %}
       <nav class="account-nav" aria-label="{% trans 'Pro navigation' %}">
-        <a href="{% url 'b2b:portal' %}">{% trans "Overview" %}</a>
-        <a href="{% url 'b2b:catalogue' %}">{% trans "Pro catalogue" %}</a>
-        <a href="{% url 'b2b:history' %}">{% trans "Orders" %}</a>
-        <a href="{% url 'b2b:documents' %}">{% trans "Documents" %}</a>
-        <a href="{% url 'b2b:notifications' %}">{% trans "Notifications" %}</a>
-        <a href="{% url 'b2b:profile' %}">{% trans "Company profile" %}</a>
-        <a href="{% url 'b2b:configurator' %}">{% trans "Configurator" %}</a>
+        <a href="{% url 'b2b:portal' %}"       class="{% if cur == 'portal' %}is-active{% endif %}">{% trans "My profile" %}</a>
+        <a href="{% url 'b2b:in_progress' %}"  class="{% if cur == 'in_progress' %}is-active{% endif %}">{% trans "Orders in progress" %}</a>
+        <a href="{% url 'b2b:history' %}"      class="{% if cur == 'history' %}is-active{% endif %}">{% trans "History" %}</a>
+        <a href="{% url 'b2b:catalogue' %}"    class="{% if cur == 'catalogue' %}is-active{% endif %}">{% trans "B2B catalogue" %}</a>
+        <a href="{% url 'b2b:exclusive' %}"    class="{% if cur == 'exclusive' %}is-active{% endif %}">{% trans "Exclusive products" %}</a>
+        <a href="{% url 'b2b:configurator' %}" class="{% if cur == 'configurator' %}is-active{% endif %}">{% trans "Configurator" %}</a>
+        <a href="{% url 'b2b:profile' %}"      class="{% if cur == 'profile' %}is-active{% endif %}">{% trans "Company profile" %}</a>
         <a href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a>
       </nav>
+      {% endwith %}
     </aside>
     <div class="account-content">
       {% block portal_content %}{% endblock %}

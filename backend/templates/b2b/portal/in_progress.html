@@ -1,0 +1,45 @@
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Orders in progress" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Orders in progress" %}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">{% trans "Track your active orders" %}</h1>
+  <p class="muted" style="margin-bottom:2rem;">
+    {% trans "Follow every order that is not delivered yet." %}
+  </p>
+
+  {% if orders %}
+    <div class="table-wrap">
+        <table class="table">
+        <thead><tr>
+            <th>{% trans "Order" %}</th><th>{% trans "Date" %}</th>
+            <th>{% trans "Products" %}</th><th>{% trans "Amount" %}</th>
+            <th>{% trans "Status" %}</th>
+        </tr></thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.order_number }}</td>
+                <td>{{ o.created_at|date:"d.m.Y" }}</td>
+                <td class="muted small">
+                {% for it in o.items.all %}{{ it.sku.product.name_fr }} ×{{ it.quantity }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                </td>
+                <td>{{ o.total_amount }} {{ o.currency }}</td>
+                <td><span class="badge">{{ o.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+  {% else %}
+    <p class="muted">{% trans "No order in progress right now." %}</p>
+  {% endif %}
+
+  <div class="card" style="margin-top:2rem;padding:1.25rem 1.5rem;border:1px solid var(--c-line);border-radius:var(--radius);">
+    <p class="muted small" style="margin:0;">
+      {% trans "Your account manager contacts you 48h before each delivery to confirm the details." %}
+    </p>
+  </div>
+{% endblock %}
