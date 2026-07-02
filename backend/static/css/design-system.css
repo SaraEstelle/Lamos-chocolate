@@ -55,7 +55,7 @@ p{color:var(--c-text)}
 .h-display{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.6rem);font-weight:300;color:var(--c-ink)}
 .h-display em{font-style:italic;color:var(--c-gold-3)}
 .h-display-center{text-align:center}
-.gold-line{display:block;width:54px;height:1px;background:linear-gradient(90deg,transparent,var(--c-gold),transparent);margin-bottom:1rem}
+.gold-line{display:block;width:54px;height:1px;background:linear-gradient(90deg,transparent,var(--c-gold),transparent);margin-left:auto;margin-right:auto;margin-bottom:1rem}
 .gold-line-left{margin-left:0}
 .section-header{max-width:720px;margin:0 auto 3rem;text-align:center}
 .section-header .gold-line{margin-inline:auto}
