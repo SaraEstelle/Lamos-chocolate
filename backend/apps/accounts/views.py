@@ -37,6 +37,10 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_http_methods
 from django.shortcuts import render, redirect
 
+from django.urls import reverse
+from django.utils import timezone
+
+
 logger = logging.getLogger('apps.accounts')
 
 @require_http_methods(["GET"])
@@ -176,6 +180,88 @@ def login_view(request):
             messages.error(request, "Incorrect email or password.")
             return render(request, 'accounts/login.html', {'form': form})
 
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+def access_view(request):
+    """
+    Combined B2C access page: sign-in AND sign-up on one sliding card.
+
+    - GET ?mode=register  -> opens on the sign-up side.
+    - POST form_type=login    -> authenticate + redirect (open-redirect safe).
+    - POST form_type=register -> create customer, store nLPD consent, then
+      send the user to the sign-in side to log in.
+
+    We keep the legacy login_view / register_view untouched (tests rely on them).
+    Template: accounts/access.html
+    """
+    # Already logged in? Skip the page entirely.
+    if request.user.is_authenticated:
+        return redirect(post_auth_redirect_target(request.user))
+
+    login_form = LoginForm()
+    register_form = RegisterForm()
+    # Which side is open when we render (default = sign-in).
+    active_panel = "register" if request.GET.get("mode") == "register" else "signin"
+
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+
+        # ---------- SIGN UP (B2C) ----------
+        if form_type == "register":
+            active_panel = "register"  # stay on this side if anything fails
+            register_form = RegisterForm(request.POST)
+
+            # nLPD / GDPR consent is a hard requirement for account creation.
+            if not request.POST.get("gdpr"):
+                register_form.add_error(None, "You must accept the privacy policy.")
+
+            if register_form.is_valid():
+                try:
+                    customer = create_customer(
+                        email=register_form.cleaned_data["email"],
+                        password=register_form.cleaned_data["password"],
+                        first_name=register_form.cleaned_data["first_name"],
+                        last_name=register_form.cleaned_data["last_name"],
+                        preferred_language=register_form.cleaned_data.get("preferred_language", "fr"),
+                    )
+                    # Store consent WITH a timestamp (Swiss nLPD proof of consent).
+                    customer.consent_nlpd = True
+                    customer.consent_nlpd_at = timezone.now()
+                    customer.save(update_fields=["consent_nlpd", "consent_nlpd_at"])
+
+                    logger.info(f"New B2C customer via access page:{customer.email}")
+                    messages.success(request, "Account created! You can now sign in.")
+                    # Bounce to the sign-in side of the same page.
+                    return redirect(reverse("accounts:access"))
+                except ValueError as e:
+                    register_form.add_error("email", str(e))
+
+        # ---------- SIGN IN ----------
+        else:
+            active_panel = "signin"
+            login_form = LoginForm(request.POST)
+            if login_form.is_valid():
+                customer = login_form.customer  # set in LoginForm.clean()
+                login(request, customer)
+                if login_form.cleaned_data.get("remember_me"):
+                    request.session.set_expiry(1209600)  # 14 days
+                logger.info(f"Customer logged in via access page:{customer.email}")
+
+                # Honour a safe internal ?next=, else the role-based landing page.
+                next_url = request.GET.get("next")
+                if next_url and url_has_allowed_host_and_scheme(
+                    url=next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    return redirect(next_url)
+                return redirect(post_auth_redirect_target(customer))
+
+    return render(request, "accounts/access.html", {
+        "login_form": login_form,
+        "register_form": register_form,
+        "active_panel": active_panel,
+    })
 
 @require_http_methods(["GET"])
 @login_required(login_url='accounts:login')
