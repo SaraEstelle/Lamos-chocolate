@@ -109,7 +109,7 @@ def portal_home_view(request):
     })
 
 
-@b2b_account_required
+@b2b_login_required
 @require_http_methods(["GET"])
 def portal_catalogue_view(request):
     """Pro catalogue with real-time stock per SKU."""
