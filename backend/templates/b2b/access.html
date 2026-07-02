@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+{% load i18n static socialaccount %}
+
+{% block title %}{% trans "Professional space" %} · Lamos Chocolate{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/auth-slide.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card auth-card--single" id="authCard">
+
+    {# ══════════════ LEFT : PRO SIGN IN ══════════════ #}
+    <div class="auth-pane auth-pane--signin">
+      <svg class="auth-crown" viewBox="0 0 100 80" fill="none">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+      </svg>
+      <h2 class="auth-title">{% trans "Partner sign in" %}</h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="login">
+        {% if login_form.non_field_errors %}<p class="auth-error">{{ login_form.non_field_errors|striptags }}</p>{% endif %}
+
+        <div class="auth-field">
+          <label for="{{ login_form.email.id_for_label }}">{% trans "Professional email" %}</label>
+          {{ login_form.email }}
+        </div>
+        <div class="auth-field password-wrap">
+          <label for="{{ login_form.password.id_for_label }}">{% trans "Password" %}</label>
+          {{ login_form.password }}
+          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
+        </div>
+
+        <p style="text-align:right;margin:.25rem 0 .5rem;">
+          <a href="{% url 'accounts:password_reset' %}" class="auth-link" style="font-size:.8rem;">{% trans "Forgot your password?" %}</a>
+        </p>
+
+        <button type="submit" class="auth-submit">{% trans "Sign in" %}</button>
+      </form>
+
+      {# Mobile: direct link to the B2B front. #}
+      <p class="auth-switch-mobile">
+        {% trans "Not a partner yet?" %}
+        <a class="auth-link" href="{% url 'b2b:presentation' %}">{% trans "Discover the B2B space" %}</a>
+      </p>
+    </div>
+
+    {# ══════════════ RIGHT : STATIC GOLD PANEL -> B2B FRONT ══════════════ #}
+    <div class="auth-overlay">
+      <div class="auth-overlay-inner">
+        <svg class="auth-overlay-crown" viewBox="0 0 100 80" fill="none">
+          <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="rgba(26,15,7,.7)" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="16" y="54" width="68" height="5" fill="rgba(26,15,7,.7)"/>
+        </svg>
+        <h3 class="auth-overlay-title">{% trans "Become a partner" %}</h3>
+        <p class="auth-overlay-desc">{% trans "Volume pricing, customization and dedicated support." %}</p>
+        {# This is a LINK (not a toggle): it sends the user to the B2B front. #}
+        <a href="{% url 'b2b:presentation' %}" class="auth-overlay-btn">{% trans "Discover the B2B space" %}</a>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="text-align:center;margin-top:1.5rem;color:#8a6a45;font-size:.85rem;">
+    {% trans "Not a professional?" %}
+    <a href="{% url 'accounts:access' %}" class="auth-link">{% trans "Individual space" %} →</a>
+  </p>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static 'js/auth-slide.js' %}" defer></script>
+{% endblock %}
