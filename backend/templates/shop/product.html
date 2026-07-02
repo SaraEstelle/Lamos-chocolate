@@ -4,118 +4,127 @@
 {% block title %}{{ product|localized:"name" }} — Lamos Chocolate{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
-      <li class="breadcrumb-item">
-        <a href="{% url 'shop:category' slug=product.category.slug %}">{{ product.category|localized:"name" }}</a>
-      </li>
-      <li class="breadcrumb-item active" aria-current="page">{{ product|localized:"name" }}</li>
-    </ol>
-  </nav>
+<section class="section container">
 
-  <div class="row g-4">
-    <!-- Image gallery -->
-    <div class="col-12 col-md-6">
+  {# --- Breadcrumb (Marbre, discret) --- #}
+  <p class="muted small" style="margin-bottom:1.5rem;">
+    <a href="{% url 'shop:catalog' %}" style="color:var(--c-gold-3)">{% trans "Shop" %}</a> ·
+    <a href="{% url 'shop:category' slug=product.category.slug %}" style="color:var(--c-gold-3)">{{ product.category|localized:"name" }}</a> ·
+    <span>{{ product|localized:"name" }}</span>
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;">
+
+    {# ============ LEFT: gallery ============ #}
+    <div>
       {% if images %}
         <img src="{{ product.primary_image_url }}" id="main-product-image"
-             class="img-fluid rounded mb-2" alt="{{ product|localized:'name' }}">
-        <div class="d-flex gap-2 flex-wrap">
+             alt="{{ product|localized:'name' }}"
+             style="width:100%;border:1px solid var(--c-line);border-radius:var(--radius);margin-bottom:.75rem;">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
           {% for image in images %}
-            <img src="{{ image.image_url }}" class="img-thumbnail"
-                 style="width: 72px; height: 72px; object-fit: cover; cursor: pointer;"
-                 alt="{{ image.alt_text }}"
-                 onclick="document.getElementById('main-product-image').src=this.src">
+            <img src="{{ image.image_url }}" alt="{{ image.alt_text }}"
+                 onclick="document.getElementById('main-product-image').src=this.src"
+                 style="width:72px;height:72px;object-fit:cover;border:1px solid var(--c-line);border-radius:var(--radius);cursor:pointer;">
           {% endfor %}
         </div>
       {% else %}
-        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 320px;">
-          <span class="text-muted">{% trans "No image" %}</span>
+        <div style="height:340px;border:1px solid var(--c-line);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:var(--c-marble-2);">
+          <span class="muted">{% trans "No image" %}</span>
         </div>
       {% endif %}
     </div>
 
-    <!-- Product info -->
-    <div class="col-12 col-md-6">
-      <h1 class="h3">{{ product|localized:"name" }}</h1>
-      <p class="text-muted">{{ product.category|localized:"name" }}</p>
+    {# ============ RIGHT: story + info ============ #}
+    <div>
+      <p class="eyebrow">{{ product.category|localized:"name" }}</p>
+      <h1 class="h-display" style="margin-bottom:1rem;">{{ product|localized:"name" }}</h1>
 
+      {# 1) STORYTELLING — the product presentation paragraph #}
       {% with description=product|localized:"description" %}
-        {% if description %}<p>{{ description|linebreaks }}</p>{% endif %}
+        {% if description %}
+          <div class="muted" style="line-height:1.9;margin-bottom:1.75rem;">{{ description|linebreaks }}</div>
+        {% endif %}
       {% endwith %}
 
+      {# 2) INGREDIENTS #}
       {% with ingredients=product|localized:"ingredients" %}
         {% if ingredients %}
-          <h2 class="h6 mt-3">{% trans "Ingredients" %}</h2>
-          <p class="small text-muted">{{ ingredients }}</p>
+          <h2 class="eyebrow">{% trans "Ingredients" %}</h2>
+          <p class="muted" style="margin-bottom:1.25rem;">{{ ingredients }}</p>
         {% endif %}
       {% endwith %}
 
+      {# 3) ALLERGENS #}
       {% with allergens=product|localized:"allergens" %}
         {% if allergens %}
-          <h2 class="h6 mt-3">{% trans "Allergens" %}</h2>
-          <p class="small text-muted">{{ allergens }}</p>
+          <h2 class="eyebrow">{% trans "Allergens" %}</h2>
+          <p class="muted" style="margin-bottom:1.75rem;">{{ allergens }}</p>
         {% endif %}
       {% endwith %}
 
-      <!-- Available formats (SKUs) -->
-      <h2 class="h5 mt-4">{% trans "Available formats" %}</h2>
+      {# 4) FORMATS / VARIANTS #}
+      <h2 class="eyebrow">{% trans "Available formats" %}</h2>
       {% url 'cart:add' as cart_add_url %}
-      <ul class="list-group mb-3">
+      <div style="display:flex;flex-direction:column;gap:.85rem;">
         {% for sku in skus %}
-          <li class="list-group-item">
-            <div class="d-flex justify-content-between align-items-start">
+          <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
               <div>
+                {# Show what actually distinguishes the SKUs. `format` is often
+                   identical across flavours, so fall back to the unique sku_code
+                   to avoid the "duplicate rows" effect seen on Truffes/Carrés.
+                   TODO: add a real `variant_name`/`flavor` field on SKU to show
+                   the flavour name here (see GUIDE_FIXES §4b). #}
                 <strong>{{ sku.format }}</strong>
-                {% if sku.weight_g %}<span class="text-muted">· {{ sku.weight_g }}g</span>{% endif %}
-                <div class="fw-bold">{{ sku.price }} {{ sku.currency }}</div>
+                {% if sku.weight_g %}<span class="muted">· {{ sku.weight_g }}g</span>{% endif %}
+                <div class="muted small">{{ sku.sku_code }}</div>
+                <div style="font-family:var(--font-title);margin-top:.35rem;">{{ sku.price }} {{ sku.currency }}</div>
                 {% if sku.stock.quantity > 0 %}
-                  <span class="badge bg-success">{% trans "In stock" %}</span>
+                  <span class="badge badge--new">{% trans "In stock" %}</span>
                 {% else %}
-                  <span class="badge bg-secondary">{% trans "Out of stock" %}</span>
+                  <span class="badge">{% trans "Out of stock" %}</span>
                 {% endif %}
               </div>
               <div>
                 {% if cart_add_url %}
-                  <form action="{{ cart_add_url }}" method="post" class="d-flex gap-1"
+                  <form action="{{ cart_add_url }}" method="post"
+                        style="display:flex;gap:.4rem;align-items:center;"
                         data-cart-add data-added-label="{% trans 'Added to your cart.' %}">
                     {% csrf_token %}
                     <input type="hidden" name="sku_id" value="{{ sku.id }}">
                     <input type="number" name="quantity" value="1" min="1"
-                           class="form-control form-control-sm" style="width: 64px;">
-                    <button type="submit" class="btn btn-dark btn-sm"
+                           class="field-input" style="width:64px;">
+                    <button type="submit" class="btn btn-gold btn-sm"
                             {% if sku.stock.quantity == 0 %}disabled{% endif %}>
                       {% trans "Add to cart" %}
                     </button>
                   </form>
-                {% else %}
-                  {# Cart app not wired yet — graceful degradation. #}
-                  <button type="button" class="btn btn-dark btn-sm" disabled
-                          title="{% trans 'Cart coming soon' %}">
-                    {% trans "Add to cart" %}
-                  </button>
                 {% endif %}
               </div>
             </div>
 
-            <!-- Estimated delivery per shipping zone (Approach A) -->
             {% if sku.delivery_estimates %}
-              <div class="mt-2 small text-muted">
-                <span class="me-1">{% trans "Estimated delivery:" %}</span>
+              <div class="muted small" style="margin-top:.6rem;">
+                {% trans "Estimated delivery:" %}
                 {% for estimate in sku.delivery_estimates %}
-                  <span class="badge bg-light text-dark border">
-                    {{ estimate.zone.zone_name }}: {{ estimate.days }}{% trans "d" %}
-                  </span>
+                  <span class="badge" style="margin-left:.25rem;">{{ estimate.zone.zone_name }}: {{ estimate.days }}{% trans "d" %}</span>
                 {% endfor %}
               </div>
             {% endif %}
-          </li>
+          </div>
         {% empty %}
-          <li class="list-group-item text-muted">{% trans "No formats available." %}</li>
+          <p class="muted">{% trans "No formats available." %}</p>
         {% endfor %}
-      </ul>
+      </div>
     </div>
   </div>
-</div>
+</section>
+
+<style>
+  @media (max-width:768px){
+    section.section .container, /* safety */
+    div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+  }
+</style>
 {% endblock %}

@@ -55,7 +55,7 @@ p{color:var(--c-text)}
 .h-display{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.6rem);font-weight:300;color:var(--c-ink)}
 .h-display em{font-style:italic;color:var(--c-gold-3)}
 .h-display-center{text-align:center}
-.gold-line{display:block;width:54px;height:1px;background:linear-gradient(90deg,transparent,var(--c-gold),transparent);margin-bottom:1rem}
+.gold-line{display:block;width:54px;height:1px;background:linear-gradient(90deg,transparent,var(--c-gold),transparent);margin-left:auto;margin-right:auto;margin-bottom:1rem}
 .gold-line-left{margin-left:0}
 .section-header{max-width:720px;margin:0 auto 3rem;text-align:center}
 .section-header .gold-line{margin-inline:auto}
@@ -201,6 +201,7 @@ p{color:var(--c-text)}
 
 /* ---- 15. FORMS ----------------------------------------------------------- */
 .field{margin-bottom:1.1rem}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}@media (max-width:520px){.field-row{grid-template-columns:1fr}}
 .field label{display:block;font-family:var(--font-title);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--c-text-2);margin-bottom:.4rem}
 .field input,.field textarea,.field select,.field-input{width:100%;background:var(--c-ivory-2);border:1px solid var(--c-line);border-radius:var(--radius);padding:.78rem .9rem;color:var(--c-ink);font-family:var(--font-body)}
 .field input:focus,.field textarea:focus,.field select:focus,.field-input:focus{outline:none;border-color:var(--c-gold);box-shadow:0 0 0 3px var(--c-gold-soft)}

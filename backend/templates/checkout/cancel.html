@@ -4,16 +4,11 @@
 {% block title %}{% trans "Payment cancelled" %} — Lamos Chocolate{% endblock %}
 
 {% block content %}
-<div class="container my-5 text-center">
-  <h1 class="h3 mb-3">{% trans "Payment cancelled" %}</h1>
-  <p class="lead">
-    {% trans "Your payment was cancelled and you have not been charged." %}
-  </p>
-  <p class="text-muted">
-    {% trans "Your cart has been kept — you can review it and try again." %}
-  </p>
-  <a href="{% url 'cart:view' %}" class="btn btn-dark mt-3">
-    {% trans "Back to cart" %}
-  </a>
-</div>
+<section class="section container" style="max-width:560px;text-align:center;">
+  <span class="eyebrow">{% trans "Checkout" %}</span>
+  <h1 class="h-display">{% trans "Payment cancelled" %}</h1>
+  <span class="gold-line" style="margin:1rem auto;"></span>
+  <p class="muted">{% trans "Your payment was cancelled and you have not been charged. Your cart has been kept." %}</p>
+  <a href="{% url 'cart:view' %}" class="btn btn-gold" style="margin-top:1.5rem;">&larr; {% trans "Back to cart" %}</a>
+</section>
 {% endblock %}

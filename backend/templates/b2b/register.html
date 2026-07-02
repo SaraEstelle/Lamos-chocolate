@@ -1,0 +1,174 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Create your pro account" %} · Lamos Chocolate{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/auth-slide.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="b2b-register">
+  <div class="b2b-reg-card">
+
+    {# --- En-tête --- #}
+    <div style="text-align:center;margin-bottom:2rem;">
+      <span class="eyebrow">{% trans "Professional space" %}</span>
+      <h1 class="h-display">{% trans "Create your pro account" %}</h1>
+      <span class="gold-line" style="margin:1rem auto 0;"></span>
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div style="border:1px solid var(--c-danger);border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:1rem;color:var(--c-danger);font-size:.85rem;">
+          {{ form.non_field_errors|striptags }}
+        </div>
+      {% endif %}
+
+      {# --- Prénom + Nom --- #}
+      <div class="field-row">
+        <div class="field">
+          <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }} *</label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.first_name.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.last_name.id_for_label }}">{{ form.last_name.label }} *</label>
+          {{ form.last_name }}
+          {% if form.last_name.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.last_name.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      {# --- Email --- #}
+      <div class="field">
+        <label for="{{ form.email.id_for_label }}">{{ form.email.label }} *</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <p class="small" style="color:var(--c-danger)">
+            {{ form.email.errors|striptags }}
+          </p>
+        {% endif %}
+      </div>
+
+      {# --- Mot de passe --- #}
+      <div class="field-row">
+        <div class="field">
+          <label for="{{ form.password.id_for_label }}">{{ form.password.label }} *</label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.password.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password_confirm.id_for_label }}">{{ form.password_confirm.label }} *</label>
+          {{ form.password_confirm }}
+          {% if form.password_confirm.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.password_confirm.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      <p class="muted small" style="margin-top:-.4rem;margin-bottom:1.1rem;">
+        {% trans "At least 12 characters, with upper- and lower-case, a digit and a special character." %}
+      </p>
+
+      {# --- Entreprise + Secteur --- #}
+      <div class="field-row">
+        <div class="field">
+          <label for="{{ form.company_name.id_for_label }}">{{ form.company_name.label }} *</label>
+          {{ form.company_name }}
+          {% if form.company_name.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.company_name.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.sector.id_for_label }}">{{ form.sector.label }} *</label>
+          {{ form.sector }}
+          {% if form.sector.errors %}
+            <p class="small" style="color:var(--c-danger)">
+              {{ form.sector.errors|striptags }}
+            </p>
+          {% endif %}
+        </div>
+      </div>
+
+      {# --- Téléphone --- #}
+      <div class="field">
+        <label for="{{ form.phone.id_for_label }}">{{ form.phone.label }}</label>
+        {{ form.phone }}
+        {% if form.phone.errors %}
+          <p class="small" style="color:var(--c-danger)">
+            {{ form.phone.errors|striptags }}
+          </p>
+        {% endif %}
+      </div>
+
+      {# --- Langue --- #}
+      <div class="field">
+        <label for="{{ form.preferred_language.id_for_label }}">{{ form.preferred_language.label }} *</label>
+        {{ form.preferred_language }}
+        {% if form.preferred_language.errors %}
+          <p class="small" style="color:var(--c-danger)">
+            {{ form.preferred_language.errors|striptags }}
+          </p>
+        {% endif %}
+      </div>
+
+      {# --- Conditions --- #}
+      <label style="display:flex;align-items:flex-start;gap:.5rem;margin:1rem 0 1.25rem;font-size:.85rem;color:var(--c-text-2);">
+        {{ form.accept_terms }}
+        <span>
+          {% trans "I accept the" %}
+          <a href="{% url 'main:terms' %}" target="_blank" style="color:var(--c-gold-3)">
+            {% trans "terms" %}
+          </a>
+          {% trans "and the" %}
+          <a href="{% url 'main:privacy' %}" target="_blank" style="color:var(--c-gold-3)">
+            {% trans "privacy policy" %}
+          </a>.
+        </span>
+      </label>
+
+      {% if form.accept_terms.errors %}
+        <p class="small" style="color:var(--c-danger);margin-top:-.9rem;">
+          {{ form.accept_terms.errors|striptags }}
+        </p>
+      {% endif %}
+
+      <button type="submit" class="btn btn-gold btn-lg" style="width:100%;">
+        {% trans "Submit for validation" %} &rarr;
+      </button>
+    </form>
+
+    <p class="muted small" style="text-align:center;margin-top:1.25rem;">
+      {% trans "Already a partner?" %}
+      <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">
+        {% trans "Sign in" %}
+      </a>
+    </p>
+
+  </div>
+</section>
+
+{% endblock %}

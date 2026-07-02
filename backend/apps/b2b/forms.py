@@ -15,6 +15,12 @@ from apps.b2b.models import B2BRequest
 
 from apps.b2b.models import CustomizationRequest
 from apps.shop.models import SKU
+from django.db import transaction
+
+from apps.accounts.models import Customer
+from apps.common.constants import (
+    CustomerTypeChoices, B2BSegmentChoices, B2BAccountStatusChoices,
+)
 
 class B2BRequestForm(forms.ModelForm):
     """Public form for a professional to request a quote / bulk order."""
@@ -90,3 +96,71 @@ class ConfiguratorForm(forms.ModelForm):
         if qty is not None and qty < 1:
             raise forms.ValidationError(_("Quantity must be at least 1."))
         return qty
+
+class B2BRegisterForm(forms.Form):
+    """Self-service B2B registration. Creates a pending pro account."""
+    first_name   = forms.CharField(max_length=150)
+    last_name    = forms.CharField(max_length=150)
+    email        = forms.EmailField()
+    company_name = forms.CharField(max_length=200)
+    sector       = forms.ChoiceField(choices=B2BSegmentChoices.choices)
+    phone        = forms.CharField(max_length=20, required=False)
+    password     = forms.CharField(min_length=12, widget=forms.PasswordInput)
+    password_confirm = forms.CharField(widget=forms.PasswordInput)
+    preferred_language = forms.ChoiceField(
+        choices=[
+            ("fr", "Français"),
+            ("en", "English"),
+            ("de-ch", "Deutsch (Schweiz)"),
+            ("it-ch", "Italiano (Svizzera)"),
+        ],
+        initial="en",
+        label=_("Preferred language"),
+    )
+    accept_terms = forms.BooleanField(required=True)
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].lower()
+        if Customer.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already registered.")
+        return email
+
+    def clean_password(self):
+        p = self.cleaned_data.get("password", "")
+        checks = [any(c.isupper() for c in p), any(c.islower() for c in p),
+                  any(c.isdigit() for c in p), any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p)]
+        if not all(checks):
+            raise forms.ValidationError("Password must contain uppercase, lowercase, digit and special char.")
+        return p
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("password") != cleaned.get("password_confirm"):
+            raise forms.ValidationError("The two passwords do not match.")
+        return cleaned
+
+    @transaction.atomic
+    def save(self):
+        """Create the Customer (pro, inactive portal) + a PENDING B2BAccount."""
+        data = self.cleaned_data
+        customer = Customer(
+            email=data["email"],
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            phone=data.get("phone", ""),
+            company_name=data["company_name"],
+            preferred_language=data["preferred_language"],
+            is_b2b=True,
+            customer_type=CustomerTypeChoices.B2B_DISTRIBUTOR,
+        )
+        customer.set_password(data["password"])
+        customer.save()
+
+        from apps.accounts.models import B2BAccount
+        account = B2BAccount.objects.create(
+            customer=customer,
+            company_name=data["company_name"],
+            segment=data["sector"],
+            status=B2BAccountStatusChoices.PENDING,
+        )
+        return customer, account

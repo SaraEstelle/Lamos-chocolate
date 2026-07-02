@@ -4,60 +4,54 @@
 {% block title %}{% trans "Checkout" %} — Lamos Chocolate{% endblock %}
 
 {% block content %}
-<h1>{% trans "Checkout" %}</h1>
+<section class="section container" style="max-width:1040px;">
+  <span class="eyebrow">{% trans "Checkout" %}</span>
+  <h1 class="h-display" style="margin-bottom:2rem;">{% trans "Shipping & payment" %}</h1>
 
-<div class="row">
-  <div class="col-md-7">
-    <h2 class="h5">{% trans "Shipping address" %}</h2>
-    <form method="post" action="{% url 'checkout:create_session' %}">
-      {% csrf_token %}
-      {% for field in form %}
-        <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-            <div class="form-text">{{ field.help_text }}</div>
-          {% endif %}
-          {% for error in field.errors %}
-            <div class="text-danger small">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endfor %}
-      <button type="submit" class="btn btn-dark">
-        {% trans "Proceed to payment" %}
-      </button>
-    </form>
-  </div>
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:3rem;align-items:start;">
 
-  <div class="col-md-5">
-    <h2 class="h5">{% trans "Order summary" %}</h2>
-    <table class="table align-middle">
-      <thead>
-        <tr>
-          <th>{% trans "Product" %}</th>
-          <th>{% trans "Qty" %}</th>
-          <th>{% trans "Subtotal" %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart_items %}
-          <tr>
-            <td>{{ item.display_name }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.subtotal }} {{ item.sku.currency }}</td>
-          </tr>
+    {# ---- Shipping form ---- #}
+    <div>
+      <h2 class="eyebrow">{% trans "Shipping address" %}</h2>
+      <form method="post" action="{% url 'checkout:create_session' %}" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="field">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}<p class="muted small">{{ field.help_text }}</p>{% endif %}
+            {% if field.errors %}<p class="small" style="color:var(--c-danger)">{{ field.errors|striptags }}</p>{% endif %}
+          </div>
         {% endfor %}
-      </tbody>
-      <tfoot>
-        <tr>
-          <th colspan="2">{% trans "Total" %}</th>
-          <th>{{ cart_total }}</th>
-        </tr>
-      </tfoot>
-    </table>
-    <a href="{% url 'cart:view' %}" class="btn btn-outline-secondary btn-sm">
-      {% trans "Back to cart" %}
-    </a>
+        <button type="submit" class="btn btn-gold btn-lg">{% trans "Proceed to payment" %} &rarr;</button>
+      </form>
+    </div>
+
+    {# ---- Order summary ---- #}
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.75rem;background:var(--c-ivory);">
+      <h2 class="eyebrow">{% trans "Order summary" %}</h2>
+      <table class="table" style="margin-bottom:1rem;">
+        <thead>
+          <tr><th>{% trans "Product" %}</th><th>{% trans "Qty" %}</th><th style="text-align:right;">{% trans "Subtotal" %}</th></tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+            <tr>
+              <td>{{ item.display_name }}</td>
+              <td>{{ item.quantity }}</td>
+              <td style="text-align:right;">{{ item.subtotal }} {{ item.sku.currency }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:.75rem;border-top:2px solid var(--c-gold);">
+        <span style="font-family:var(--font-title);text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;">{% trans "Total" %}</span>
+        <span class="h-display" style="font-size:1.6rem;">{{ cart_total }}</span>
+      </div>
+      <a href="{% url 'cart:view' %}" class="btn btn-outline btn-sm" style="margin-top:1.25rem;">&larr; {% trans "Back to cart" %}</a>
+    </div>
   </div>
-</div>
+</section>
+
+<style>@media (max-width:768px){section.section > div[style*="grid-template-columns:1.3fr 1fr"]{grid-template-columns:1fr !important;}}</style>
 {% endblock %}

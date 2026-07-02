@@ -1,22 +1,88 @@
-{% extends "base/base.html" %}
+{% extends "b2b/portal/base_portal.html" %}
 {% load i18n %}
-{% block title %}{% trans "Pro space" %} — Lamos Chocolate{% endblock %}
-{% block content %}
-<div class="container my-5" style="max-width: 960px;">
-  <h1 class="mb-1">{% trans "Welcome" %}, {{ account.company_name }}</h1>
-  <p class="text-muted mb-4">{% trans "Your professional space" %} — {{ account.get_segment_display }}</p>
-  <div class="d-flex gap-2 mb-4">
-    <a href="{% url 'b2b:catalogue' %}" class="btn btn-primary">{% trans "Pro catalogue" %}</a>
-    <a href="{% url 'b2b:configurator' %}" class="btn btn-outline-dark">{% trans "Configurator" %}</a>
-    <a href="{% url 'b2b:history' %}" class="btn btn-outline-dark">{% trans "Order history" %}</a>
+
+{% block title %}{% trans "My profile" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "My profile" %}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">
+    {% blocktrans with company=account.company_name %}Welcome, {{ company }}{% endblocktrans %}
+  </h1>
+  <p class="muted" style="margin-bottom:2rem;">{{ account.get_segment_display }}</p>
+
+  {# ---- KPI cards (light) ---- #}
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="kpi-num">{{ kpis.orders_in_progress }}</span>
+      <span class="kpi-label">{% trans "Orders in progress" %}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-num">{{ kpis.orders_total }}</span>
+      <span class="kpi-label">{% trans "Total orders" %}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-num">{{ kpis.revenue_total }} CHF</span>
+      <span class="kpi-label">{% trans "Total spent" %}</span>
+    </div>
+    <div class="kpi-card">
+      <span class="kpi-num" style="font-size:1.2rem;">{{ account.get_status_display }}</span>
+      <span class="kpi-label">{% trans "Account status" %}</span>
+    </div>
   </div>
-  <h2 class="h5">{% trans "Recent orders" %}</h2>
+
+  {# ---- Account info card ---- #}
+  <h2 class="eyebrow">{% trans "Account information" %}</h2>
+  <div class="panel" style="margin-bottom:1rem;">
+    <table class="info-list">
+      <tbody>
+        <tr><td class="info-key">{% trans "Company" %}</td><td class="info-val">{{ account.company_name }}</td></tr>
+        <tr><td class="info-key">{% trans "Contact" %}</td><td class="info-val">{{ account.customer.get_full_name|default:"—" }}</td></tr>
+        <tr><td class="info-key">{% trans "Email" %}</td><td class="info-val">{{ account.customer.email }}</td></tr>
+        <tr><td class="info-key">{% trans "Phone" %}</td><td class="info-val">{{ account.customer.phone|default:"—" }}</td></tr>
+        <tr><td class="info-key">{% trans "Segment" %}</td><td class="info-val">{{ account.get_segment_display }}</td></tr>
+        <tr><td class="info-key">{% trans "Client number" %}</td><td class="info-val">{{ account.client_number|default:"—" }}</td></tr>
+        <tr><td class="info-key">{% trans "Member since" %}</td><td class="info-val">{{ account.created_at|date:"F Y" }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <a href="{% url 'b2b:profile' %}" class="btn btn-outline btn-sm" style="margin-bottom:2.5rem;">
+    {% trans "Edit my profile" %}
+  </a>
+
+  {# ---- Quick access ---- #}
+  <h2 class="eyebrow">{% trans "Quick access" %}</h2>
+  <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:2.5rem;">
+    <a href="{% url 'b2b:in_progress' %}" class="btn btn-gold btn-sm">{% trans "My orders in progress" %}</a>
+    <a href="{% url 'b2b:catalogue' %}" class="btn btn-outline btn-sm">{% trans "B2B catalogue" %}</a>
+    <a href="{% url 'b2b:exclusive' %}" class="btn btn-outline btn-sm">{% trans "Exclusive products" %}</a>
+    <a href="{% url 'b2b:configurator' %}" class="btn btn-outline btn-sm">{% trans "Configurator" %}</a>
+  </div>
+
+  {# ---- Recent orders ---- #}
+  <h2 class="eyebrow">{% trans "Recent orders" %}</h2>
   {% if orders %}
-    <ul class="list-group">
-      {% for o in orders %}<li class="list-group-item d-flex justify-content-between">
-        <span>{{ o.order_number }}</span><span>{{ o.total_amount }} {{ o.currency }}</span>
-      </li>{% endfor %}
-    </ul>
-  {% else %}<p class="text-muted">{% trans "No order yet." %}</p>{% endif %}
-</div>
+    <div class="table-wrap">
+        <table class="table">
+        <thead><tr>
+            <th>{% trans "Order" %}</th><th>{% trans "Date" %}</th>
+            <th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th>
+        </tr></thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.order_number }}</td>
+                <td>{{ o.created_at|date:"d.m.Y" }}</td>
+                <td>{{ o.total_amount }} {{ o.currency }}</td>
+                <td><span class="badge">{{ o.get_status_display }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+    <a href="{% url 'b2b:history' %}" class="btn btn-outline btn-sm" style="margin-top:1rem;">
+      {% trans "See all orders" %} →
+    </a>
+  {% else %}
+    <p class="muted">{% trans "No order yet." %}</p>
+  {% endif %}
 {% endblock %}

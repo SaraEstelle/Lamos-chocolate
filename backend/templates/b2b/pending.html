@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block content %}
+<section class="section container" style="max-width:560px;text-align:center;">
+  <span class="eyebrow">{% trans "Professional space" %}</span>
+  <div style="font-size:3.2rem;">&#x23F3;</div>
+  <h1 class="h-display">{% trans "Your account is being validated" %}</h1>
+  <p class="muted">{% trans "Our team is reviewing your company request. You will receive a confirmation email within 24–48h." %}</p>
+  {% if account %}
+  <div class="card" style="text-align:left;margin:1.5rem 0;">
+    <div class="card__body">
+      <p><strong>Email :</strong> {{ request.user.email }}</p>
+      <p><strong>{% trans "Company" %} :</strong> {{ account.company_name }}</p>
+      <p><strong>{% trans "Submitted on" %} :</strong> {{ account.created_at|date:"d M Y" }}</p>
+    </div>
+  </div>
+  {% endif %}
+  <a href="{% url 'main:home' %}" class="btn btn-outline">{% trans "Back to home" %}</a>
+</section>
+{% endblock %}

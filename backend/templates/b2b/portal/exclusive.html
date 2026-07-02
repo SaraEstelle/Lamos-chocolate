@@ -1,0 +1,49 @@
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Exclusive products" %} — Lamos Chocolate{% endblock %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "For B2B partners only" %}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">{% trans "Exclusive products & pre-orders" %}</h1>
+  <p class="muted" style="margin-bottom:2rem;">
+    {% trans "Early access to our newest creations, at your negotiated prices." %}
+  </p>
+
+  {% if products %}
+    <div class="stats-grid">
+      {% for info in products %}
+        <article class="card" style="padding:1.5rem;border:1px solid var(--c-line);border-radius:var(--radius);">
+          <span class="badge {% if info.availability_status == 'new' %}badge--new{% endif %}">
+            {{ info.get_availability_status_display }}
+          </span>
+          <h3 class="card-title" style="margin:.5rem 0 .25rem;">{{ info.sku.product.name_fr }}</h3>
+          <p class="muted small">{{ info.sku.sku_code }}</p>
+
+          <p style="margin:.75rem 0 .25rem;">
+            <strong>{{ info.effective_price }} CHF</strong>
+            {% if info.sku.price and info.b2b_unit_price %}
+              <span class="muted small" style="text-decoration:line-through;">{{ info.sku.price }} CHF</span>
+            {% endif %}
+          </p>
+
+          {% if info.availability_status == "coming_soon" %}
+            <p class="muted small">{% trans "Available soon — pre-order on request." %}</p>
+          {% endif %}
+
+          <a href="{% url 'b2b:configurator' %}" class="btn btn-gold btn-sm" style="margin-top:.75rem;">
+            {% trans "Request a quote" %}
+          </a>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">{% trans "No exclusive product at the moment." %}</p>
+  {% endif %}
+
+  <div class="card" style="margin-top:2rem;padding:1.25rem 1.5rem;border:1px solid var(--c-line);border-radius:var(--radius);">
+    <p class="muted small" style="margin:0;">
+      {% trans "Need large volumes or fully custom creations? Contact your account manager." %}
+    </p>
+  </div>
+{% endblock %}

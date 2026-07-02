@@ -227,6 +227,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SOCIALACCOUNT_ADAPTER = "apps.accounts.adapters.LamosSocialAccountAdapter"
+ACCOUNT_ADAPTER = "apps.accounts.adapters.LamosAccountAdapter"
 
 # ============================================================================
 # LOGGING

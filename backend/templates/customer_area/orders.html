@@ -4,63 +4,50 @@
 {% block title %}{% trans "My orders" %} — Lamos Chocolate{% endblock %}
 
 {% block account_content %}
-<div class="container my-5">
-  <a href="{% url 'customer_area:dashboard' %}" class="btn btn-link mb-3">← {% trans "Back to my account" %}</a>
-  <h1 class="mb-4">{% trans "My orders" %}</h1>
+  <span class="eyebrow">{% trans "My account" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.25rem;">{% trans "My orders" %}</h1>
 
-  <!-- Status filter -->
-  <div class="mb-4">
-    <a href="{% url 'customer_area:orders' %}" class="btn btn-sm {% if not current_status %}btn-dark{% else %}btn-outline-dark{% endif %}">{% trans "All" %}</a>
-    <a href="?status=pending" class="btn btn-sm {% if current_status == 'pending' %}btn-dark{% else %}btn-outline-dark{% endif %}">{% trans "Pending" %}</a>
-    <a href="?status=paid" class="btn btn-sm {% if current_status == 'paid' %}btn-dark{% else %}btn-outline-dark{% endif %}">{% trans "Paid" %}</a>
-    <a href="?status=shipped" class="btn btn-sm {% if current_status == 'shipped' %}btn-dark{% else %}btn-outline-dark{% endif %}">{% trans "Shipped" %}</a>
-    <a href="?status=delivered" class="btn btn-sm {% if current_status == 'delivered' %}btn-dark{% else %}btn-outline-dark{% endif %}">{% trans "Delivered" %}</a>
+  {# Status filter #}
+  <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
+    <a href="{% url 'customer_area:orders' %}" class="btn btn-sm {% if not current_status %}btn-gold{% else %}btn-outline{% endif %}">{% trans "All" %}</a>
+    <a href="?status=pending" class="btn btn-sm {% if current_status == 'pending' %}btn-gold{% else %}btn-outline{% endif %}">{% trans "Pending" %}</a>
+    <a href="?status=paid" class="btn btn-sm {% if current_status == 'paid' %}btn-gold{% else %}btn-outline{% endif %}">{% trans "Paid" %}</a>
+    <a href="?status=shipped" class="btn btn-sm {% if current_status == 'shipped' %}btn-gold{% else %}btn-outline{% endif %}">{% trans "Shipped" %}</a>
+    <a href="?status=delivered" class="btn btn-sm {% if current_status == 'delivered' %}btn-gold{% else %}btn-outline{% endif %}">{% trans "Delivered" %}</a>
   </div>
 
   {% if orders %}
-    <div class="table-responsive">
-      <table class="table table-hover align-middle">
-        <thead>
+    <table class="table">
+      <thead>
+        <tr><th>{% trans "Order" %}</th><th>{% trans "Date" %}</th><th>{% trans "Status" %}</th><th style="text-align:right;">{% trans "Total" %}</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
           <tr>
-            <th>{% trans "Order" %}</th>
-            <th>{% trans "Date" %}</th>
-            <th>{% trans "Status" %}</th>
-            <th class="text-end">{% trans "Total" %}</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for order in orders %}
-          <tr>
-            <td><code>{{ order.order_number }}</code></td>
+            <td>{{ order.order_number }}</td>
             <td>{{ order.created_at|date:"d/m/Y" }}</td>
-            <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
-            <td class="text-end">{{ order.total_amount }} {{ order.currency }}</td>
-            <td class="text-end">
-              <a href="{% url 'customer_area:order_detail' order.id %}" class="btn btn-sm btn-outline-primary">{% trans "View" %}</a>
+            <td><span class="badge">{{ order.get_status_display }}</span></td>
+            <td style="text-align:right;">{{ order.total_amount }} {{ order.currency }}</td>
+            <td style="text-align:right;">
+              <a href="{% url 'customer_area:order_detail' order.id %}" class="btn btn-sm btn-outline">{% trans "View" %}</a>
             </td>
           </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+        {% endfor %}
+      </tbody>
+    </table>
 
-    <!-- Pagination -->
     {% if orders.has_other_pages %}
-    <nav>
-      <ul class="pagination justify-content-center">
+      <div style="display:flex;gap:.75rem;justify-content:center;align-items:center;margin-top:1.5rem;">
         {% if orders.has_previous %}
-          <li class="page-item"><a class="page-link" href="?page={{ orders.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">←</a></li>
+          <a class="btn btn-sm btn-outline" href="?page={{ orders.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">&larr;</a>
         {% endif %}
-        <li class="page-item disabled"><span class="page-link">{{ orders.number }} / {{ orders.paginator.num_pages }}</span></li>
+        <span class="muted small">{{ orders.number }} / {{ orders.paginator.num_pages }}</span>
         {% if orders.has_next %}
-          <li class="page-item"><a class="page-link" href="?page={{ orders.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">→</a></li>
+          <a class="btn btn-sm btn-outline" href="?page={{ orders.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}">&rarr;</a>
         {% endif %}
-      </ul>
-    </nav>
+      </div>
     {% endif %}
   {% else %}
-    <div class="alert alert-info">{% trans "No orders found." %}</div>
+    <p class="muted">{% trans "No orders found." %}</p>
   {% endif %}
-</div>
 {% endblock %}

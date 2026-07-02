@@ -10,6 +10,9 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Customer, PasswordResetToken
 from apps.accounts.models import B2BAccount  # add near the other imports
+from django.utils import timezone
+from apps.common.constants import B2BAccountStatusChoices
+from apps.b2b.services import notify_b2b_account_validated  # email hook (Guide 3)
 
 @admin.register(Customer)
 class CustomerAdmin(BaseUserAdmin):
@@ -101,3 +104,13 @@ class B2BAccountAdmin(admin.ModelAdmin):
     list_display = ("company_name", "segment", "status", "client_number")
     list_filter = ("segment", "status")
     search_fields = ("company_name", "client_number")
+    actions = ["approve_accounts"]
+
+    @admin.action(description="Approve selected B2B accounts (activate + notify)")
+    def approve_accounts(self, request, queryset):
+        for account in queryset.exclude(status=B2BAccountStatusChoices.ACTIVE):
+            account.status = B2BAccountStatusChoices.ACTIVE
+            account.onboarded_at = timezone.now()
+            account.save(update_fields=["status", "onboarded_at"])
+            notify_b2b_account_validated(account)
+        self.message_user(request, "Selected accounts approved and notified.")

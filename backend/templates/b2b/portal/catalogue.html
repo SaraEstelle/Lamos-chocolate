@@ -1,36 +1,64 @@
-{% extends "base/base.html" %}
-{% load i18n %}
+{% extends "b2b/portal/base_portal.html" %}
+{% load i18n static %}
+
 {% block title %}{% trans "Pro catalogue" %} — Lamos Chocolate{% endblock %}
-{% block content %}
-<div class="container my-5" style="max-width: 960px;">
-  <h1 class="mb-4">{% trans "Pro catalogue" %}</h1>
-  <table class="table align-middle">
-    <thead><tr>
-      <th>{% trans "Product" %}</th><th>{% trans "Format" %}</th>
-      <th>{% trans "Pro price" %}</th><th>{% trans "MOQ" %}</th>
-      <th>{% trans "Stock" %}</th><th></th>
-    </tr></thead>
-    <tbody>
-    {% for info in catalogue %}
+
+{% block portal_content %}
+  <span class="eyebrow">{% trans "Pro space" %}</span>
+  <h1 class="h-display" style="margin-bottom:1rem;">{% trans "Pro catalogue" %}</h1>
+
+  {# Full B2B catalogue as a downloadable PDF (available to every pro). #}
+  <a class="btn btn-gold btn-sm" href="{% static 'catalogue/lamos-b2b-catalogue.pdf' %}" download>
+    {% trans "Download the full B2B catalogue (PDF)" %}
+  </a>
+
+  {% if not can_order %}
+    <div style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);border-radius:var(--radius);
+                padding:1rem 1.2rem;background:var(--c-ivory);margin:1.25rem 0;">
+      <p style="margin:0;font-weight:700;">{% trans "Account under validation" %}</p>
+      <p class="muted small" style="margin:.25rem 0 0;">
+        {% trans "You can browse the catalogue now. Ordering and personalisation unlock once your account is approved." %}
+      </p>
+    </div>
+  {% endif %}
+
+  <table class="table" style="margin-top:1.25rem;">
+    <thead>
       <tr>
-        <td>{{ info.sku.product.name_fr }}
-          <div class="small text-muted">{{ info.sku.sku_code }}</div>
-          {% if info.availability_status == "new" %}<span class="badge bg-success">{% trans "New" %}</span>{% endif %}
-          {% if info.availability_status == "coming_soon" %}<span class="badge bg-secondary">{% trans "Coming soon" %}</span>{% endif %}
-        </td>
-        <td>{{ info.sku.format }}</td>
-        <td>{{ info.effective_price }} CHF</td>
-        <td>{{ info.moq }}</td>
-        <td>
-          {{ info.sku.stock.quantity }}
-          {% if info.sku.stock.is_low %}<span class="badge bg-warning text-dark">{% trans "Low" %}</span>{% endif %}
-        </td>
-        <td><a href="{% url 'b2b:configurator' %}" class="btn btn-sm btn-outline-primary">{% trans "Configure" %}</a></td>
+        <th>{% trans "Product" %}</th>
+        <th>{% trans "Format" %}</th>
+        <th>{% trans "Pro price" %}</th>
+        <th>{% trans "MOQ" %}</th>
+        <th>{% trans "Stock" %}</th>
+        <th></th>
       </tr>
-    {% empty %}
-      <tr><td colspan="6" class="text-muted">{% trans "No product available." %}</td></tr>
-    {% endfor %}
+    </thead>
+    <tbody>
+      {% for info in catalogue %}
+        <tr>
+          <td>{{ info.sku.product.name_fr }}
+            <div class="muted small">{{ info.sku.sku_code }}</div>
+            {% if info.availability_status == "new" %}<span class="badge badge--new">{% trans "New" %}</span>{% endif %}
+            {% if info.availability_status == "coming_soon" %}<span class="badge">{% trans "Coming soon" %}</span>{% endif %}
+          </td>
+          <td>{{ info.sku.format }}</td>
+          <td>{{ info.effective_price }} CHF</td>
+          <td>{{ info.moq }}</td>
+          <td>
+            {{ info.sku.stock.quantity }}
+            {% if info.sku.stock.is_low %}<span class="badge">{% trans "Low" %}</span>{% endif %}
+          </td>
+          <td>
+            {% if can_order %}
+              <a href="{% url 'b2b:configurator' %}" class="btn btn-sm btn-gold">{% trans "Configure" %}</a>
+            {% else %}
+              <button type="button" class="btn btn-sm btn-outline" disabled>{% trans "Locked" %}</button>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="muted">{% trans "No product available." %}</td></tr>
+      {% endfor %}
     </tbody>
   </table>
-</div>
 {% endblock %}

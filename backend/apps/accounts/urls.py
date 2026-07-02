@@ -19,6 +19,9 @@ app_name = 'accounts'
 urlpatterns = [
     path("connect/", views.connect_view, name="connect"),
 
+        path("access/", views.access_view, name="access"),   # sliding B2C auth
+
+
     # Registration
     path('register/', views.register_view, name='register'),
 

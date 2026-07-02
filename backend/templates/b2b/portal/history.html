@@ -1,28 +1,45 @@
-{% extends "base/base.html" %}
+{% extends "b2b/portal/base_portal.html" %}
 {% load i18n %}
+
 {% block title %}{% trans "Order history" %} — Lamos Chocolate{% endblock %}
-{% block content %}
-<div class="container my-5" style="max-width: 960px;">
-  <h1 class="mb-4">{% trans "Order history" %}</h1>
+
+{% block portal_content %}
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+    <div>
+      <span class="eyebrow">{% trans "Order history" %}</span>
+      <h1 class="h-display" style="margin-bottom:.25rem;">{% trans "All your past orders" %}</h1>
+    </div>
+    <a href="{% url 'b2b:history_export' %}" class="btn btn-outline btn-sm">{% trans "Export CSV" %}</a>
+  </div>
+
   {% if orders %}
-    <table class="table align-middle">
-      <thead><tr><th>{% trans "Order" %}</th><th>{% trans "Date" %}</th><th>{% trans "Total" %}</th><th></th></tr></thead>
-      <tbody>
-      {% for o in orders %}
-        <tr>
-          <td>{{ o.order_number }}</td>
-          <td>{{ o.created_at|date:"d.m.Y" }}</td>
-          <td>{{ o.total_amount }} {{ o.currency }}</td>
-          <td>
-            <form method="post" action="{% url 'b2b:reorder' o.id %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-primary">{% trans "Reorder" %}</button>
-            </form>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  {% else %}<p class="text-muted">{% trans "No order yet." %}</p>{% endif %}
-</div>
+    <div class="table-wrap">
+        <table class="table">
+        <thead><tr>
+            <th>{% trans "Order" %}</th><th>{% trans "Date" %}</th>
+            <th>{% trans "Amount" %}</th><th>{% trans "Status" %}</th>
+            <th>{% trans "Actions" %}</th>
+        </tr></thead>
+        <tbody>
+            {% for o in orders %}
+            <tr>
+                <td>{{ o.order_number }}</td>
+                <td>{{ o.created_at|date:"d.m.Y" }}</td>
+                <td>{{ o.total_amount }} {{ o.currency }}</td>
+                <td><span class="badge">{{ o.get_status_display }}</span></td>
+                <td>
+                {# 1-click reorder (existing view). CSRF required -> tiny inline form. #}
+                <form method="post" action="{% url 'b2b:reorder' o.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm">{% trans "Reorder" %}</button>
+                </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+  {% else %}
+    <p class="muted">{% trans "No order yet." %}</p>
+  {% endif %}
 {% endblock %}

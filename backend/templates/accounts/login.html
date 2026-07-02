@@ -1,96 +1,63 @@
 {% extends "base/base.html" %}
-{% load i18n %}
+{% load i18n socialaccount %}
 
-{% block title %}{% trans "Log in" %} - Lamos Chocolate{% endblock %}
+{% block title %}{% trans "Sign in" %} · Lamos Chocolate{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-5">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">{% trans "Log in" %} 🔓</h2>
-                </div>
-                <div class="card-body">
+<section class="section container" style="max-width:460px;">
 
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+  <div class="reveal" style="text-align:center;margin-bottom:2rem;">
+    <p class="eyebrow">{% trans "Welcome back" %}</p>
+    <h1 class="h-display">{% trans "Sign in" %}</h1>
+    <span class="gold-line" style="margin:1rem auto 0;"></span>
+  </div>
 
-                    <form method="post" class="needs-validation" novalidate>
-                        {% csrf_token %}
+  {# Messages (success/error) are already rendered globally by base/messages.html #}
 
-                        <div class="mb-3">
-                            {{ form.email.label_tag }}
-                            {{ form.email }}
-                            {% if form.email.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.email.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
+  <form method="post" novalidate class="reveal">
+    {% csrf_token %}
 
-                        <div class="mb-3">
-                            {{ form.password.label_tag }}
-                            {{ form.password }}
-                            {% if form.password.errors %}
-                                <div class="invalid-feedback d-block">
-                                    {{ form.password.errors.0 }}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        {% load socialaccount i18n %}
-
-                        <div class="social-auth" style="margin-top:2rem;text-align:center;">
-                        <p class="eyebrow">{% trans "Or continue with" %}</p>
-
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline" style="width:100%;margin-bottom:.75rem;">
-                            {% trans "Continue with Google" %}
-                        </a>
-
-                        {# Facebook: only show when configured (env vars set) #}
-                        {% if FACEBOOK_ENABLED %}
-                            <a href="{% provider_login_url 'facebook' %}" class="btn btn-outline" style="width:100%;margin-bottom:.75rem;">
-                            {% trans "Continue with Facebook" %}
-                            </a>
-                        {% endif %}
-
-                        {# Instagram: NOT available as a login method (Meta shut it down). #}
-                        <button type="button" class="btn btn-outline" style="width:100%;opacity:.5;cursor:not-allowed;"
-                                title="{% trans 'Instagram login is no longer supported by Meta.' %}" disabled>
-                            {% trans "Instagram (unavailable)" %}
-                        </button>
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            {{ form.remember_me }}
-                            {{ form.remember_me.label_tag }}
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            {% trans "Log in" %} →
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <p>
-                            <a href="{% url 'accounts:password_reset' %}">
-                                {% trans "Forgot password?" %}
-                            </a>
-                        </p>
-                        <p>{% trans "No account yet?" %}
-                            <a href="{% url 'accounts:register' %}">{% trans "Sign up" %}</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="field">
+      <label for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
+      {{ form.email }}
+      {% if form.email.errors %}<p class="small" style="color:var(--c-danger)">{{ form.email.errors|striptags }}</p>{% endif %}
     </div>
-</div>
+
+    <div class="field">
+      <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+      {{ form.password }}
+      {% if form.password.errors %}<p class="small" style="color:var(--c-danger)">{{ form.password.errors|striptags }}</p>{% endif %}
+    </div>
+
+    <label style="display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--c-text-2);margin-bottom:1.25rem;">
+      {{ form.remember_me }} {% trans "Keep me signed in" %}
+    </label>
+
+    <button type="submit" class="btn btn-gold btn-lg" style="width:100%;">{% trans "Sign in" %} &rarr;</button>
+  </form>
+
+  {# --- Social + secondary links --- #}
+  <div class="reveal" style="margin-top:1.5rem;text-align:center;">
+    <p class="eyebrow" style="margin-bottom:.9rem;">{% trans "Or continue with" %}</p>
+
+    <a href="{% provider_login_url 'google' %}" class="btn btn-outline" style="width:100%;margin-bottom:.6rem;">
+      {% trans "Continue with Google" %}
+    </a>
+
+    {% if FACEBOOK_ENABLED %}
+      <a href="{% provider_login_url 'facebook' %}" class="btn btn-outline" style="width:100%;margin-bottom:.6rem;">
+        {% trans "Continue with Facebook" %}
+      </a>
+    {% endif %}
+
+    <p class="muted small" style="margin-top:1rem;">
+      <a href="{% url 'accounts:password_reset' %}" style="color:var(--c-gold-3)">{% trans "Forgot your password?" %}</a>
+    </p>
+    <p class="muted small">
+      {% trans "No account yet?" %}
+      <a href="{% url 'accounts:connect' %}" style="color:var(--c-gold-3)">{% trans "Create one" %}</a>
+    </p>
+  </div>
+
+</section>
 {% endblock %}

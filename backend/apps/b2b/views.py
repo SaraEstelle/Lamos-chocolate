@@ -3,6 +3,11 @@ apps/b2b/views.py
 =================
 B2B views: L0 public funnel + L1 pro space + L2 configurator.
 """
+import csv
+from django.http import HttpResponse
+from apps.b2b.selectors import (
+    get_b2b_orders_in_progress, get_exclusive_products, get_b2b_dashboard_kpis,
+)
 
 from decimal import Decimal
 
@@ -23,8 +28,42 @@ from apps.b2b.services import notify_quote_request, simulate_quote
 from apps.checkout.models import Order
 
 from apps.b2b.forms import ConfiguratorForm
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from apps.b2b.forms import B2BRegisterForm
+from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
+from apps.b2b.decorators import b2b_account_required, b2b_login_required
+
+from django.views.decorators.csrf import csrf_protect
+from apps.accounts.forms import LoginForm
+from apps.accounts.redirects import post_auth_redirect_target
 
 
+
+@require_http_methods(["GET", "POST"])
+def register_view(request):
+    """Method 1: a professional creates their own (pending) account."""
+    if request.method == "POST":
+        form = B2BRegisterForm(request.POST)
+        if form.is_valid():
+            customer, account = form.save()
+            notify_b2b_account_pending(account)      # email staff + applicant
+            login(request, customer,
+                  backend="django.contrib.auth.backends.ModelBackend")
+            return redirect("b2b:pending")
+    else:
+        form = B2BRegisterForm()
+    return render(request, "b2b/register.html", {"form": form})
+
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def pending_view(request):
+    """Shown while a pro account awaits validation."""
+    account = getattr(request.user, "b2b_account", None)
+    if account and account.status == "active":
+        return redirect("b2b:portal")          # already validated
+    return render(request, "b2b/pending.html", {"account": account})
 # ----------------------------------------------------------------------------
 # L0 — Public funnel (no login)
 # ----------------------------------------------------------------------------
@@ -65,23 +104,92 @@ def success_view(request):
     """Confirmation page after submission."""
     return render(request, "b2b/success.html")
 
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+def access_view(request):
+    """
+    B2B access page: pro SIGN-IN only.
 
+    Registration lives on the B2B front (b2b:presentation -> b2b:register), so
+    here we just authenticate and let redirect() decide pending vs portal.
+    Template: b2b/access.html
+    """
+    if request.user.is_authenticated:
+        return redirect(post_auth_redirect_target(request.user))
+
+    login_form = LoginForm()
+    if request.method == "POST":
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            customer = login_form.customer           # set in LoginForm.clean()
+            login(request, customer)
+            return redirect(post_auth_redirect_target(customer))
+
+    return render(request, "b2b/access.html", {"login_form": login_form})
 # ----------------------------------------------------------------------------
 # L1 — Pro space (login + B2BAccount required)
 # ----------------------------------------------------------------------------
 @b2b_account_required
 @require_http_methods(["GET"])
 def portal_home_view(request):
-    """Pro portal home: greeting + a few recent orders + catalogue preview."""
+    """Pro dashboard home = 'Profil' tab: account info + KPIs + recent orders."""
     account = request.b2b_account
     return render(request, "b2b/portal/home.html", {
         "account": account,
-        "catalogue": get_pro_catalogue()[:6],
+        "kpis": get_b2b_dashboard_kpis(account),
         "orders": get_b2b_orders(account, limit=5),
+        "catalogue": get_pro_catalogue()[:6],
+    })
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def in_progress_view(request):
+    """'Commandes en cours' tab: orders still moving (pending..shipped)."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/in_progress.html", {
+        "account": account,
+        "orders": get_b2b_orders_in_progress(account),
     })
 
 
 @b2b_account_required
+@require_http_methods(["GET"])
+def exclusive_view(request):
+    """'Produits exclusifs & pré-commandes' tab (pro-only NEW / COMING_SOON)."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/exclusive.html", {
+        "account": account,
+        "products": get_exclusive_products(),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def history_export_view(request):
+    """
+    Export the account's B2B order history as CSV (the 'Exporter CSV' button).
+
+    Streams a UTF-8 CSV with a BOM so Excel opens accents correctly.
+    Scoped to the account owner → no data leak.
+    """
+    account = request.b2b_account
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="orders_history.csv"'
+    response.write("\ufeff")  # BOM for Excel
+
+    writer = csv.writer(response, delimiter=";")
+    writer.writerow(["Order", "Date", "Amount", "Currency", "Status"])
+    for o in get_b2b_orders(account, limit=1000):
+        writer.writerow([
+            o.order_number,
+            o.created_at.strftime("%d.%m.%Y"),
+            o.total_amount,
+            o.currency,
+            o.get_status_display(),
+        ])
+    return response
+
+@b2b_login_required
 @require_http_methods(["GET"])
 def portal_catalogue_view(request):
     """Pro catalogue with real-time stock per SKU."""
@@ -89,8 +197,10 @@ def portal_catalogue_view(request):
     # The pro consulted live stock → track it (feeds B2B engagement KPIs).
     track_event("b2b_stock_viewed", customer=request.user, channel="b2b",
                 account=str(account.id))
+    can_order = account.status == "active"
     return render(request, "b2b/portal/catalogue.html", {
         "account": account, "catalogue": get_pro_catalogue(),
+        "can_order": can_order,
     })
 
 
@@ -183,3 +293,32 @@ def configurator_view(request):
     return render(request, "b2b/configurator.html", {
         "account": account, "form": form, "simulation": simulation,
     })
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def documents_view(request):
+    """Pro documents (invoices/quotes). Reuses orders + quote simulations."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/documents.html", {
+        "account": account,
+        "orders": get_b2b_orders(account),
+        "quotes": account.quote_simulations.all()[:20],
+    })
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def notifications_view(request):
+    """Account-level notifications (validation, quote status…)."""
+    return render(request, "b2b/portal/notifications.html", {"account": request.b2b_account})
+
+@b2b_account_required
+@require_http_methods(["GET", "POST"])
+def company_profile_view(request):
+    """Edit company info (name, payment terms read-only for the pro)."""
+    account = request.b2b_account
+    if request.method == "POST":
+        account.company_name = request.POST.get("company_name", account.company_name).strip()
+        account.save(update_fields=["company_name"])
+        messages.success(request, _("Company profile updated."))
+        return redirect("b2b:profile")
+    return render(request, "b2b/portal/profile.html", {"account": account})

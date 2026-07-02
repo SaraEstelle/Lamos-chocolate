@@ -1,31 +1,46 @@
 {% extends "base/base.html" %}
 {% load i18n %}
+
 {% block title %}{% trans "Professional request" %} — Lamos Chocolate{% endblock %}
+
 {% block content %}
-<div class="container my-5" style="max-width: 720px;">
-  <h1 class="mb-2">{% trans "Professional / B2B request" %}</h1>
-  <p class="text-muted mb-4">{% trans "Tell us about your needs and we'll get back to you with a tailored offer." %}</p>
+<section class="section container" style="max-width:720px;">
+  <span class="eyebrow">{% trans "Professionals" %}</span>
+  <h1 class="h-display" style="margin-bottom:.5rem;">{% trans "Professional / B2B request" %}</h1>
+  <p class="muted" style="margin-bottom:1.75rem;">{% trans "Tell us about your needs and we'll get back to you with a tailored offer." %}</p>
+
   <form method="post" novalidate>
     {% csrf_token %}
-    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    {% if form.non_field_errors %}
+      <div style="border:1px solid var(--c-danger);border-radius:var(--radius);padding:.75rem 1rem;margin-bottom:1rem;color:var(--c-danger);">
+        {{ form.non_field_errors|striptags }}
+      </div>
+    {% endif %}
+
     {% for field in form %}
       {% if field.name != "website" and field.name != "wants_marketing" %}
-        <div class="mb-3">
-          <label for="{{ field.id_for_label }}" class="form-label">
-            {{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} *{% endif %}
           </label>
           {{ field }}
-          {% if field.errors %}<div class="text-danger small">{{ field.errors.0 }}</div>{% endif %}
+          {% if field.errors %}<p class="small" style="color:var(--c-danger)">{{ field.errors|striptags }}</p>{% endif %}
         </div>
       {% endif %}
     {% endfor %}
-    <div class="form-check mb-3">
-      {{ form.wants_marketing }}
-      <label class="form-check-label" for="{{ form.wants_marketing.id_for_label }}">{{ form.wants_marketing.label }}</label>
-    </div>
-    {{ form.website }}{# honeypot: hidden via d-none #}
-    <button type="submit" class="btn btn-primary">{% trans "Send request" %}</button>
+
+    {# Marketing opt-in (nLPD): explicit, unticked by default. #}
+    <label style="display:flex;align-items:center;gap:.5rem;margin:1rem 0;font-size:.85rem;color:var(--c-text-2);">
+      {{ form.wants_marketing }} {{ form.wants_marketing.label }}
+    </label>
+
+    {{ form.website }}  {# honeypot — kept hidden by the widget #}
+
+    <button type="submit" class="btn btn-gold btn-lg">{% trans "Send request" %}</button>
   </form>
-  <p class="text-muted small mt-4">{% trans "Your data is used solely to process your request. We do not share it with third parties. You can request access or deletion at any time." %}</p>
-</div>
+
+  <p class="muted small" style="margin-top:2rem;">
+    {% trans "Your data is used solely to process your request. We do not share it with third parties. You can request access or deletion at any time." %}
+  </p>
+</section>
 {% endblock %}
