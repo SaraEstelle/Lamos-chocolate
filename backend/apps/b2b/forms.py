@@ -107,6 +107,16 @@ class B2BRegisterForm(forms.Form):
     phone        = forms.CharField(max_length=20, required=False)
     password     = forms.CharField(min_length=12, widget=forms.PasswordInput)
     password_confirm = forms.CharField(widget=forms.PasswordInput)
+    preferred_language = forms.ChoiceField(
+        choices=[
+            ("fr", "Français"),
+            ("en", "English"),
+            ("de-ch", "Deutsch (Schweiz)"),
+            ("it-ch", "Italiano (Svizzera)"),
+        ],
+        initial="en",
+        label=_("Preferred language"),
+    )
     accept_terms = forms.BooleanField(required=True)
 
     def clean_email(self):
@@ -139,6 +149,7 @@ class B2BRegisterForm(forms.Form):
             last_name=data["last_name"],
             phone=data.get("phone", ""),
             company_name=data["company_name"],
+            preferred_language=data["preferred_language"],
             is_b2b=True,
             customer_type=CustomerTypeChoices.B2B_DISTRIBUTOR,
         )
