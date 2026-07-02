@@ -3,6 +3,11 @@ apps/b2b/views.py
 =================
 B2B views: L0 public funnel + L1 pro space + L2 configurator.
 """
+import csv
+from django.http import HttpResponse
+from apps.b2b.selectors import (
+    get_b2b_orders_in_progress, get_exclusive_products, get_b2b_dashboard_kpis,
+)
 
 from decimal import Decimal
 
@@ -28,6 +33,12 @@ from django.contrib.auth.decorators import login_required
 from apps.b2b.forms import B2BRegisterForm
 from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
 from apps.b2b.decorators import b2b_account_required, b2b_login_required
+
+from django.views.decorators.csrf import csrf_protect
+from apps.accounts.forms import LoginForm
+from apps.accounts.redirects import post_auth_redirect_target
+
+
 
 @require_http_methods(["GET", "POST"])
 def register_view(request):
@@ -93,21 +104,90 @@ def success_view(request):
     """Confirmation page after submission."""
     return render(request, "b2b/success.html")
 
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+def access_view(request):
+    """
+    B2B access page: pro SIGN-IN only.
 
+    Registration lives on the B2B front (b2b:presentation -> b2b:register), so
+    here we just authenticate and let redirect() decide pending vs portal.
+    Template: b2b/access.html
+    """
+    if request.user.is_authenticated:
+        return redirect(post_auth_redirect_target(request.user))
+
+    login_form = LoginForm()
+    if request.method == "POST":
+        login_form = LoginForm(request.POST)
+        if login_form.is_valid():
+            customer = login_form.customer           # set in LoginForm.clean()
+            login(request, customer)
+            return redirect(post_auth_redirect_target(customer))
+
+    return render(request, "b2b/access.html", {"login_form": login_form})
 # ----------------------------------------------------------------------------
 # L1 — Pro space (login + B2BAccount required)
 # ----------------------------------------------------------------------------
 @b2b_account_required
 @require_http_methods(["GET"])
 def portal_home_view(request):
-    """Pro portal home: greeting + a few recent orders + catalogue preview."""
+    """Pro dashboard home = 'Profil' tab: account info + KPIs + recent orders."""
     account = request.b2b_account
     return render(request, "b2b/portal/home.html", {
         "account": account,
-        "catalogue": get_pro_catalogue()[:6],
+        "kpis": get_b2b_dashboard_kpis(account),
         "orders": get_b2b_orders(account, limit=5),
+        "catalogue": get_pro_catalogue()[:6],
     })
 
+@b2b_account_required
+@require_http_methods(["GET"])
+def in_progress_view(request):
+    """'Commandes en cours' tab: orders still moving (pending..shipped)."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/in_progress.html", {
+        "account": account,
+        "orders": get_b2b_orders_in_progress(account),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def exclusive_view(request):
+    """'Produits exclusifs & pré-commandes' tab (pro-only NEW / COMING_SOON)."""
+    account = request.b2b_account
+    return render(request, "b2b/portal/exclusive.html", {
+        "account": account,
+        "products": get_exclusive_products(),
+    })
+
+
+@b2b_account_required
+@require_http_methods(["GET"])
+def history_export_view(request):
+    """
+    Export the account's B2B order history as CSV (the 'Exporter CSV' button).
+
+    Streams a UTF-8 CSV with a BOM so Excel opens accents correctly.
+    Scoped to the account owner → no data leak.
+    """
+    account = request.b2b_account
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="orders_history.csv"'
+    response.write("\ufeff")  # BOM for Excel
+
+    writer = csv.writer(response, delimiter=";")
+    writer.writerow(["Order", "Date", "Amount", "Currency", "Status"])
+    for o in get_b2b_orders(account, limit=1000):
+        writer.writerow([
+            o.order_number,
+            o.created_at.strftime("%d.%m.%Y"),
+            o.total_amount,
+            o.currency,
+            o.get_status_display(),
+        ])
+    return response
 
 @b2b_login_required
 @require_http_methods(["GET"])
