@@ -1,0 +1,149 @@
+{% extends "base/base.html" %}
+{% load i18n static socialaccount %}
+
+{% block title %}{% trans "Sign in" %} · Lamos Chocolate{% endblock %}
+
+{% block extra_head %}
+  <link rel="stylesheet" href="{% static 'css/auth-slide.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  {# active_panel = "register" -> the card opens on the sign-up side (used when
+     the sign-up form has errors, so the user sees them). #}
+  <div class="auth-card {% if active_panel == 'register' %}mode-register{% endif %}" id="authCard">
+
+    {# ══════════════ LEFT COLUMN : SIGN IN ══════════════ #}
+    <div class="auth-pane auth-pane--signin">
+      <svg class="auth-crown" viewBox="0 0 100 80" fill="none">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+      </svg>
+      <h2 class="auth-title">{% trans "Sign in" %}</h2>
+
+    
+      <div class="auth-social">
+        <a href="{% provider_login_url 'google' %}" class="auth-social-btn" aria-label="Google">G</a>
+        {% if FACEBOOK_ENABLED %}<a href="{% provider_login_url 'facebook' %}" class="auth-social-btn" aria-label="Facebook">f</a>{% endif %}
+      </div>
+      <p class="auth-separator">{% trans "or sign in with your email" %}</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="login">
+        {% if login_form.non_field_errors %}<p class="auth-error">{{ login_form.non_field_errors|striptags }}</p>{% endif %}
+
+        <div class="auth-field">
+          <label for="{{ login_form.email.id_for_label }}">{% trans "Email" %}</label>
+          {{ login_form.email }}
+        </div>
+
+        <div class="auth-field password-wrap">
+          <label for="{{ login_form.password.id_for_label }}">{% trans "Password" %}</label>
+          {{ login_form.password }}
+          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
+        </div>
+
+        <p style="text-align:right;margin:.25rem 0 .5rem;">
+          <a href="{% url 'accounts:password_reset' %}" class="auth-link" style="font-size:.8rem;">{% trans "Forgot your password?" %}</a>
+        </p>
+
+        <button type="submit" class="auth-submit">{% trans "Sign in" %}</button>
+      </form>
+
+      {# Mobile-only switch (overlay hidden on small screens). #}
+      <p class="auth-switch-mobile">
+        {% trans "No account yet?" %} <a class="auth-link" data-auth="register">{% trans "Create one" %}</a>
+      </p>
+    </div>
+
+    {# ══════════════ RIGHT COLUMN : SIGN UP ══════════════ #}
+    <div class="auth-pane auth-pane--signup">
+      <svg class="auth-crown" viewBox="0 0 100 80" fill="none">
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
+      </svg>
+      <h2 class="auth-title">{% trans "Join Lamos" %}</h2>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="form_type" value="register">
+        {% if register_form.non_field_errors %}<p class="auth-error">{{ register_form.non_field_errors|striptags }}</p>{% endif %}
+
+        <div class="auth-row">
+          <div class="auth-field">
+            <label>{{ register_form.first_name.label }}</label>{{ register_form.first_name }}
+          </div>
+          <div class="auth-field">
+            <label>{{ register_form.last_name.label }}</label>{{ register_form.last_name }}
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label>{{ register_form.email.label }}</label>{{ register_form.email }}
+          {% if register_form.email.errors %}<p class="auth-error">{{ register_form.email.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="auth-field password-wrap">
+          <label>{{ register_form.password.label }}</label>{{ register_form.password }}
+          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
+          {% if register_form.password.errors %}<p class="auth-error">{{ register_form.password.errors|striptags }}</p>{% endif %}
+        </div>
+
+        <div class="auth-field password-wrap">
+          <label>{{ register_form.password_confirm.label }}</label>{{ register_form.password_confirm }}
+          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
+        </div>
+
+        {# nLPD / RGPD consent — mandatory, read server-side as request.POST['gdpr']. #}
+        <label class="form-inline" style="display:flex;gap:.5rem;align-items:flex-start;font-size:.8rem;color:var(--a-text);text-transform:none;letter-spacing:0;margin:.5rem 0 .25rem;">
+          <input type="checkbox" name="gdpr" required style="width:auto;margin-top:.2rem;">
+          <span>{% trans "I accept the" %}
+            <a href="{% url 'main:privacy' %}" target="_blank" class="auth-link">{% trans "privacy policy" %}</a>
+          </span>
+        </label>
+
+        <button type="submit" class="auth-submit">{% trans "Create my account" %}</button>
+      </form>
+
+      <p class="auth-switch-mobile">
+        {% trans "Already a member?" %} <a class="auth-link" data-auth="signin">{% trans "Sign in" %}</a>
+      </p>
+    </div>
+
+    {# ══════════════ SLIDING GOLD OVERLAY ══════════════ #}
+    <div class="auth-overlay">
+      {# Shown by default: invites to register. #}
+      <div class="auth-overlay-inner auth-msg--signup">
+        <svg class="auth-overlay-crown" viewBox="0 0 100 80" fill="none">
+          <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="rgba(26,15,7,.7)" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="16" y="54" width="68" height="5" fill="rgba(26,15,7,.7)"/>
+        </svg>
+        <h3 class="auth-overlay-title">{% trans "New here?" %}</h3>
+        <p class="auth-overlay-desc">{% trans "Create your account and access our exclusive creations." %}</p>
+        <button type="button" class="auth-overlay-btn" data-auth="register">{% trans "Create an account" %}</button>
+      </div>
+      {# Shown in register mode: invites back to sign-in. #}
+      <div class="auth-overlay-inner auth-msg--signin">
+        <svg class="auth-overlay-crown" viewBox="0 0 100 80" fill="none">
+          <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="rgba(26,15,7,.7)" stroke-width="2" stroke-linejoin="round"/>
+          <rect x="16" y="54" width="68" height="5" fill="rgba(26,15,7,.7)"/>
+        </svg>
+        <h3 class="auth-overlay-title">{% trans "Welcome back!" %}</h3>
+        <p class="auth-overlay-desc">{% trans "Sign in to find your orders and your chocolate universe." %}</p>
+        <button type="button" class="auth-overlay-btn" data-auth="signin">{% trans "Sign in" %}</button>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="text-align:center;margin-top:1.5rem;color:#8a6a45;font-size:.85rem;">
+    {% trans "Are you a professional?" %}
+    <a href="{% url 'b2b:access' %}" class="auth-link">{% trans "Access the B2B space" %} →</a>
+  </p>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script src="{% static 'js/auth-slide.js' %}" defer></script>
+{% endblock %}
