@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
+from apps.accounts.models import B2BAccount
 from apps.b2b.models import B2BRequest
 from apps.backoffice.dashboards import (
     get_kpis,
@@ -19,6 +20,8 @@ from apps.backoffice.dashboards import (
     get_revenue_last_30_days,
     get_top_products,
 )
+from apps.backoffice.selectors import get_pending_b2b_accounts
+from apps.backoffice.services import activate_b2b_account, reject_b2b_account
 from apps.checkout.models import Order
 from apps.forecasting.services import get_production_estimates, get_stockout_risks
 
@@ -110,3 +113,40 @@ def b2b_update_status_view(request, request_id):
         b2b.processed_at = timezone.now()
         b2b.save(update_fields=["status", "processed_at"])
     return redirect("backoffice:b2b_requests")
+
+
+@staff_member_required
+@require_http_methods(["GET"])
+def b2b_accounts_view(request):
+    """
+    List self-registered pro accounts awaiting validation.
+
+    This is the human step of the B2B onboarding: a staff member reviews each
+    pending company and grants or denies portal access.
+    """
+    return render(request, "backoffice/b2b_accounts.html", {
+        "pending_accounts": get_pending_b2b_accounts(),
+    })
+
+
+@staff_member_required
+@require_http_methods(["POST"])
+def b2b_account_decision_view(request, account_id):
+    """
+    Apply a staff decision (activate / reject) to one pending pro account.
+
+    Security:
+    - staff_member_required: only staff can reach this.
+    - POST only: a state change must never happen on a GET (CSRF + idempotency).
+    - account_id is a UUID (B2BAccount.id is a UUIDField) -> <uuid:...> route.
+    """
+    account = get_object_or_404(B2BAccount, id=account_id)
+    decision = request.POST.get("decision")
+
+    if decision == "activate":
+        activate_b2b_account(account)
+        # TODO (Guide 3): notify the applicant that their account is validated.
+    elif decision == "reject":
+        reject_b2b_account(account)
+
+    return redirect("backoffice:b2b_accounts")
