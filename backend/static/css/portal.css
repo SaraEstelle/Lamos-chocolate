@@ -1,0 +1,91 @@
+/* =============================================================================
+   portal.css — Light "Marbre Blanc" styles for the B2B pro portal.
+   -----------------------------------------------------------------------------
+   Reuses the shared design tokens (--c-ivory, --c-line, --c-gold, --c-text...).
+   Loaded only on portal pages via {% block extra_head %}.
+   Goal: clean KPI cards + readable panels + responsive tables, all LIGHT.
+   ========================================================================== */
+
+/* ---- KPI cards (replace the dark .stats) --------------------------------- */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.kpi-card {
+  background: var(--c-ivory-2);          /* light ivory, NOT dark */
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  padding: 1.4rem 1.25rem;
+  text-align: center;
+  box-shadow: var(--shadow-1);
+}
+.kpi-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  line-height: 1.1;
+  color: var(--c-gold);                  /* gold number on light card */
+}
+.kpi-label {
+  display: block;
+  margin-top: .4rem;
+  font-family: var(--font-title);
+  font-size: .58rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+}
+
+/* ---- Panel = light content card ------------------------------------------ */
+.panel {
+  background: var(--c-ivory-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-1);
+}
+
+/* ---- Info list (Company / Email / Phone ...) ----------------------------- */
+.info-list { width: 100%; border-collapse: collapse; }
+.info-list td { padding: .75rem .25rem; border-bottom: 1px solid var(--c-line); vertical-align: top; }
+.info-list tr:last-child td { border-bottom: 0; }
+.info-list .info-key {
+  color: var(--c-text-3); font-family: var(--font-title);
+  font-size: .6rem; letter-spacing: .14em; text-transform: uppercase;
+  width: 42%;
+}
+.info-list .info-val { color: var(--c-text); }
+
+/* ---- Tables: nice header + horizontal scroll on small screens ------------ */
+/* Wrap every portal <table> in <div class="table-wrap"> so it can scroll
+   sideways on mobile instead of breaking the layout. */
+.table-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table thead th {
+  text-align: left;
+  font-family: var(--font-title);
+  font-size: .58rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--c-text-3);
+  padding: .6rem .75rem;
+  border-bottom: 1px solid var(--c-line);
+  white-space: nowrap;
+}
+.table tbody td {
+  padding: .8rem .75rem;
+  border-bottom: 1px solid var(--c-line);
+  color: var(--c-text);
+  vertical-align: middle;
+}
+.table tbody tr:hover { background: var(--c-marble); }
+
+/* ---- Active nav link in the sidebar -------------------------------------- */
+.account-nav a.is-active { color: var(--c-gold-3); border-left-color: var(--c-gold); }
+
+/* ---- Small responsive tweaks for the portal ------------------------------ */
+@media (max-width: 768px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: .75rem; }
+}
+@media (max-width: 420px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
