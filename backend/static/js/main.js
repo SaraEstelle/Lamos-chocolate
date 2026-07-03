@@ -57,7 +57,7 @@
       });
     });
   }
-
+})();
 /* ---- Cookie consent ---- */
 (function () {
   "use strict";
