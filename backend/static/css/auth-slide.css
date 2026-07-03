@@ -17,14 +17,14 @@
 .auth-wrap {
   --a-bg:     #0a0502;   /* bandeau derrière la carte */
   --a-card:   #1a0f07;   /* fond des formulaires       */
-  --a-field:  #241608;   /* fond des champs            */
+  --a-field:  #2a1a0a;   /* fond des champs            */
   --a-gold:   #c9a84c;   /* or principal               */
   --a-gold-2: #e2c06e;   /* or clair (survol)          */
   --a-gold-3: #8a6a2a;   /* or foncé                   */
   --a-cream:  #f5ead4;   /* titres                     */
   --a-text:   #d8c290;   /* texte courant sur sombre   */
-  --a-mut:    #8a6a45;   /* texte discret              */
-  --a-line:   rgba(201,168,76,.16); /* filets          */
+  --a-mut:    #a8895c;   /* texte discret              */
+  --a-line:   rgba(201,168,76,.30); /* filets          */
 
   display: block;
   background: var(--a-bg);
@@ -71,7 +71,12 @@
   font-size: .9rem;
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-.auth-card input::placeholder { color: #7a5f38; }
+.auth-card input::placeholder,
+.auth-card select::placeholder { color: #b39c6d; opacity: 1; }
+.auth-card input:not([type="checkbox"]):not([type="radio"]),
+.auth-card select {
+  border-color: rgba(201,168,76,.38);
+}
 .auth-card input:focus, .auth-card select:focus {
   outline: none;
   border-color: var(--a-gold);
@@ -209,63 +214,46 @@
   .auth-overlay { transition: none; }
 }
 /* =============================================================================
-   B2B REGISTER (marbre blanc / doré — cohérent avec auth system)
+   B2B REGISTER — carte Marbre Blanc claire, labels lisibles
    ========================================================================== */
-
 .b2b-register {
-  background: var(--a-bg);
+  background: var(--c-marble);          /* fond marbre du site */
   padding: 3.5rem 1rem 4rem;
 }
-
-/* Carte */
 .b2b-register .b2b-reg-card {
-  max-width: 620px;
-  margin: 0 auto;
-
-  background: var(--a-card);
-  border: 1px solid var(--a-line);
-  border-radius: 6px;
-
-  padding: 2.5rem;
-  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+  max-width: 620px; margin: 0 auto;
+  background: var(--c-ivory-2);         /* carte ivoire */
+  border: 1px solid var(--c-line);
+  border-radius: 6px; padding: 2.5rem;
+  box-shadow: var(--shadow-2);
 }
-
-/* Inputs & selects (alignés sur auth-card) */
+/* Champs clairs, texte encre (déjà lisibles), bordure nette. */
 .b2b-register input:not([type="checkbox"]):not([type="radio"]),
-.b2b-register select {
-  width: 100%;
-  padding: .8rem .9rem;
-  margin-top: .35rem;
-
-  background: var(--a-field);
-  border: 1px solid var(--a-line);
-  border-radius: 3px;
-
-  color: var(--a-cream);
+.b2b-register select,
+.b2b-register textarea {
+  width: 100%; padding: .8rem .9rem; margin-top: .35rem;
+  background: var(--c-ivory); color: var(--c-ink);
+  border: 1px solid var(--c-line); border-radius: 3px;
   font-size: .9rem;
-
-  transition: border-color .2s ease, box-shadow .2s ease;
 }
-
-.b2b-register input::placeholder {
-  color: #7a5f38;
-}
-
+.b2b-register input::placeholder,
+.b2b-register select::placeholder { color: var(--c-text-3); opacity: 1; }
 .b2b-register input:focus,
-.b2b-register select:focus {
-  outline: none;
-  border-color: var(--a-gold);
-  box-shadow: 0 0 0 3px rgba(201,168,76,.14);
+.b2b-register select:focus,
+.b2b-register textarea:focus {
+  outline: none; border-color: var(--c-gold);
+  box-shadow: 0 0 0 3px var(--c-gold-soft);
 }
-
-/* Labels (cohérents auth-card) */
-.b2b-register label {
+/* 👇 Le vrai fix de l'Image 4 : labels plus foncés et un peu plus grands. */
+.b2b-register label,
+.b2b-register .field label {
   display: block;
   font-family: var(--font-title, Cinzel, serif);
-  font-size: .6rem;
-  letter-spacing: .18em;
+  font-size: .68rem;                    /* .6rem → .68rem : plus lisible */
+  letter-spacing: .14em;
   text-transform: uppercase;
-  color: var(--a-gold);
+  color: var(--c-text);                 /* #3a342c ≈ 9:1 sur ivoire (au lieu de #6b6256) */
+  margin-bottom: .35rem;
 }
 
 /* Steps (si tu en ajoutes plus tard) */
