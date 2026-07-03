@@ -1,0 +1,73 @@
+# =============================================================================
+#  deploy-staging.yml  —  Build & publish image, deploy to STAGING
+# -----------------------------------------------------------------------------
+#  Role:
+#    On every push to `develop` (or manually), build the production Docker
+#    image and push it to the GitHub Container Registry (ghcr.io).
+#    The image build + push is REAL and works out of the box (it uses the
+#    automatic GITHUB_TOKEN, no external secret needed).
+#
+#  HONEST LIMITATION (read this):
+#    The final "deploy to the server" step is a PLACEHOLDER. You do not yet
+#    have a staging server. Until you add server credentials as GitHub
+#    Secrets (SSH host/key), that step only prints what it WOULD do.
+#    This is intentional and safe: it demonstrates the pipeline shape
+#    without pretending to deploy to a machine that does not exist.
+# =============================================================================
+
+name: Deploy Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:            # lets you trigger it by hand from the Actions tab
+
+# Permissions the automatic token needs to push to ghcr.io.
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Log in to GitHub Container Registry using the built-in token.
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Build the image from your existing Dockerfile and push it.
+      # Tag it "staging" + the commit SHA so each build is traceable.
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infrastructure/docker/django/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:staging
+            ghcr.io/${{ github.repository }}:staging-${{ github.sha }}
+
+      # ---- PLACEHOLDER: real server deployment -------------------------------
+      # When you have a staging server, replace this with an SSH step, e.g.:
+      #
+      #   - name: Deploy over SSH
+      #     uses: appleboy/ssh-action@v1
+      #     with:
+      #       host: ${{ secrets.STAGING_HOST }}
+      #       username: ${{ secrets.STAGING_USER }}
+      #       key: ${{ secrets.STAGING_SSH_KEY }}
+      #       script: |
+      #         cd /srv/lamos && docker compose pull && docker compose up -d
+      #
+      - name: Deploy to staging (placeholder)
+        run: |
+          echo "Image pushed: ghcr.io/${{ github.repository }}:staging-${{ github.sha }}"
+          echo "No staging server configured yet — deployment step skipped on purpose."
