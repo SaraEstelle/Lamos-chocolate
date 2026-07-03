@@ -325,3 +325,64 @@ class B2BAccount(models.Model):
 
     def __str__(self):
         return f"{self.company_name} ({self.get_segment_display()})"
+
+class ConsentLog(models.Model):
+    """
+    Journal immuable et horodaté d'une décision de consentement cookies
+    (preuve de conformité nLPD / RGPD).
+
+    Fonctionne pour les visiteurs anonymes (identifiés par `consent_id`, un jeton
+    aléatoire aussi stocké dans le cookie) ET pour les clients connectés (`customer`).
+    On n'UPDATE ni ne DELETE jamais une ligne : chaque nouvelle décision crée une
+    nouvelle ligne, ce qui rend l'historique auditable.
+    """
+
+    # Clé primaire non devinable : plus sûre qu'un entier séquentiel pour un
+    # enregistrement de données personnelles sensibles (pas d'énumération, moins
+    # de fuite d'information). Cohérent avec Payment / B2BAccount du projet.
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    # Null pour un visiteur anonyme ; renseigné pour un client authentifié.
+    # SET_NULL : on garde la PREUVE de consentement même si le compte est anonymisé.
+    customer = models.ForeignKey(
+        "accounts.Customer",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="consent_logs",
+    )
+
+    # Jeton aléatoire aussi écrit dans le cookie, pour corréler les logs anonymes.
+    consent_id = models.CharField(
+        max_length=64,
+        db_index=True,
+        help_text="Anonymous consent identifier stored in the cookie",
+    )
+
+    # Catégories de consentement (consentement granulaire exigé par le RGPD/nLPD).
+    necessary = models.BooleanField(default=True)   # strictement nécessaire : toujours actif
+    analytics = models.BooleanField(default=False)  # la personne a-t-elle accepté l'analytics ?
+    marketing = models.BooleanField(default=False)  # a-t-elle accepté le marketing ?
+
+    # Version de la politique acceptée : indispensable en conformité. Si tu changes
+    # ta politique cookies, tu sais qui a consenti à quelle version (re-consentement).
+    policy_version = models.CharField(default="1.0", max_length=20)
+
+    # Contexte technique de la preuve.
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=300, blank=True, default="")
+
+    # L'horodatage EST la preuve.
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "consent_logs"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        who = self.customer_id or self.consent_id
+        return f"Consent {who} a={self.analytics} m={self.marketing} @ {self.created_at:%Y-%m-%d %H:%M}"

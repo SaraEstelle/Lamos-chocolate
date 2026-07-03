@@ -20,5 +20,21 @@
       <button type="submit" class="btn btn-gold">{% trans "Save changes" %}</button>
       <a href="{% url 'customer_area:dashboard' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
     </div>
+
+    <div class="account-section mt-5">
+        <h3>Mes données personnelles</h3>
+
+        <p class="text-muted">
+            Vous pouvez télécharger une copie de toutes les données personnelles
+            enregistrées sur votre compte conformément au RGPD et à la nLPD.
+        </p>
+
+        <a href="{% url 'customer_area:data_export' %}"
+        class="btn btn-primary">
+            Télécharger mes données
+        </a>
+    </div>
+
   </form>
+
 {% endblock %}

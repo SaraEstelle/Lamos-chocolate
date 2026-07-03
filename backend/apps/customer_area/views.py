@@ -38,6 +38,13 @@ from django.contrib.auth import update_session_auth_hash
 from apps.accounts.forms import PasswordChangeForm
 from apps.checkout.models import Order
 
+import json
+
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.views.decorators.http import require_http_methods
+
+from apps.checkout.models import Order  # import classique recommandé
 
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
@@ -183,3 +190,27 @@ def invoice_detail_view(request, order_id):
     """Printable invoice, scoped to the owner (prevents IDOR)."""
     order = get_object_or_404(Order, id=order_id, customer=request.user)
     return render(request, "customer_area/invoice_detail.html", {"order": order})
+
+@login_required(login_url="accounts:login")
+@require_http_methods(["GET"])
+def data_export_view(request):
+    """RGPD/nLPD right of access: export the user's data as JSON."""
+    u = request.user
+    data = {
+        "account": {
+            "email": u.email, "first_name": u.first_name, "last_name": u.last_name,
+            "phone": u.phone, "npa": u.npa, "canton": u.canton,
+            "preferred_language": u.preferred_language,
+            "created_at": u.created_at.isoformat(),
+        },
+        "consents": list(u.consent_logs.values("analytics", "marketing", "created_at")),
+        "orders": list(
+            __import__("apps.checkout.models", fromlist=["Order"]).Order.objects
+            .filter(customer=u).values("id", "order_number", "status", "created_at")
+        ),
+        "addresses": list(u.addresses.values()) if hasattr(u, "addresses") else [],
+    }
+    payload = json.dumps(data, indent=2, default=str, ensure_ascii=False)
+    response = HttpResponse(payload, content_type="application/json")
+    response["Content-Disposition"] = 'attachment; filename="lamos-my-data.json"'
+    return response

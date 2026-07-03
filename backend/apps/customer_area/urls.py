@@ -23,6 +23,7 @@ urlpatterns = [
     path("password/", views.password_change_view, name="password_change"),
     path("invoices/", views.invoices_view, name="invoices"),
     path("invoices/<int:order_id>/", views.invoice_detail_view, name="invoice_detail"),
+    path("data-export/", views.data_export_view, name="data_export"),
     # Addresses
     path("addresses/", views.addresses_view, name="addresses"),
     path("addresses/new/", views.address_create_view, name="address_create"),
