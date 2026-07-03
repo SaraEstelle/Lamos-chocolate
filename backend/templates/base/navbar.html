@@ -1,4 +1,4 @@
-{% load i18n static %}
+{% load i18n static custom_tags %}
 
 <header class="site-header" role="banner">
   <nav class="nav-inner" aria-label="{% trans 'Main navigation' %}">
@@ -41,18 +41,19 @@
         <ul class="lang-menu" role="list">
           {% for code, name in AVAILABLE_LANGS %}
             <li>
-              <form action="{% url 'set_language' %}" method="post">
+                <form action="{% url 'set_language' %}" method="post">
                 {% csrf_token %}
-                {# Return to the current URL after switching. #}
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                {# Pre-computed at render time -> already the correct URL for `code`. #}
+                {% switch_language_url code as target_url %}
+                <input type="hidden" name="next" value="{{ target_url }}">
                 <input type="hidden" name="language" value="{{ code }}">
                 <button type="submit"
                         class="lang-item {% if code == CURRENT_LANG %}is-active{% endif %}">
-                  {{ name }}
+                    {{ name }}
                 </button>
-              </form>
+                </form>
             </li>
-          {% endfor %}
+            {% endfor %}
         </ul>
       </details>
 
