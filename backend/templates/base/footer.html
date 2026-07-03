@@ -1,0 +1,55 @@
+{% load i18n static %}
+{# Footer — backend/templates/base/footer.html #}
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-grid">
+
+    <div class="footer-brand">
+      <div class="footer-logo">
+        <img src="{% static 'images/logo.webp' %}" alt="Lamos Chocolate" width="46" height="46" onerror="this.style.display='none'">
+      </div>
+      <p class="footer-tagline">{% trans "The spirit of Dubai, the nobility of Swiss chocolate." %}</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg></a>
+        <a href="#" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">{% trans "Navigation" %}</p>
+      <ul>
+        <li><a href="{% url 'main:home' %}">{% trans "Home" %}</a></li>
+        <li><a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
+        <li><a href="{% url 'main:about' %}">{% trans "About Us" %}</a></li>
+        <li><a href="{% url 'b2b:presentation' %}">{% trans "B2B Space" %}</a></li>
+        <li><a href="{% url 'main:contact' %}">{% trans "Contact" %}</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">{% trans "Legal" %}</p>
+      <ul>
+        <li><a href="{% url 'main:terms' %}">{% trans "Terms & Conditions" %}</a></li>
+        <li><a href="{% url 'main:privacy' %}">{% trans "Privacy Policy" %}</a></li>
+        <li><a href="#" id="manage-cookies">{% trans "Manage cookies" %}</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">{% trans "Newsletter" %}</p>
+      <p style="font-size:.85rem;color:var(--c-island-mut);margin-bottom:1rem;font-style:italic;">{% trans "Receive our news and exclusive offers." %}</p>
+      <form class="footer-newsletter" method="post" action="#">
+        {% csrf_token %}
+        <input type="email" name="email" placeholder="votre@email.com" aria-label="Email">
+        <button type="submit">{% trans "Sign up" %}</button>
+      </form>
+      <p style="font-size:.66rem;color:var(--c-island-mut);margin-top:.6rem;">{% trans "By subscribing you accept our privacy policy." %}</p>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Lamos Chocolate · {% trans "All rights reserved" %} · lamos-chocolate.ch</span>
+    <span>Dubai · Switzerland · Since 2021</span>
+  </div>
+</footer>

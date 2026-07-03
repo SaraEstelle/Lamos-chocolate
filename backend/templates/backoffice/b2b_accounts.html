@@ -1,0 +1,65 @@
+{% extends "backoffice/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "B2B account validation" %} — Backoffice{% endblock %}
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Pro accounts awaiting validation" %}</h1>
+
+  {% if pending_accounts %}
+  <div class="card shadow-sm">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>{% trans "Company" %}</th>
+          <th>{% trans "Contact" %}</th>
+          <th>{% trans "Segment" %}</th>
+          <th>{% trans "Submitted on" %}</th>
+          <th class="text-end">{% trans "Decision" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for account in pending_accounts %}
+        <tr>
+          <td><strong>{{ account.company_name }}</strong></td>
+          <td>
+            {{ account.customer.first_name }} {{ account.customer.last_name }}<br>
+            <span class="text-muted small">{{ account.customer.email }}</span>
+          </td>
+          <td>{{ account.get_segment_display }}</td>
+          <td>{{ account.created_at|date:"d M Y, H:i" }}</td>
+          <td class="text-end">
+            {% comment %}
+              Two separate POST forms: one to activate, one to reject.
+              A state change must always be a POST protected by CSRF.
+            {% endcomment %}
+            <form method="post"
+                  action="{% url 'backoffice:b2b_account_decision' account.id %}"
+                  class="d-inline">
+              {% csrf_token %}
+              <input type="hidden" name="decision" value="activate">
+              <button type="submit" class="btn btn-success btn-sm">
+                ✓ {% trans "Approve" %}
+              </button>
+            </form>
+            <form method="post"
+                  action="{% url 'backoffice:b2b_account_decision' account.id %}"
+                  class="d-inline"
+                  onsubmit="return confirm('{% trans "Reject this pro account?" %}');">
+              {% csrf_token %}
+              <input type="hidden" name="decision" value="reject">
+              <button type="submit" class="btn btn-outline-danger btn-sm">
+                ✕ {% trans "Reject" %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="alert alert-light border text-center py-5">
+    <div style="font-size:2rem;">✅</div>
+    <p class="mb-0 text-muted">{% trans "No pending pro accounts. You're all caught up." %}</p>
+  </div>
+  {% endif %}
+{% endblock %}

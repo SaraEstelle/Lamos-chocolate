@@ -1,0 +1,93 @@
+{% load i18n static custom_tags %}
+
+<header class="site-header" role="banner">
+  <nav class="nav-inner" aria-label="{% trans 'Main navigation' %}">
+
+    <a href="{% url 'main:home' %}" class="nav-logo" aria-label="Lamos Chocolate — {% trans 'Home' %}">
+      <img src="{% static 'images/logo.webp' %}" alt="Lamos Chocolate"
+           width="40" height="40" onerror="this.style.display='none'">
+      Lamos <span>Chocolate</span>
+    </a>
+
+    <ul class="nav-links" id="primary-nav" role="list">
+      <li><a href="{% url 'main:home' %}">{% trans "Home" %}</a></li>
+      <li><a href="{% url 'shop:catalog' %}">{% trans "Shop" %}</a></li>
+      <li><a href="{% url 'main:about' %}">{% trans "About Us" %}</a></li>
+      <li><a href="{% url 'main:contact' %}">{% trans "Contact" %}</a></li>
+
+      {# --- Éléments repris dans le menu burger (mobile) --- #}
+      {% if request.user.is_authenticated %}
+        <li class="nav-only-mobile"><a href="{% url 'customer_area:dashboard' %}">{% trans "My account" %}</a></li>
+        <li class="nav-only-mobile"><a href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a></li>
+      {% else %}
+        <li class="nav-only-mobile"><a href="{% url 'accounts:connect' %}">{% trans "Sign in" %}</a></li>
+      {% endif %}
+      <li class="nav-cta-mobile"><a href="{% url 'shop:catalog' %}" class="btn btn-gold">{% trans "Order Now" %}</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      {# ================================================================= #}
+      {# Language switcher — native <details>, no JS, no Bootstrap.        #}
+      {# Reads settings.LANGUAGES via the i18n context processor and posts #}
+      {# to Django's set_language view. `next` keeps the visitor on the    #}
+      {# same page (Django rewrites the language prefix for us).           #}
+      {# ================================================================= #}
+      {% get_current_language as CURRENT_LANG %}
+      {% get_available_languages as AVAILABLE_LANGS %}
+      <details class="lang-switch">
+        <summary aria-label="{% trans 'Change language' %}">
+          {{ CURRENT_LANG|upper }}   {# e.g. FR / EN / DE-CH / IT-CH #}
+        </summary>
+        <ul class="lang-menu" role="list">
+          {% for code, name in AVAILABLE_LANGS %}
+            <li>
+                <form action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                {# Pre-computed at render time -> already the correct URL for `code`. #}
+                {% switch_language_url code as target_url %}
+                <input type="hidden" name="next" value="{{ target_url }}">
+                <input type="hidden" name="language" value="{{ code }}">
+                <button type="submit"
+                        class="lang-item {% if code == CURRENT_LANG %}is-active{% endif %}">
+                    {{ name }}
+                </button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+      </details>
+
+      {# --- Bouton COMPTE unique (icône personne) --- #}
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'customer_area:dashboard' %}" class="nav-icon-btn" aria-label="{% trans 'My account' %}">
+      {% else %}
+        <a href="{% url 'accounts:connect' %}" class="nav-icon-btn" aria-label="{% trans 'Sign in' %}">
+      {% endif %}
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </a>
+
+      {# --- CHARIOT (conservé) --- #}
+      <a href="{% url 'cart:view' %}" class="nav-icon-btn" aria-label="{% trans 'View cart' %}">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+             stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="9" cy="20" r="1.4"></circle><circle cx="18" cy="20" r="1.4"></circle>
+          <path d="M2 3h2.2l2.3 12.3a1.6 1.6 0 0 0 1.6 1.3h8.7a1.6 1.6 0 0 0 1.6-1.3L21 7H5.5"></path>
+        </svg>
+        <span class="nav-cart-badge" data-cart-count
+              {% if not cart_count %}hidden{% endif %}>{{ cart_count }}</span>
+      </a>
+
+      {# --- CTA desktop (masqué en mobile, présent dans le menu) --- #}
+      <a href="{% url 'shop:catalog' %}" class="btn btn-gold nav-cta-desktop">{% trans "Order Now" %}</a>
+
+      <button class="nav-burger" type="button" aria-controls="primary-nav"
+              aria-expanded="false" aria-label="{% trans 'Open menu' %}">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+  </nav>
+</header>

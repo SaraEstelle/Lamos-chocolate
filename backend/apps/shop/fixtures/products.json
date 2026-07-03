@@ -1,0 +1,26 @@
+[
+  {"model": "shop.product", "pk": 1, "fields": {
+    "slug": "kunafa", "name_fr": "Tablette Kunafa", "name_en": "Kunafa Bar",
+    "description_fr": "Notre tablette signature : chocolat au lait, kunafa croustillant et pistache.",
+    "description_en": "Our signature bar: milk chocolate, crispy kunafa and pistachio.",
+    "ingredients_fr": "Chocolat au lait, kunafa (pâte phyllo), pistaches, beurre de cacao, sucre.",
+    "ingredients_en": "Milk chocolate, kunafa (phyllo), pistachios, cocoa butter, sugar.",
+    "allergens_fr": "Fruits à coque, lait, gluten, soja.", "allergens_en": "Tree nuts, milk, gluten, soy.",
+    "category": 1, "is_active": true, "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z"}},
+  {"model": "shop.product", "pk": 2, "fields": {
+    "slug": "truffes", "name_fr": "Truffes", "name_en": "Truffles",
+    "description_fr": "Cylindre de 260 g de truffes fondantes, disponibles en quatre parfums.",
+    "description_en": "260g cylinder of melt-in-the-mouth truffles, in four flavors.",
+    "ingredients_fr": "Chocolat, crème, beurre, sucre, arômes naturels.",
+    "ingredients_en": "Chocolate, cream, butter, sugar, natural flavors.",
+    "allergens_fr": "Lait, soja. Selon parfum : fruits à coque.", "allergens_en": "Milk, soy. Depending on flavor: tree nuts.",
+    "category": 2, "is_active": true, "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z"}},
+  {"model": "shop.product", "pk": 3, "fields": {
+    "slug": "carres-lamos", "name_fr": "Carrés Lamo's", "name_en": "Lamo's Squares",
+    "description_fr": "Petits carrés gravés du logo Lamo's, vendus à l'unité ou en coffret assorti.",
+    "description_en": "Small squares engraved with the Lamo's logo, sold individually or in an assorted box.",
+    "ingredients_fr": "Chocolat, sucre, beurre de cacao, arômes naturels.",
+    "ingredients_en": "Chocolate, sugar, cocoa butter, natural flavors.",
+    "allergens_fr": "Lait, soja. Peut contenir des fruits à coque.", "allergens_en": "Milk, soy. May contain tree nuts.",
+    "category": 3, "is_active": true, "created_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z"}}
+]

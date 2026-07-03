@@ -1,0 +1,27 @@
+{% load i18n custom_tags %}
+<form action="{% url 'shop:search' %}" method="get" class="mb-4" role="search">
+  <div class="input-group">
+    <input type="search" name="q" value="{{ search_query|default:'' }}"
+           class="form-control" placeholder="{% trans 'Search products...' %}"
+           aria-label="{% trans 'Search' %}">
+    <button class="btn btn-dark" type="submit">{% trans "Search" %}</button>
+  </div>
+</form>
+
+<h2 class="h6">{% trans "Categories" %}</h2>
+<ul class="list-unstyled">
+  <li>
+    <a href="{% url 'shop:catalog' %}"
+       class="text-decoration-none {% if not active_category %}fw-bold{% endif %}">
+      {% trans "All products" %}
+    </a>
+  </li>
+  {% for cat in categories %}
+    <li>
+      <a href="{% url 'shop:category' slug=cat.slug %}"
+         class="text-decoration-none {% if active_category == cat.slug %}fw-bold{% endif %}">
+        {{ cat|localized:"name" }}
+      </a>
+    </li>
+  {% endfor %}
+</ul>

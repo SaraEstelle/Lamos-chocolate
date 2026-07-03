@@ -1,0 +1,18 @@
+{% extends "backoffice/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Stock" %} — Backoffice{% endblock %}
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Low stock alerts" %}</h1>
+  {% if low_stock %}
+  <table class="table">
+    <thead><tr><th>SKU</th><th>{% trans "Quantity" %}</th><th>{% trans "Threshold" %}</th></tr></thead>
+    <tbody>
+      {% for s in low_stock %}
+      <tr class="table-warning"><td>{{ s.sku.sku_code }}</td><td>{{ s.quantity }}</td><td>{{ s.threshold_alert }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-success">{% trans "All stocks are above their thresholds." %}</div>
+  {% endif %}
+{% endblock %}

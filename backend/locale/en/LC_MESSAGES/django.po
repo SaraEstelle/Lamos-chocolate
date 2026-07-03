@@ -1,0 +1,2447 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Lamos Chocolate\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-03 12:00+0000\n"
+"PO-Revision-Date: 2026-07-03 12:00+0000\n"
+"Last-Translator: Sara Estelle\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: apps/accounts/admin.py:49
+msgid "Identity"
+msgstr ""
+
+#: apps/accounts/admin.py:55
+msgid "Personal"
+msgstr ""
+
+#: apps/accounts/admin.py:61 templates/accounts/connect.html:49
+msgid "Business"
+msgstr ""
+
+#: apps/accounts/admin.py:67
+msgid "Preferences"
+msgstr ""
+
+#: apps/accounts/admin.py:73
+msgid "Permissions"
+msgstr ""
+
+#: apps/accounts/admin.py:85
+msgid "Dates"
+msgstr ""
+
+#: apps/accounts/admin.py:92
+msgid "Segmentation & KPI"
+msgstr ""
+
+#: apps/accounts/admin.py:98
+msgid "Consent (nLPD)"
+msgstr ""
+
+#: apps/accounts/models.py:48
+msgid "Email is required"
+msgstr ""
+
+#: apps/accounts/models.py:196 templates/backoffice/orders.html:9
+msgid "Customer"
+msgstr ""
+
+#: apps/accounts/models.py:197
+msgid "Customers"
+msgstr ""
+
+#: apps/accounts/models.py:256
+msgid "Password Reset Token"
+msgstr ""
+
+#: apps/accounts/models.py:257
+msgid "Password Reset Tokens"
+msgstr ""
+
+#: apps/b2b/forms.py:43
+msgid "I agree to receive commercial offers from Lamos Chocolate"
+msgstr ""
+
+#: apps/b2b/forms.py:81 apps/b2b/forms.py:118
+msgid "Quantity must be at least 1."
+msgstr ""
+
+#: apps/b2b/forms.py:141
+msgid "Preferred language"
+msgstr ""
+
+#: apps/b2b/views.py:90
+msgid "Too many requests. Please try again later."
+msgstr ""
+
+#: apps/b2b/views.py:96
+msgid "We already received your request."
+msgstr ""
+
+#: apps/b2b/views.py:99
+msgid "Your request has been sent. Thank you!"
+msgstr ""
+
+#: apps/b2b/views.py:290
+msgid "Reorder prepared. Our team will confirm pricing."
+msgstr ""
+
+#: apps/b2b/views.py:341
+msgid "Quote requested. Our team will contact you."
+msgstr ""
+
+#: apps/b2b/views.py:395
+msgid "Company profile updated."
+msgstr ""
+
+#: apps/cart/models.py:59
+msgid "Cart"
+msgstr ""
+
+#: apps/cart/models.py:60
+msgid "Carts"
+msgstr ""
+
+#: apps/cart/models.py:110
+msgid "Cart Item"
+msgstr ""
+
+#: apps/cart/models.py:111
+msgid "Cart Items"
+msgstr ""
+
+#: apps/cart/views.py:66
+msgid "Item added to your cart."
+msgstr ""
+
+#: apps/cart/views.py:76 templates/cart/cart.html:32
+msgid "Cart updated."
+msgstr ""
+
+#: apps/cart/views.py:83 templates/cart/cart.html:43
+msgid "Item removed from your cart."
+msgstr ""
+
+#: apps/checkout/forms.py:20
+msgid "First name"
+msgstr ""
+
+#: apps/checkout/forms.py:25
+msgid "Last name"
+msgstr ""
+
+#: apps/checkout/forms.py:30 templates/customer_area/address_form.html:4
+#: templates/customer_area/address_form.html:9
+msgid "Address"
+msgstr ""
+
+#: apps/checkout/forms.py:35
+msgid "Address (complement)"
+msgstr ""
+
+#: apps/checkout/forms.py:41
+msgid "City"
+msgstr ""
+
+#: apps/checkout/forms.py:46
+msgid "Postal code"
+msgstr ""
+
+#: apps/checkout/forms.py:51
+msgid "Country"
+msgstr ""
+
+#: apps/checkout/forms.py:53
+msgid "Two-letter country code (e.g. CH, FR)."
+msgstr ""
+
+#: apps/checkout/views.py:30 apps/checkout/views.py:48
+#: templates/cart/cart.html:69
+msgid "Your cart is empty."
+msgstr ""
+
+#: apps/customer_area/views.py:61
+msgid "Order not found."
+msgstr ""
+
+#: apps/customer_area/views.py:74
+msgid "Your profile has been updated."
+msgstr ""
+
+#: apps/customer_area/views.py:116
+msgid "Address saved."
+msgstr ""
+
+#: apps/customer_area/views.py:132
+msgid "Address updated."
+msgstr ""
+
+#: apps/customer_area/views.py:145
+msgid "Address deleted."
+msgstr ""
+
+#: apps/customer_area/views.py:159
+msgid "Your password has been updated."
+msgstr ""
+
+#: apps/forecasting/models.py:87
+msgid "Forecast"
+msgstr ""
+
+#: apps/forecasting/models.py:88
+msgid "Forecasts"
+msgstr ""
+
+#: apps/forecasting/models.py:118 templates/b2b/portal/catalogue.html:49
+msgid "Low"
+msgstr ""
+
+#: apps/forecasting/models.py:119
+msgid "Medium"
+msgstr ""
+
+#: apps/forecasting/models.py:120
+msgid "High"
+msgstr ""
+
+#: apps/forecasting/models.py:121
+msgid "Critical"
+msgstr ""
+
+#: apps/forecasting/models.py:152
+msgid "Alert"
+msgstr ""
+
+#: apps/forecasting/models.py:153
+msgid "Alerts"
+msgstr ""
+
+#: apps/main/forms.py:16
+msgid "Your name"
+msgstr ""
+
+#: apps/main/forms.py:20
+msgid "Your email"
+msgstr ""
+
+#: apps/main/forms.py:24
+msgid "Message"
+msgstr ""
+
+#: apps/main/views.py:60
+msgid "Your message has been sent. Thank you!"
+msgstr ""
+
+#: apps/shop/forms.py:18 templates/shop/partials/filters.html:5
+msgid "Search products..."
+msgstr ""
+
+#: templates/accounts/access.html:4 templates/accounts/access.html:22
+#: templates/accounts/access.html:51 templates/accounts/access.html:110
+#: templates/accounts/access.html:134 templates/accounts/connect.html:10
+#: templates/accounts/connect.html:41 templates/accounts/connect.html:62
+#: templates/accounts/connect.html:72 templates/accounts/login.html:4
+#: templates/accounts/login.html:11 templates/accounts/login.html:36
+#: templates/b2b/access.html:41 templates/b2b/register.html:167
+#: templates/base/navbar.html:23 templates/base/navbar.html:63
+msgid "Sign in"
+msgstr ""
+
+#: templates/accounts/access.html:29
+msgid "or sign in with your email"
+msgstr ""
+
+#: templates/accounts/access.html:37 templates/accounts/login.html:21
+#: templates/accounts/password_reset.html:21 templates/b2b/portal/home.html:40
+#: templates/emails/welcome.html:42
+msgid "Email"
+msgstr ""
+
+#: templates/accounts/access.html:42 templates/accounts/login.html:27
+#: templates/accounts/password_reset.html:9
+#: templates/accounts/password_reset_confirm.html:9
+#: templates/b2b/access.html:32 templates/customer_area/base_account.html:15
+msgid "Password"
+msgstr ""
+
+#: templates/accounts/access.html:44 templates/accounts/access.html:89
+#: templates/accounts/access.html:95 templates/b2b/access.html:34
+msgid "Show password"
+msgstr ""
+
+#: templates/accounts/access.html:48 templates/accounts/login.html:54
+#: templates/accounts/password_reset.html:10 templates/b2b/access.html:38
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/accounts/access.html:56 templates/accounts/login.html:57
+msgid "No account yet?"
+msgstr ""
+
+#: templates/accounts/access.html:56 templates/accounts/login.html:58
+msgid "Create one"
+msgstr ""
+
+#: templates/accounts/access.html:66 templates/accounts/register.html:10
+msgid "Join Lamos"
+msgstr ""
+
+#: templates/accounts/access.html:101 templates/accounts/register.html:31
+#: templates/b2b/register.html:142
+msgid "I accept the"
+msgstr ""
+
+#: templates/accounts/access.html:102 templates/accounts/register.html:32
+#: templates/b2b/register.html:148
+msgid "privacy policy"
+msgstr ""
+
+#: templates/accounts/access.html:106 templates/accounts/connect.html:38
+msgid "Create my account"
+msgstr ""
+
+#: templates/accounts/access.html:110 templates/accounts/connect.html:40
+msgid "Already a member?"
+msgstr ""
+
+#: templates/accounts/access.html:122
+msgid "New here?"
+msgstr ""
+
+#: templates/accounts/access.html:123
+msgid "Create your account and access our exclusive creations."
+msgstr ""
+
+#: templates/accounts/access.html:124
+msgid "Create an account"
+msgstr ""
+
+#: templates/accounts/access.html:132
+msgid "Welcome back!"
+msgstr ""
+
+#: templates/accounts/access.html:133
+msgid "Sign in to find your orders and your chocolate universe."
+msgstr ""
+
+#: templates/accounts/access.html:141
+msgid "Are you a professional?"
+msgstr ""
+
+#: templates/accounts/access.html:142
+msgid "Access the B2B space"
+msgstr ""
+
+#: templates/accounts/connect.html:17 templates/emails/welcome.html:7
+#: templates/emails/welcome.html:21
+msgid "Welcome"
+msgstr ""
+
+#: templates/accounts/connect.html:18
+msgid "Choose your"
+msgstr ""
+
+#: templates/accounts/connect.html:18
+msgid "space"
+msgstr ""
+
+#: templates/accounts/connect.html:20
+msgid ""
+"Access the world of Lamos Chocolate according to your profile  individual or "
+"professional partner."
+msgstr ""
+
+#: templates/accounts/connect.html:29
+msgid "Individual"
+msgstr ""
+
+#: templates/accounts/connect.html:30
+msgid "Consumer"
+msgstr ""
+
+#: templates/accounts/connect.html:31
+msgid ""
+"Order our artisan creations and discover the excellence of Swiss-Dubai "
+"chocolate."
+msgstr ""
+
+#: templates/accounts/connect.html:34
+msgid "Online orders & real-time tracking"
+msgstr ""
+
+#: templates/accounts/connect.html:35
+msgid "Personalized boxes & gifts"
+msgstr ""
+
+#: templates/accounts/connect.html:36
+msgid "Access to limited editions"
+msgstr ""
+
+#: templates/accounts/connect.html:48
+msgid "Professional"
+msgstr ""
+
+#: templates/accounts/connect.html:50
+msgid "Bespoke corporate solutions for your business gifts and events."
+msgstr ""
+
+#: templates/accounts/connect.html:53
+msgid "Volume pricing & B2B terms"
+msgstr ""
+
+#: templates/accounts/connect.html:54
+msgid "Logo & packaging customization"
+msgstr ""
+
+#: templates/accounts/connect.html:55
+msgid "Online quotes & pro invoicing"
+msgstr ""
+
+#: templates/accounts/connect.html:56
+msgid "Dedicated account manager"
+msgstr ""
+
+#: templates/accounts/connect.html:59 templates/b2b/access.html:47
+#: templates/b2b/access.html:61 templates/main/contact.html:52
+msgid "Discover the B2B space"
+msgstr ""
+
+#: templates/accounts/connect.html:61 templates/b2b/register.html:165
+msgid "Already a partner?"
+msgstr ""
+
+#: templates/accounts/connect.html:71 templates/accounts/register.html:40
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/accounts/login.html:10
+msgid "Welcome back"
+msgstr ""
+
+#: templates/accounts/login.html:33
+msgid "Keep me signed in"
+msgstr ""
+
+#: templates/accounts/login.html:41
+msgid "Or continue with"
+msgstr ""
+
+#: templates/accounts/login.html:44
+msgid "Continue with Google"
+msgstr ""
+
+#: templates/accounts/login.html:49
+msgid "Continue with Facebook"
+msgstr ""
+
+#: templates/accounts/password_reset.html:4
+msgid "Reset password"
+msgstr ""
+
+#: templates/accounts/password_reset.html:15
+msgid ""
+"Enter your email address to receive a reset link. The link is valid for 1 "
+"hour."
+msgstr ""
+
+#: templates/accounts/password_reset.html:25
+msgid "Send reset link"
+msgstr ""
+
+#: templates/accounts/password_reset.html:29
+#: templates/accounts/password_reset_confirm.html:28
+msgid "Back to login"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:4
+msgid "New password"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:10
+msgid "Set a new password"
+msgstr ""
+
+#: templates/accounts/password_reset_confirm.html:24
+#: templates/customer_area/password_change.html:4
+msgid "Change password"
+msgstr ""
+
+#: templates/accounts/register.html:4 templates/accounts/register.html:36
+#: templates/base/footer.html:44
+msgid "Sign up"
+msgstr ""
+
+#: templates/accounts/register.html:9
+msgid "Create your account"
+msgstr ""
+
+#: templates/accounts/register.html:41 templates/emails/welcome.html:34
+msgid "Log in"
+msgstr ""
+
+#: templates/b2b/access.html:4 templates/b2b/pending.html:5
+#: templates/b2b/register.html:18
+msgid "Professional space"
+msgstr ""
+
+#: templates/b2b/access.html:20
+msgid "Partner sign in"
+msgstr ""
+
+#: templates/b2b/access.html:28
+msgid "Professional email"
+msgstr ""
+
+#: templates/b2b/access.html:46
+msgid "Not a partner yet?"
+msgstr ""
+
+#: templates/b2b/access.html:58
+msgid "Become a partner"
+msgstr ""
+
+#: templates/b2b/access.html:59
+msgid "Volume pricing, customization and dedicated support."
+msgstr ""
+
+#: templates/b2b/access.html:68
+msgid "Not a professional?"
+msgstr ""
+
+#: templates/b2b/access.html:69
+msgid "Individual space"
+msgstr ""
+
+#: templates/b2b/configurator.html:4 templates/b2b/portal/base_portal.html:27
+#: templates/b2b/portal/home.html:58
+msgid "Configurator"
+msgstr ""
+
+#: templates/b2b/configurator.html:7
+msgid "Personalisation"
+msgstr ""
+
+#: templates/b2b/configurator.html:8
+msgid "Configurator & quote"
+msgstr ""
+
+#: templates/b2b/configurator.html:9
+msgid ""
+"Configure your product on 4 axes, simulate the price against the MOQ, then "
+"request a quote."
+msgstr ""
+
+#: templates/b2b/configurator.html:28
+msgid "Simulate"
+msgstr ""
+
+#: templates/b2b/configurator.html:29 templates/b2b/portal/exclusive.html:35
+#: templates/b2b/presentation.html:19
+msgid "Request a quote"
+msgstr ""
+
+#: templates/b2b/configurator.html:37
+msgid "Estimation"
+msgstr ""
+
+#: templates/b2b/configurator.html:38 templates/cart/cart.html:17
+msgid "Unit price"
+msgstr ""
+
+#: templates/b2b/configurator.html:39 templates/b2b/portal/documents.html:68
+msgid "Estimated value"
+msgstr ""
+
+#: templates/b2b/configurator.html:42
+msgid "MOQ reached"
+msgstr ""
+
+#: templates/b2b/configurator.html:43
+#, python-format
+msgid "Minimum order quantity reached (MOQ %(moq)s)."
+msgstr ""
+
+#: templates/b2b/configurator.html:45 templates/b2b/portal/documents.html:82
+msgid "Below MOQ"
+msgstr ""
+
+#: templates/b2b/configurator.html:46
+#, python-format
+msgid "Below the minimum order quantity (MOQ %(moq)s)."
+msgstr ""
+
+#: templates/b2b/pending.html:7
+msgid "Your account is being validated"
+msgstr ""
+
+#: templates/b2b/pending.html:8
+msgid ""
+"Our team is reviewing your company request. You will receive a confirmation "
+"email within 2448h."
+msgstr ""
+
+#: templates/b2b/pending.html:13 templates/b2b/portal/home.html:38
+#: templates/backoffice/b2b_accounts.html:21
+#: templates/backoffice/b2b_requests.html:9
+msgid "Company"
+msgstr ""
+
+#: templates/b2b/pending.html:14 templates/backoffice/b2b_accounts.html:24
+msgid "Submitted on"
+msgstr ""
+
+#: templates/b2b/pending.html:18 templates/b2b/success.html:8
+#: templates/errors/403.html:64 templates/errors/404.html:23
+#: templates/errors/500.html:64
+msgid "Back to home"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:13
+#: templates/b2b/portal/catalogue.html:7 templates/b2b/portal/documents.html:16
+#: templates/b2b/portal/notifications.html:16
+#: templates/b2b/portal/profile.html:17
+msgid "Pro space"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:16
+msgid "Pending validation"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:21
+msgid "Pro navigation"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:22 templates/b2b/portal/home.html:4
+#: templates/b2b/portal/home.html:7 templates/customer_area/dashboard.html:31
+#: templates/customer_area/profile.html:4
+#: templates/customer_area/profile.html:8
+msgid "My profile"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:23 templates/b2b/portal/home.html:17
+#: templates/b2b/portal/in_progress.html:4
+#: templates/b2b/portal/in_progress.html:7
+msgid "Orders in progress"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:24
+msgid "History"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:25 templates/b2b/portal/home.html:56
+msgid "B2B catalogue"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:26
+#: templates/b2b/portal/exclusive.html:4 templates/b2b/portal/home.html:57
+msgid "Exclusive products"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:28
+#: templates/b2b/portal/profile.html:14 templates/b2b/portal/profile.html:18
+msgid "Company profile"
+msgstr ""
+
+#: templates/b2b/portal/base_portal.html:29 templates/base/navbar.html:21
+#: templates/customer_area/base_account.html:16
+msgid "Log out"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:4 templates/b2b/portal/catalogue.html:8
+msgid "Pro catalogue"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:12
+msgid "Download the full B2B catalogue (PDF)"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:18
+#: templates/b2b/portal/notifications.html:35
+msgid "Account under validation"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:20
+msgid ""
+"You can browse the catalogue now. Ordering and personalisation unlock once "
+"your account is approved."
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:28
+#: templates/backoffice/forecasting.html:16
+#: templates/backoffice/forecasting.html:37 templates/cart/cart.html:15
+#: templates/checkout/checkout.html:35
+msgid "Product"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:29 templates/cart/cart.html:16
+msgid "Format"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:30
+msgid "Pro price"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:31
+#: templates/b2b/portal/documents.html:69
+msgid "MOQ"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:32
+#: templates/backoffice/dashboard.html:37 templates/backoffice/stock.html:3
+msgid "Stock"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:41 templates/main/home.html:156
+#: templates/shop/catalog.html:40
+msgid "New"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:42
+msgid "Coming soon"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:53
+msgid "Configure"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:55
+msgid "Locked"
+msgstr ""
+
+#: templates/b2b/portal/catalogue.html:60
+msgid "No product available."
+msgstr ""
+
+#: templates/b2b/portal/documents.html:13
+#: templates/b2b/portal/documents.html:17
+msgid "Documents"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:20
+msgid "Orders & invoices"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:25 templates/b2b/portal/history.html:19
+#: templates/b2b/portal/home.html:67 templates/b2b/portal/in_progress.html:17
+#: templates/backoffice/orders.html:9 templates/customer_area/invoices.html:13
+#: templates/customer_area/order_detail.html:4
+#: templates/customer_area/order_detail.html:8
+#: templates/customer_area/orders.html:22 templates/main/home.html:133
+#: templates/main/home.html:148 templates/main/home.html:164
+msgid "Order"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:26
+#: templates/b2b/portal/documents.html:67 templates/b2b/portal/history.html:19
+#: templates/b2b/portal/home.html:67 templates/b2b/portal/in_progress.html:17
+#: templates/backoffice/orders.html:9 templates/customer_area/invoices.html:14
+#: templates/customer_area/orders.html:22
+msgid "Date"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:27 templates/backoffice/orders.html:9
+#: templates/cart/cart.html:58 templates/checkout/checkout.html:48
+#: templates/customer_area/invoices.html:16
+#: templates/customer_area/order_detail.html:24
+#: templates/customer_area/orders.html:22
+#: templates/emails/order_confirmation.html:23
+msgid "Total"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:28
+#: templates/b2b/portal/documents.html:70 templates/b2b/portal/history.html:20
+#: templates/b2b/portal/home.html:68 templates/b2b/portal/in_progress.html:19
+#: templates/b2b/portal/profile.html:53
+#: templates/backoffice/b2b_requests.html:9 templates/backoffice/orders.html:9
+#: templates/customer_area/invoices.html:15
+#: templates/customer_area/order_detail.html:31
+#: templates/customer_area/orders.html:22
+msgid "Status"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:29
+#: templates/customer_area/invoice_detail.html:8
+#: templates/customer_area/invoice_detail.html:26
+msgid "Invoice"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:45
+msgid "Download"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:49
+msgid "PDF invoices coming soon"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:50
+msgid "Soon"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:58 templates/b2b/portal/history.html:43
+#: templates/b2b/portal/home.html:86
+msgid "No order yet."
+msgstr ""
+
+#: templates/b2b/portal/documents.html:62
+msgid "Quote simulations"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:80
+msgid "Reached"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:87
+msgid "Converted"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:89
+#: templates/customer_area/order_detail.html:34
+#: templates/customer_area/orders.html:13
+msgid "Pending"
+msgstr ""
+
+#: templates/b2b/portal/documents.html:97
+msgid "No quote simulation yet."
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:7
+msgid "For B2B partners only"
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:8
+msgid "Exclusive products & pre-orders"
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:10
+msgid "Early access to our newest creations, at your negotiated prices."
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:31
+msgid "Available soon  pre-order on request."
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:41
+msgid "No exclusive product at the moment."
+msgstr ""
+
+#: templates/b2b/portal/exclusive.html:46
+msgid ""
+"Need large volumes or fully custom creations? Contact your account manager."
+msgstr ""
+
+#: templates/b2b/portal/history.html:4 templates/b2b/portal/history.html:9
+msgid "Order history"
+msgstr ""
+
+#: templates/b2b/portal/history.html:10
+msgid "All your past orders"
+msgstr ""
+
+#: templates/b2b/portal/history.html:12
+msgid "Export CSV"
+msgstr ""
+
+#: templates/b2b/portal/history.html:20 templates/b2b/portal/home.html:68
+#: templates/b2b/portal/in_progress.html:18
+#: templates/customer_area/invoice_detail.html:46
+msgid "Amount"
+msgstr ""
+
+#: templates/b2b/portal/history.html:21
+msgid "Actions"
+msgstr ""
+
+#: templates/b2b/portal/history.html:34
+msgid "Reorder"
+msgstr ""
+
+#: templates/b2b/portal/home.html:9
+#, python-format
+msgid "Welcome, %(company)s"
+msgstr ""
+
+#: templates/b2b/portal/home.html:21 templates/customer_area/dashboard.html:17
+msgid "Total orders"
+msgstr ""
+
+#: templates/b2b/portal/home.html:25
+msgid "Total spent"
+msgstr ""
+
+#: templates/b2b/portal/home.html:29
+msgid "Account status"
+msgstr ""
+
+#: templates/b2b/portal/home.html:34 templates/b2b/portal/profile.html:41
+msgid "Account information"
+msgstr ""
+
+#: templates/b2b/portal/home.html:39 templates/backoffice/b2b_accounts.html:22
+#: templates/backoffice/b2b_requests.html:9 templates/base/footer.html:25
+#: templates/base/navbar.html:16 templates/main/contact.html:4
+#: templates/main/privacy.html:29
+msgid "Contact"
+msgstr ""
+
+#: templates/b2b/portal/home.html:41
+msgid "Phone"
+msgstr ""
+
+#: templates/b2b/portal/home.html:42 templates/b2b/portal/profile.html:49
+#: templates/backoffice/b2b_accounts.html:23
+msgid "Segment"
+msgstr ""
+
+#: templates/b2b/portal/home.html:43 templates/b2b/portal/profile.html:64
+msgid "Client number"
+msgstr ""
+
+#: templates/b2b/portal/home.html:44 templates/b2b/portal/profile.html:72
+msgid "Member since"
+msgstr ""
+
+#: templates/b2b/portal/home.html:49
+msgid "Edit my profile"
+msgstr ""
+
+#: templates/b2b/portal/home.html:53 templates/customer_area/dashboard.html:26
+msgid "Quick access"
+msgstr ""
+
+#: templates/b2b/portal/home.html:55
+msgid "My orders in progress"
+msgstr ""
+
+#: templates/b2b/portal/home.html:62
+msgid "Recent orders"
+msgstr ""
+
+#: templates/b2b/portal/home.html:83
+msgid "See all orders"
+msgstr ""
+
+#: templates/b2b/portal/in_progress.html:8
+msgid "Track your active orders"
+msgstr ""
+
+#: templates/b2b/portal/in_progress.html:10
+msgid "Follow every order that is not delivered yet."
+msgstr ""
+
+#: templates/b2b/portal/in_progress.html:18
+msgid "Products"
+msgstr ""
+
+#: templates/b2b/portal/in_progress.html:37
+msgid "No order in progress right now."
+msgstr ""
+
+#: templates/b2b/portal/in_progress.html:42
+msgid ""
+"Your account manager contacts you 48h before each delivery to confirm the "
+"details."
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:13
+#: templates/b2b/portal/notifications.html:17
+msgid "Notifications"
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:26
+msgid "Your pro account is active"
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:28
+msgid "You have full access to the pro catalogue and the configurator."
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:37
+msgid ""
+"Our team is reviewing your request. You will be notified by email within "
+"2448h."
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:53
+msgid "Welcome on board"
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:55
+#, python-format
+msgid ""
+"\n"
+"            Your account was activated on %(date)s.\n"
+"          "
+msgstr ""
+
+#: templates/b2b/portal/notifications.html:66
+msgid ""
+"Real-time notifications (quote updates, shipping) will appear here soon."
+msgstr ""
+
+#: templates/b2b/portal/profile.html:25
+msgid "Company name"
+msgstr ""
+
+#: templates/b2b/portal/profile.html:36 templates/customer_area/profile.html:20
+msgid "Save changes"
+msgstr ""
+
+#: templates/b2b/portal/profile.html:45
+msgid "Contact email"
+msgstr ""
+
+#: templates/b2b/portal/profile.html:68
+msgid "Payment terms"
+msgstr ""
+
+#: templates/b2b/portal/profile.html:79
+msgid ""
+"To change your segment, payment terms or any other commercial detail, please "
+"contact our team."
+msgstr ""
+
+#: templates/b2b/presentation.html:4
+msgid "Professionals  Corporate Gifting"
+msgstr ""
+
+#: templates/b2b/presentation.html:10
+msgid "Corporate gifting & B2B"
+msgstr ""
+
+#: templates/b2b/presentation.html:12 templates/shop/catalog.html:11
+msgid "The"
+msgstr ""
+
+#: templates/b2b/presentation.html:12
+msgid "art"
+msgstr ""
+
+#: templates/b2b/presentation.html:12
+msgid "of the professional gift"
+msgstr ""
+
+#: templates/b2b/presentation.html:16
+msgid ""
+"Swiss chocolate elevated to a corporate signature. From a private bank's "
+"year-end gift to a luxury hotel's welcome amenity, every box carries your "
+"name  engraved, packaged and delivered to your standards."
+msgstr ""
+
+#: templates/b2b/presentation.html:21
+msgid "Enter the pro space"
+msgstr ""
+
+#: templates/b2b/presentation.html:23
+msgid "Create a pro account"
+msgstr ""
+
+#: templates/b2b/presentation.html:30
+msgid "Trusted by demanding houses"
+msgstr ""
+
+#: templates/b2b/presentation.html:37
+msgid "Luxury hotels"
+msgstr ""
+
+#: templates/b2b/presentation.html:38
+msgid "Welcome amenities & suite gifts"
+msgstr ""
+
+#: templates/b2b/presentation.html:42
+msgid "Private banks"
+msgstr ""
+
+#: templates/b2b/presentation.html:43
+msgid "Client & year-end gifting"
+msgstr ""
+
+#: templates/b2b/presentation.html:47
+msgid "Watchmakers"
+msgstr ""
+
+#: templates/b2b/presentation.html:48
+msgid "Boutique & event gifting"
+msgstr ""
+
+#: templates/b2b/presentation.html:52
+msgid "Corporate events"
+msgstr ""
+
+#: templates/b2b/presentation.html:53
+msgid "Seminars, launches, galas"
+msgstr ""
+
+#: templates/b2b/presentation.html:59
+msgid "Four axes of personalisation"
+msgstr ""
+
+#: templates/b2b/presentation.html:60
+msgid "Make it unmistakably yours"
+msgstr ""
+
+#: templates/b2b/presentation.html:65
+msgid "1  Engraved logo"
+msgstr ""
+
+#: templates/b2b/presentation.html:66
+msgid "Your emblem embossed directly onto each chocolate."
+msgstr ""
+
+#: templates/b2b/presentation.html:69
+msgid "2  Inner packaging"
+msgstr ""
+
+#: templates/b2b/presentation.html:70
+msgid "Trays, liners and dividers in your colours."
+msgstr ""
+
+#: templates/b2b/presentation.html:73
+msgid "3  Outer packaging"
+msgstr ""
+
+#: templates/b2b/presentation.html:74
+msgid "Boxes, sleeves and ribbons with your branding."
+msgstr ""
+
+#: templates/b2b/presentation.html:77
+msgid "4  Weight & format"
+msgstr ""
+
+#: templates/b2b/presentation.html:78
+msgid "From bite-size favours to grand presentation boxes."
+msgstr ""
+
+#: templates/b2b/presentation.html:84
+msgid "How it works"
+msgstr ""
+
+#: templates/b2b/presentation.html:89
+msgid "Tell us your project"
+msgstr ""
+
+#: templates/b2b/presentation.html:90
+msgid "Volume, occasion, deadline and branding."
+msgstr ""
+
+#: templates/b2b/presentation.html:94
+msgid "Receive a tailored quote"
+msgstr ""
+
+#: templates/b2b/presentation.html:95
+msgid "Priced by our team, validated by a human."
+msgstr ""
+
+#: templates/b2b/presentation.html:99
+msgid "We craft & deliver"
+msgstr ""
+
+#: templates/b2b/presentation.html:100
+msgid "Swiss-made, delivered on your schedule."
+msgstr ""
+
+#: templates/b2b/presentation.html:106
+msgid "Tell us about your project"
+msgstr ""
+
+#: templates/b2b/presentation.html:108
+msgid "A dedicated account manager replies within 2448h."
+msgstr ""
+
+#: templates/b2b/register.html:5 templates/b2b/register.html:19
+msgid "Create your pro account"
+msgstr ""
+
+#: templates/b2b/register.html:90
+msgid ""
+"At least 12 characters, with upper- and lower-case, a digit and a special "
+"character."
+msgstr ""
+
+#: templates/b2b/register.html:144
+msgid "terms"
+msgstr ""
+
+#: templates/b2b/register.html:146
+msgid "and the"
+msgstr ""
+
+#: templates/b2b/register.html:160
+msgid "Submit for validation"
+msgstr ""
+
+#: templates/b2b/request_form.html:4
+msgid "Professional request"
+msgstr ""
+
+#: templates/b2b/request_form.html:8
+msgid "Professionals"
+msgstr ""
+
+#: templates/b2b/request_form.html:9
+msgid "Professional / B2B request"
+msgstr ""
+
+#: templates/b2b/request_form.html:10
+msgid ""
+"Tell us about your needs and we'll get back to you with a tailored offer."
+msgstr ""
+
+#: templates/b2b/request_form.html:39
+msgid "Send request"
+msgstr ""
+
+#: templates/b2b/request_form.html:43
+msgid ""
+"Your data is used solely to process your request. We do not share it with "
+"third parties. You can request access or deletion at any time."
+msgstr ""
+
+#: templates/b2b/success.html:3 templates/b2b/success.html:6
+msgid "Request sent"
+msgstr ""
+
+#: templates/b2b/success.html:7
+msgid "Thank you! We'll get back to you shortly."
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:4
+msgid "B2B account validation"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:10
+msgid "Pro accounts awaiting validation"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:12
+#: templates/backoffice/b2b_requests.html:6
+#: templates/backoffice/forecasting.html:8 templates/backoffice/orders.html:6
+#: templates/backoffice/stock.html:6
+msgid "Back to dashboard"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:25
+msgid "Decision"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:50
+msgid "Approve"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:56
+msgid "Reject this pro account?"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:60
+msgid "Reject"
+msgstr ""
+
+#: templates/backoffice/b2b_accounts.html:72
+msgid "No pending pro accounts. You're all caught up."
+msgstr ""
+
+#: templates/backoffice/b2b_requests.html:3
+#: templates/backoffice/b2b_requests.html:7
+#: templates/backoffice/dashboard.html:39
+msgid "B2B requests"
+msgstr ""
+
+#: templates/backoffice/b2b_requests.html:9 templates/checkout/checkout.html:35
+#: templates/customer_area/invoice_detail.html:44
+msgid "Qty"
+msgstr ""
+
+#: templates/backoffice/b2b_requests.html:9
+msgid "Change"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:4
+msgid "Backoffice"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:8
+msgid "Backoffice dashboard"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:19
+msgid "Revenue"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:22
+msgid "Paid orders"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:25
+msgid "Avg. basket"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:28
+msgid "Low stock"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:31
+msgid "B2B revenue"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:36
+msgid "Manage orders"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:36
+#: templates/backoffice/dashboard.html:40
+msgid "pending"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:38
+#: templates/backoffice/forecasting.html:4
+#: templates/backoffice/forecasting.html:9
+msgid "Forecasting"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:39
+msgid "new"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:40
+msgid "Validate pro accounts"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:45
+msgid "Revenue (last 30 days)"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:51
+msgid "Top products"
+msgstr ""
+
+#: templates/backoffice/dashboard.html:58
+msgid "No sales yet."
+msgstr ""
+
+#: templates/backoffice/forecasting.html:13
+msgid "Stockout risks"
+msgstr ""
+
+#: templates/backoffice/forecasting.html:16 templates/backoffice/stock.html:10
+#: templates/cart/cart.html:18
+msgid "Quantity"
+msgstr ""
+
+#: templates/backoffice/forecasting.html:16 templates/backoffice/stock.html:10
+msgid "Threshold"
+msgstr ""
+
+#: templates/backoffice/forecasting.html:29
+msgid "No stockout risks."
+msgstr ""
+
+#: templates/backoffice/forecasting.html:35
+msgid "Delivery estimates per zone"
+msgstr ""
+
+#: templates/backoffice/forecasting.html:37
+msgid "Estimates"
+msgstr ""
+
+#: templates/backoffice/forecasting.html:45
+#: templates/emails/order_shipped.html:11
+msgid "days"
+msgstr ""
+
+#: templates/backoffice/orders.html:3 templates/backoffice/orders.html:7
+#: templates/customer_area/base_account.html:11
+msgid "Orders"
+msgstr ""
+
+#: templates/backoffice/orders.html:9
+msgid "Change status"
+msgstr ""
+
+#: templates/backoffice/stock.html:7
+msgid "Low stock alerts"
+msgstr ""
+
+#: templates/backoffice/stock.html:18
+msgid "All stocks are above their thresholds."
+msgstr ""
+
+#: templates/base/base.html:7
+msgid "Lamos Chocolate  Swiss artisan chocolate, the spirit of Dubai."
+msgstr ""
+
+#: templates/base/cookie_banner.html:4
+msgid "Cookie consent"
+msgstr ""
+
+#: templates/base/cookie_banner.html:7
+msgid "We value your privacy."
+msgstr ""
+
+#: templates/base/cookie_banner.html:8
+msgid ""
+"We use strictly necessary cookies and, with your consent, analytics cookies. "
+"No data leaves Switzerland/EU."
+msgstr ""
+
+#: templates/base/cookie_banner.html:9 templates/main/privacy.html:3
+#: templates/main/privacy.html:6
+msgid "Privacy policy"
+msgstr ""
+
+#: templates/base/cookie_banner.html:14
+msgid "Reject non-essential"
+msgstr ""
+
+#: templates/base/cookie_banner.html:15
+msgid "Customize"
+msgstr ""
+
+#: templates/base/cookie_banner.html:16
+msgid "Accept all"
+msgstr ""
+
+#: templates/base/cookie_banner.html:21
+msgid "Strictly necessary (always on)"
+msgstr ""
+
+#: templates/base/cookie_banner.html:22
+msgid "Analytics"
+msgstr ""
+
+#: templates/base/cookie_banner.html:23
+msgid "Marketing"
+msgstr ""
+
+#: templates/base/cookie_banner.html:24
+msgid "Save choices"
+msgstr ""
+
+#: templates/base/footer.html:10
+msgid "The spirit of Dubai, the nobility of Swiss chocolate."
+msgstr ""
+
+#: templates/base/footer.html:19
+msgid "Navigation"
+msgstr ""
+
+#: templates/base/footer.html:21 templates/base/navbar.html:6
+#: templates/base/navbar.html:13
+msgid "Home"
+msgstr ""
+
+#: templates/base/footer.html:22 templates/base/navbar.html:14
+#: templates/shop/catalog.html:4 templates/shop/product.html:11
+msgid "Shop"
+msgstr ""
+
+#: templates/base/footer.html:23 templates/base/navbar.html:15
+#: templates/main/about.html:4
+msgid "About Us"
+msgstr ""
+
+#: templates/base/footer.html:24
+msgid "B2B Space"
+msgstr ""
+
+#: templates/base/footer.html:30
+msgid "Legal"
+msgstr ""
+
+#: templates/base/footer.html:32
+msgid "Terms & Conditions"
+msgstr ""
+
+#: templates/base/footer.html:33 templates/emails/reset_password.html:72
+#: templates/emails/welcome.html:68
+msgid "Privacy Policy"
+msgstr ""
+
+#: templates/base/footer.html:34
+msgid "Manage cookies"
+msgstr ""
+
+#: templates/base/footer.html:39
+msgid "Newsletter"
+msgstr ""
+
+#: templates/base/footer.html:40
+msgid "Receive our news and exclusive offers."
+msgstr ""
+
+#: templates/base/footer.html:46
+msgid "By subscribing you accept our privacy policy."
+msgstr ""
+
+#: templates/base/footer.html:52 templates/emails/reset_password.html:69
+#: templates/emails/welcome.html:65
+msgid "All rights reserved"
+msgstr ""
+
+#: templates/base/navbar.html:4
+msgid "Main navigation"
+msgstr ""
+
+#: templates/base/navbar.html:20 templates/base/navbar.html:61
+#: templates/customer_area/address_form.html:8
+#: templates/customer_area/addresses.html:9
+#: templates/customer_area/base_account.html:8
+#: templates/customer_area/dashboard.html:4
+#: templates/customer_area/dashboard.html:7
+#: templates/customer_area/orders.html:7 templates/customer_area/profile.html:7
+msgid "My account"
+msgstr ""
+
+#: templates/base/navbar.html:25 templates/base/navbar.html:83
+msgid "Order Now"
+msgstr ""
+
+#: templates/base/navbar.html:38
+msgid "Change language"
+msgstr ""
+
+#: templates/base/navbar.html:72
+msgid "View cart"
+msgstr ""
+
+#: templates/base/navbar.html:86
+msgid "Open menu"
+msgstr ""
+
+#: templates/cart/cart.html:4 templates/cart/cart.html:9
+msgid "Your cart"
+msgstr ""
+
+#: templates/cart/cart.html:8
+msgid "Your order"
+msgstr ""
+
+#: templates/cart/cart.html:19 templates/checkout/checkout.html:35
+#: templates/customer_area/invoice_detail.html:65
+msgid "Subtotal"
+msgstr ""
+
+#: templates/cart/cart.html:37
+msgid "Update"
+msgstr ""
+
+#: templates/cart/cart.html:48
+msgid "Remove"
+msgstr ""
+
+#: templates/cart/cart.html:59
+msgid "item(s)"
+msgstr ""
+
+#: templates/cart/cart.html:65 templates/checkout/success.html:13
+msgid "Continue shopping"
+msgstr ""
+
+#: templates/cart/cart.html:66
+msgid "Proceed to checkout"
+msgstr ""
+
+#: templates/cart/cart.html:70
+msgid "Browse the shop"
+msgstr ""
+
+#: templates/checkout/cancel.html:4 templates/checkout/cancel.html:9
+msgid "Payment cancelled"
+msgstr ""
+
+#: templates/checkout/cancel.html:8 templates/checkout/checkout.html:4
+#: templates/checkout/checkout.html:8
+msgid "Checkout"
+msgstr ""
+
+#: templates/checkout/cancel.html:11
+msgid ""
+"Your payment was cancelled and you have not been charged. Your cart has been "
+"kept."
+msgstr ""
+
+#: templates/checkout/cancel.html:12 templates/checkout/checkout.html:51
+msgid "Back to cart"
+msgstr ""
+
+#: templates/checkout/checkout.html:9
+msgid "Shipping & payment"
+msgstr ""
+
+#: templates/checkout/checkout.html:15
+#: templates/customer_area/order_detail.html:41
+msgid "Shipping address"
+msgstr ""
+
+#: templates/checkout/checkout.html:26
+msgid "Proceed to payment"
+msgstr ""
+
+#: templates/checkout/checkout.html:32
+msgid "Order summary"
+msgstr ""
+
+#: templates/checkout/success.html:4
+msgid "Payment received"
+msgstr ""
+
+#: templates/checkout/success.html:9
+msgid "Order confirmed"
+msgstr ""
+
+#: templates/checkout/success.html:10
+#: templates/emails/order_confirmation.html:7
+msgid "Thank you for your order!"
+msgstr ""
+
+#: templates/checkout/success.html:12
+msgid ""
+"Your payment was successful. You will receive your order details by email "
+"shortly."
+msgstr ""
+
+#: templates/customer_area/address_form.html:7
+msgid "Back to addresses"
+msgstr ""
+
+#: templates/customer_area/address_form.html:15
+msgid "Please fix the errors below."
+msgstr ""
+
+#: templates/customer_area/address_form.html:35
+msgid "Save"
+msgstr ""
+
+#: templates/customer_area/addresses.html:4
+#: templates/customer_area/addresses.html:10
+#: templates/customer_area/dashboard.html:30
+msgid "My addresses"
+msgstr ""
+
+#: templates/customer_area/addresses.html:12
+msgid "Add address"
+msgstr ""
+
+#: templates/customer_area/addresses.html:21
+msgid "Default"
+msgstr ""
+
+#: templates/customer_area/addresses.html:31
+msgid "Edit"
+msgstr ""
+
+#: templates/customer_area/addresses.html:34
+msgid "Delete"
+msgstr ""
+
+#: templates/customer_area/addresses.html:41
+msgid "You have no saved addresses yet."
+msgstr ""
+
+#: templates/customer_area/base_account.html:9
+msgid "Account navigation"
+msgstr ""
+
+#: templates/customer_area/base_account.html:10
+msgid "Overview"
+msgstr ""
+
+#: templates/customer_area/base_account.html:12
+#: templates/customer_area/invoices.html:7
+msgid "Invoices"
+msgstr ""
+
+#: templates/customer_area/base_account.html:13
+msgid "Addresses"
+msgstr ""
+
+#: templates/customer_area/base_account.html:14
+msgid "Profile"
+msgstr ""
+
+#: templates/customer_area/dashboard.html:9
+#: templates/emails/b2b_notification.html:8
+#: templates/emails/order_confirmation.html:8
+#: templates/emails/order_shipped.html:8
+msgid "Hello"
+msgstr ""
+
+#: templates/customer_area/dashboard.html:11
+msgid "Welcome back to your space."
+msgstr ""
+
+#: templates/customer_area/dashboard.html:21
+msgid "Pending orders"
+msgstr ""
+
+#: templates/customer_area/dashboard.html:28
+#: templates/customer_area/orders.html:4 templates/customer_area/orders.html:8
+msgid "My orders"
+msgstr ""
+
+#: templates/customer_area/dashboard.html:29
+msgid "My invoices"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:14
+msgid "Back"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:15
+msgid "Print / Save as PDF"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:34
+msgid "Billed to"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:43
+msgid "Item"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:45
+msgid "Unit"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:69
+msgid "Total (incl. VAT)"
+msgstr ""
+
+#: templates/customer_area/invoice_detail.html:76
+msgid ""
+"Lamos Chocolate  Swiss VAT included where applicable  Thank you for your "
+"order."
+msgstr ""
+
+#: templates/customer_area/invoices.html:28
+msgid "View invoice"
+msgstr ""
+
+#: templates/customer_area/invoices.html:35
+msgid "You have no invoices yet."
+msgstr ""
+
+#: templates/customer_area/order_detail.html:7
+msgid "Back to my orders"
+msgstr ""
+
+#: templates/customer_area/order_detail.html:16
+msgid "Items"
+msgstr ""
+
+#: templates/customer_area/order_detail.html:35
+#: templates/customer_area/orders.html:14
+msgid "Paid"
+msgstr ""
+
+#: templates/customer_area/order_detail.html:36
+#: templates/customer_area/orders.html:15
+msgid "Shipped"
+msgstr ""
+
+#: templates/customer_area/order_detail.html:37
+#: templates/customer_area/orders.html:16
+msgid "Delivered"
+msgstr ""
+
+#: templates/customer_area/orders.html:12
+msgid "All"
+msgstr ""
+
+#: templates/customer_area/orders.html:32 templates/shop/catalog.html:50
+#: templates/shop/partials/product_card.html:18
+msgid "View"
+msgstr ""
+
+#: templates/customer_area/orders.html:51
+msgid "No orders found."
+msgstr ""
+
+#: templates/customer_area/password_change.html:14
+msgid "Update password"
+msgstr ""
+
+#: templates/customer_area/profile.html:21
+msgid "Cancel"
+msgstr ""
+
+#: templates/emails/b2b_notification.html:4
+msgid "Request received"
+msgstr ""
+
+#: templates/emails/b2b_notification.html:7
+msgid "We received your request"
+msgstr ""
+
+#: templates/emails/b2b_notification.html:9
+msgid "Thank you for your interest in Lamos Chocolate for"
+msgstr ""
+
+#: templates/emails/b2b_notification.html:10
+msgid "Our team will review your request and get back to you shortly."
+msgstr ""
+
+#: templates/emails/b2b_notification.html:12
+msgid "Estimated quantity"
+msgstr ""
+
+#: templates/emails/b2b_notification.html:13
+msgid "Occasion"
+msgstr ""
+
+#: templates/emails/b2b_request_confirmation.txt:2
+#, python-format
+msgid "Hello %(name)s,"
+msgstr ""
+
+#: templates/emails/b2b_request_confirmation.txt:4
+msgid "We received your professional request and will get back to you shortly."
+msgstr ""
+
+#: templates/emails/b2b_request_confirmation.txt:6
+msgid "Lamos Chocolate"
+msgstr ""
+
+#: templates/emails/base_email.html:15 templates/emails/base_email.html:25
+msgid "Swiss artisan chocolate"
+msgstr ""
+
+#: templates/emails/base_email.html:26
+msgid "This is an automated message, please do not reply."
+msgstr ""
+
+#: templates/emails/order_confirmation.html:4
+msgid "Order confirmation"
+msgstr ""
+
+#: templates/emails/order_confirmation.html:9
+msgid "We have received your order. Here is a summary:"
+msgstr ""
+
+#: templates/emails/order_confirmation.html:13
+msgid "Order number"
+msgstr ""
+
+#: templates/emails/order_confirmation.html:28
+msgid "We will notify you when your order ships."
+msgstr ""
+
+#: templates/emails/order_shipped.html:4
+msgid "Your order has shipped"
+msgstr ""
+
+#: templates/emails/order_shipped.html:7
+msgid "Your order is on its way!"
+msgstr ""
+
+#: templates/emails/order_shipped.html:9
+msgid "Good news! Your order"
+msgstr ""
+
+#: templates/emails/order_shipped.html:9
+msgid "has been shipped."
+msgstr ""
+
+#: templates/emails/order_shipped.html:11
+msgid "Estimated delivery"
+msgstr ""
+
+#: templates/emails/order_shipped.html:13
+msgid "Thank you for shopping with us!"
+msgstr ""
+
+#: templates/emails/reset_password.html:7
+#: templates/emails/reset_password.html:16
+msgid "Password Reset"
+msgstr ""
+
+#: templates/emails/reset_password.html:21
+msgid "Reset your password"
+msgstr ""
+
+#: templates/emails/reset_password.html:24
+msgid "You requested a password reset for your account"
+msgstr ""
+
+#: templates/emails/reset_password.html:29
+msgid "Click the button below to create a new password:"
+msgstr ""
+
+#: templates/emails/reset_password.html:35
+msgid "Reset my password"
+msgstr ""
+
+#: templates/emails/reset_password.html:40
+msgid "Or copy this link:"
+msgstr ""
+
+#: templates/emails/reset_password.html:47
+msgid "Important:"
+msgstr ""
+
+#: templates/emails/reset_password.html:47
+msgid "This link expires in"
+msgstr ""
+
+#: templates/emails/reset_password.html:47
+msgid "hour(s)"
+msgstr ""
+
+#: templates/emails/reset_password.html:47
+msgid "For security reasons, the link can only be used once."
+msgstr ""
+
+#: templates/emails/reset_password.html:52
+msgid "Didn't request this?"
+msgstr ""
+
+#: templates/emails/reset_password.html:54
+msgid ""
+"If you didn't request a password reset, you can safely ignore this email. "
+"Your password will remain unchanged."
+msgstr ""
+
+#: templates/emails/reset_password.html:58
+msgid "For security, this request was made from IP address:"
+msgstr ""
+
+#: templates/emails/reset_password.html:65 templates/emails/welcome.html:61
+msgid "Questions?"
+msgstr ""
+
+#: templates/emails/reset_password.html:73 templates/emails/welcome.html:69
+msgid "Terms of Service"
+msgstr ""
+
+#: templates/emails/welcome.html:16
+msgid "Welcome!"
+msgstr ""
+
+#: templates/emails/welcome.html:24
+msgid "Thank you for signing up with"
+msgstr ""
+
+#: templates/emails/welcome.html:28
+msgid ""
+"Your account is now active. You can log in anytime to explore our selection "
+"of premium Swiss chocolates."
+msgstr ""
+
+#: templates/emails/welcome.html:40
+msgid "Your account"
+msgstr ""
+
+#: templates/emails/welcome.html:43
+msgid "Name"
+msgstr ""
+
+#: templates/emails/welcome.html:44
+msgid "Language"
+msgstr ""
+
+#: templates/emails/welcome.html:49
+msgid "Next steps"
+msgstr ""
+
+#: templates/emails/welcome.html:51
+msgid "Browse our chocolate catalog"
+msgstr ""
+
+#: templates/emails/welcome.html:52
+msgid "Add your favorites to cart"
+msgstr ""
+
+#: templates/emails/welcome.html:53
+msgid "Proceed to secure checkout"
+msgstr ""
+
+#: templates/emails/welcome.html:54
+msgid "Receive your order in Switzerland"
+msgstr ""
+
+#: templates/errors/403.html:59
+msgid "Access denied"
+msgstr ""
+
+#: templates/errors/403.html:60
+msgid "You don't have access to this page."
+msgstr ""
+
+#: templates/errors/403.html:62
+msgid "Please sign in with the right account, or go back home."
+msgstr ""
+
+#: templates/errors/404.html:20
+msgid "Page not found"
+msgstr ""
+
+#: templates/errors/404.html:21
+msgid "This page seems to have melted."
+msgstr ""
+
+#: templates/errors/404.html:22
+msgid "The page you are looking for does not exist or has moved."
+msgstr ""
+
+#: templates/errors/500.html:59
+msgid "Server error"
+msgstr ""
+
+#: templates/errors/500.html:60
+msgid "Something went wrong on our side."
+msgstr ""
+
+#: templates/errors/500.html:62
+msgid "We've been notified. Please try again in a moment."
+msgstr ""
+
+#: templates/main/about.html:10 templates/main/home.html:27
+msgid "Our story"
+msgstr ""
+
+#: templates/main/about.html:12
+msgid "The spirit of Dubai,"
+msgstr ""
+
+#: templates/main/about.html:12
+msgid "the nobility of Swiss chocolate"
+msgstr ""
+
+#: templates/main/about.html:14
+msgid ""
+"A house born between two worlds: oriental luxury and Helvetic excellence."
+msgstr ""
+
+#: templates/main/about.html:25 templates/main/home.html:85
+msgid "Founded"
+msgstr ""
+
+#: templates/main/about.html:30 templates/main/home.html:90
+msgid "The DNA of an extraordinary house"
+msgstr ""
+
+#: templates/main/about.html:31
+msgid "A story born"
+msgstr ""
+
+#: templates/main/about.html:31
+msgid "long before chocolate"
+msgstr ""
+
+#: templates/main/about.html:32 templates/main/home.html:93
+msgid "LAMOS was not born from chocolate. LAMOS was born from excellence."
+msgstr ""
+
+#: templates/main/about.html:33
+msgid ""
+"Before LAMOS Chocolate, there was LAMOS Sweets  a house founded in Dubai, "
+"recognised for its absolute standards in high-end pastry."
+msgstr ""
+
+#: templates/main/about.html:34
+msgid ""
+"In 2021, this culture of detail met chocolate. Not as one more product, but "
+"as the natural culmination of a craft already praised by the Gulf's 5-star "
+"hotels and luxury houses."
+msgstr ""
+
+#: templates/main/about.html:51 templates/main/home.html:193
+msgid "Ingredients as a statement of faith"
+msgstr ""
+
+#: templates/main/about.html:52 templates/main/home.html:194
+msgid "In premium chocolate,"
+msgstr ""
+
+#: templates/main/about.html:52 templates/main/home.html:194
+msgid "the ingredients are the story"
+msgstr ""
+
+#: templates/main/about.html:58
+msgid ""
+"The absolute Swiss benchmark, chosen by the best chocolatiers in the world."
+msgstr ""
+
+#: templates/main/about.html:63
+msgid "An incomparable cream, prized by international pastry chefs."
+msgstr ""
+
+#: templates/main/about.html:68
+msgid ""
+"The most sought-after pistachios in the world  deep green, rare sweetness."
+msgstr ""
+
+#: templates/main/about.html:79 templates/main/home.html:224
+msgid "Some houses are born to sell, and some are born to"
+msgstr ""
+
+#: templates/main/about.html:79 templates/main/home.html:224
+msgid "move us"
+msgstr ""
+
+#: templates/main/about.html:79 templates/main/home.html:224
+msgid "LAMOS belongs to the second."
+msgstr ""
+
+#: templates/main/about.html:81 templates/main/home.html:226
+msgid "The spirit of Lamos Chocolate"
+msgstr ""
+
+#: templates/main/about.html:83 templates/main/home.html:26
+msgid "Discover our creations"
+msgstr ""
+
+#: templates/main/contact.html:10 templates/main/privacy.html:30
+msgid "Contact us"
+msgstr ""
+
+#: templates/main/contact.html:12
+msgid "A question, an order,"
+msgstr ""
+
+#: templates/main/contact.html:12
+msgid "or a partnership?"
+msgstr ""
+
+#: templates/main/contact.html:14
+msgid ""
+"Our team will be glad to help. Lamos Chocolate serves individuals, "
+"companies, hotels and luxury houses."
+msgstr ""
+
+#: templates/main/contact.html:24
+msgid "Write to us"
+msgstr ""
+
+#: templates/main/contact.html:34
+msgid "Send message"
+msgstr ""
+
+#: templates/main/contact.html:41
+msgid "Information"
+msgstr ""
+
+#: templates/main/contact.html:44
+msgid "Artisan manufacture founded in Dubai. Based in Dubai since 2021."
+msgstr ""
+
+#: templates/main/contact.html:51
+msgid "Partnerships & companies"
+msgstr ""
+
+#: templates/main/contact.html:55
+msgid "Delivery"
+msgstr ""
+
+#: templates/main/contact.html:59
+msgid "See our creations"
+msgstr ""
+
+#: templates/main/home.html:4
+msgid "The spirit of Dubai, the nobility of Swiss chocolate"
+msgstr ""
+
+#: templates/main/home.html:5
+msgid ""
+"LAMO'S CHOCOLATE  Artisan manufacture founded in Dubai in 2021. Pistachio & "
+"Kunafa, Pecan Praline, Matcha. Dubai  Switzerland."
+msgstr ""
+
+#: templates/main/home.html:23
+msgid ""
+"The spirit of Dubai, the nobility of Swiss chocolate. An artisan manufacture "
+"born at the crossroads of East and West."
+msgstr ""
+
+#: templates/main/home.html:58
+msgid "Origin"
+msgstr ""
+
+#: templates/main/home.html:59
+msgid "Founded in Dubai, arrived in Switzerland"
+msgstr ""
+
+#: templates/main/home.html:64
+msgid "Philosophy"
+msgstr ""
+
+#: templates/main/home.html:65
+msgid "The original, not the imitator"
+msgstr ""
+
+#: templates/main/home.html:70
+msgid "Customization"
+msgstr ""
+
+#: templates/main/home.html:71
+#, python-format
+msgid "100%% bespoke, from the bar to the packaging"
+msgstr ""
+
+#: templates/main/home.html:91
+msgid "Born long before"
+msgstr ""
+
+#: templates/main/home.html:91
+msgid "chocolate"
+msgstr ""
+
+#: templates/main/home.html:95
+msgid ""
+"Before LAMOS Chocolate, there was LAMOS Sweets  a house founded in Dubai, "
+"built on a rare obsession in fine gastronomy: the absolute excellence of "
+"high-end pastry."
+msgstr ""
+
+#: templates/main/home.html:96
+msgid ""
+"In 2021, this culture of detail met chocolate  not as one more product, but "
+"as the natural culmination of a craft already proven with the Gulf's 5-star "
+"hotels, private banks and jewellery houses."
+msgstr ""
+
+#: templates/main/home.html:104
+msgid "Read our full story"
+msgstr ""
+
+#: templates/main/home.html:116
+msgid "Our signature creations"
+msgstr ""
+
+#: templates/main/home.html:117
+msgid "The art of"
+msgstr ""
+
+#: templates/main/home.html:117
+msgid "exceptional chocolate"
+msgstr ""
+
+#: templates/main/home.html:118
+msgid ""
+"Each bar is handcrafted by award-winning chefs, with ingredients selected "
+"from the four corners of the world."
+msgstr ""
+
+#: templates/main/home.html:130
+#, python-format
+msgid ""
+"Artisan pistachio-kunafa cream (35%%) in a silky Carma milk chocolate. The "
+"original LAMOS technique  the one that started it all."
+msgstr ""
+
+#: templates/main/home.html:145
+#, python-format
+msgid ""
+"Intense dark couverture (55.2%%) with a silky pecan praline (55%%). Woody "
+"softness, bold character, absolute finesse."
+msgstr ""
+
+#: templates/main/home.html:161
+msgid ""
+"Grade A ceremonial matcha meeting Swiss Carma white chocolate. From Japan to "
+"Geneva, via Dubai."
+msgstr ""
+
+#: templates/main/home.html:171
+msgid "See the whole collection "
+msgstr ""
+
+#: templates/main/home.html:180
+msgid "TikTok views  Dubai Chocolate phenomenon"
+msgstr ""
+
+#: templates/main/home.html:181
+msgid "UAE rating  premium platforms"
+msgstr ""
+
+#: templates/main/home.html:182
+msgid "Growth in Dubai Chocolate conversations in 1 year"
+msgstr ""
+
+#: templates/main/home.html:183
+msgid "Customization  chocolate & packaging"
+msgstr ""
+
+#: templates/main/home.html:201
+msgid ""
+"One of the most respected couvertures in the world. The absolute Swiss "
+"benchmark, trusted by the planet's finest chocolatiers."
+msgstr ""
+
+#: templates/main/home.html:207
+msgid ""
+"An incomparable cream, the favourite of the world's great pastry chefs. "
+"Texture, flavour, perfection."
+msgstr ""
+
+#: templates/main/home.html:213
+msgid ""
+"The pistachios of Rafsanjan, considered the finest in the world. Sweet, "
+"rich, deep green  the ones great chefs fight over."
+msgstr ""
+
+#: templates/main/home.html:235
+msgid "Order  Partnership  Gifts"
+msgstr ""
+
+#: templates/main/privacy.html:7 templates/main/terms.html:7
+msgid "Last updated:"
+msgstr ""
+
+#: templates/main/privacy.html:9
+msgid ""
+"This policy explains how Lamos Chocolate processes personal data, in "
+"accordance with the Swiss Federal Act on Data Protection (nLPD / FADP) and, "
+"where applicable, the EU GDPR."
+msgstr ""
+
+#: templates/main/privacy.html:11
+msgid "Data controller"
+msgstr ""
+
+#: templates/main/privacy.html:14
+msgid "What data we collect"
+msgstr ""
+
+#: templates/main/privacy.html:15
+msgid ""
+"Account data (name, email), order data (address, purchases), and technical "
+"data (IP address, language) needed to operate the shop."
+msgstr ""
+
+#: templates/main/privacy.html:17
+msgid "Why we process it (purpose & legal basis)"
+msgstr ""
+
+#: templates/main/privacy.html:18
+msgid ""
+"To create and manage your account, process orders and payments, provide "
+"support, and meet legal obligations. Marketing emails are sent only with "
+"your explicit consent."
+msgstr ""
+
+#: templates/main/privacy.html:20
+msgid "Cookies"
+msgstr ""
+
+#: templates/main/privacy.html:21
+msgid ""
+"We use strictly necessary cookies (session, security). Any analytics or "
+"marketing cookies are set only after your consent and can be withdrawn at "
+"any time."
+msgstr ""
+
+#: templates/main/privacy.html:23
+msgid "Retention"
+msgstr ""
+
+#: templates/main/privacy.html:24
+msgid ""
+"We keep personal data only as long as necessary for the purposes above or as "
+"required by law."
+msgstr ""
+
+#: templates/main/privacy.html:26
+msgid "Your rights"
+msgstr ""
+
+#: templates/main/privacy.html:27
+msgid ""
+"You can request access, correction, deletion, or restriction of your data, "
+"and withdraw consent at any time, by contacting us."
+msgstr ""
+
+#: templates/main/terms.html:3 templates/main/terms.html:6
+msgid "Terms of service"
+msgstr ""
+
+#: templates/main/terms.html:8
+msgid "By using this website you agree to these terms of service."
+msgstr ""
+
+#: templates/shop/catalog.html:10
+msgid "Our collection"
+msgstr ""
+
+#: templates/shop/catalog.html:11
+msgid "creations"
+msgstr ""
+
+#: templates/shop/catalog.html:12
+msgid ""
+"Handcrafted bars, premium ingredients, packaging to match. Choose, "
+"customise, savour."
+msgstr ""
+
+#: templates/shop/catalog.html:21
+msgid "View all"
+msgstr ""
+
+#: templates/shop/catalog.html:55
+msgid ""
+"No products available yet. (Load the product fixtures to fill the shop.)"
+msgstr ""
+
+#: templates/shop/partials/filters.html:6
+#: templates/shop/partials/filters.html:7
+msgid "Search"
+msgstr ""
+
+#: templates/shop/partials/filters.html:11
+msgid "Categories"
+msgstr ""
+
+#: templates/shop/partials/filters.html:16
+msgid "All products"
+msgstr ""
+
+#: templates/shop/partials/product_card.html:14
+msgid "From"
+msgstr ""
+
+#: templates/shop/product.html:33
+msgid "No image"
+msgstr ""
+
+#: templates/shop/product.html:53
+msgid "Ingredients"
+msgstr ""
+
+#: templates/shop/product.html:61
+msgid "Allergens"
+msgstr ""
+
+#: templates/shop/product.html:67
+msgid "Available formats"
+msgstr ""
+
+#: templates/shop/product.html:84
+msgid "In stock"
+msgstr ""
+
+#: templates/shop/product.html:86
+msgid "Out of stock"
+msgstr ""
+
+#: templates/shop/product.html:93
+msgid "Added to your cart."
+msgstr ""
+
+#: templates/shop/product.html:100
+msgid "Add to cart"
+msgstr ""
+
+#: templates/shop/product.html:109
+msgid "Estimated delivery:"
+msgstr ""
+
+#: templates/shop/product.html:111
+msgid "d"
+msgstr ""
+
+#: templates/shop/product.html:117
+msgid "No formats available."
+msgstr ""

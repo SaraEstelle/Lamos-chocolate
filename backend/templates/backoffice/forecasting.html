@@ -1,0 +1,49 @@
+{% extends "backoffice/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Forecasting" %} — Backoffice{% endblock %}
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Forecasting" %}</h1>
+
+  <!-- Stockout risks -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-warning-subtle">⚠️ {% trans "Stockout risks" %}</div>
+    {% if stockout_risks %}
+    <table class="table mb-0">
+      <thead><tr><th>SKU</th><th>{% trans "Product" %}</th><th>{% trans "Quantity" %}</th><th>{% trans "Threshold" %}</th></tr></thead>
+      <tbody>
+        {% for risk in stockout_risks %}
+        <tr class="table-warning">
+          <td>{{ risk.sku.sku_code }}</td>
+          <td>{{ risk.sku.product.name_fr }}</td>
+          <td>{{ risk.quantity }}</td>
+          <td>{{ risk.threshold }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="card-body text-success">{% trans "No stockout risks." %}</div>
+    {% endif %}
+  </div>
+
+  <!-- Production / delivery estimates -->
+  <div class="card shadow-sm">
+    <div class="card-header">{% trans "Delivery estimates per zone" %}</div>
+    <table class="table mb-0">
+      <thead><tr><th>SKU</th><th>{% trans "Product" %}</th><th>{% trans "Estimates" %}</th></tr></thead>
+      <tbody>
+        {% for row in production %}
+        <tr>
+          <td>{{ row.sku.sku_code }}</td>
+          <td>{{ row.sku.product.name_fr }}</td>
+          <td>
+            {% for est in row.estimates %}
+              <span class="badge bg-light text-dark me-1">{{ est.zone.zone_name }}: {{ est.days }} {% trans "days" %}</span>
+            {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

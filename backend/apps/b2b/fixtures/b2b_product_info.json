@@ -1,0 +1,12 @@
+[
+  {"model": "b2b.b2bproductinfo", "pk": 1, "fields": {"sku": 1, "is_b2b_available": true, "availability_status": "active", "moq": 48, "b2b_unit_price": "5.50"}},
+  {"model": "b2b.b2bproductinfo", "pk": 2, "fields": {"sku": 2, "is_b2b_available": true, "availability_status": "active", "moq": 48, "b2b_unit_price": "9.50"}},
+  {"model": "b2b.b2bproductinfo", "pk": 3, "fields": {"sku": 3, "is_b2b_available": true, "availability_status": "active", "moq": 24, "b2b_unit_price": "16.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 4, "fields": {"sku": 4, "is_b2b_available": true, "availability_status": "new", "moq": 24, "b2b_unit_price": "20.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 5, "fields": {"sku": 5, "is_b2b_available": true, "availability_status": "active", "moq": 12, "b2b_unit_price": "28.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 6, "fields": {"sku": 6, "is_b2b_available": true, "availability_status": "active", "moq": 12, "b2b_unit_price": "28.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 7, "fields": {"sku": 7, "is_b2b_available": true, "availability_status": "active", "moq": 12, "b2b_unit_price": "28.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 8, "fields": {"sku": 8, "is_b2b_available": true, "availability_status": "active", "moq": 12, "b2b_unit_price": "28.00"}},
+  {"model": "b2b.b2bproductinfo", "pk": 9, "fields": {"sku": 9, "is_b2b_available": true, "availability_status": "active", "moq": 100, "b2b_unit_price": "1.90"}},
+  {"model": "b2b.b2bproductinfo", "pk": 10, "fields": {"sku": 10, "is_b2b_available": true, "availability_status": "coming_soon", "moq": 100, "b2b_unit_price": "1.90"}}
+]

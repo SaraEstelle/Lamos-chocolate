@@ -1,0 +1,30 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block subject %}Lamos Chocolate{% endblock %}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; background: #ffffff;">
+
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #6f4e37 0%, #3e2723 100%); color: white; padding: 30px 20px; border-radius: 5px 5px 0 0; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px;">🍫 Lamos Chocolate</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">{% block tagline %}{% trans "Swiss artisan chocolate" %}{% endblock %}</p>
+        </div>
+
+        <!-- Content -->
+        <div style="background: white; padding: 30px 20px;">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <div style="background: #f4f4f4; padding: 20px; text-align: center; font-size: 12px; color: #888; border-radius: 0 0 5px 5px;">
+            <p style="margin: 0;">Lamos Chocolate — {% trans "Swiss artisan chocolate" %}</p>
+            <p style="margin: 5px 0 0 0;">{% trans "This is an automated message, please do not reply." %}</p>
+        </div>
+    </div>
+</body>
+</html>

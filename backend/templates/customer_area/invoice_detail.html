@@ -1,0 +1,81 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{# backend/templates/customer_area/invoice_detail.html
+   Nécessite invoice_detail_view (Guide 2 §B.3) qui passe `order` (scellé au propriétaire).
+   Facture imprimable : bouton Imprimer -> window.print() (Ctrl+P -> PDF).
+   La génération PDF "propre" est dans le Guide 3 §B.7 (reportlab). #}
+
+{% block title %}{% trans "Invoice" %} {{ order.order_number|default:order.id }} · Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="section container">
+
+  <div class="no-print" style="margin-bottom:1.5rem;display:flex;gap:.75rem;justify-content:flex-end;">
+    <a href="{% url 'customer_area:invoices' %}" class="btn btn-outline btn-sm">{% trans "Back" %}</a>
+    <button class="btn btn-gold btn-sm" onclick="window.print()">{% trans "Print / Save as PDF" %}</button>
+  </div>
+
+  <div class="invoice">
+    <!-- Header -->
+    <div class="invoice-head">
+      <div>
+        <p style="font-family:var(--font-title);letter-spacing:.16em;text-transform:uppercase;color:var(--c-ink);font-weight:600;">LAMOS CHOCOLATE</p>
+        <p class="muted" style="font-size:.82rem;">Dubai · Switzerland<br>contact@lamos-chocolate.ch</p>
+      </div>
+      <div style="text-align:right;">
+        <p class="eyebrow" style="margin-bottom:.25rem;">{% trans "Invoice" %}</p>
+        <p style="font-family:var(--font-display);font-size:1.4rem;color:var(--c-ink);">{{ order.order_number|default:order.id }}</p>
+        <p class="muted" style="font-size:.82rem;">{{ order.created_at|date:"d F Y" }}</p>
+      </div>
+    </div>
+
+    <!-- Bill to -->
+    <div style="margin-bottom:1.5rem;">
+      <p class="eyebrow">{% trans "Billed to" %}</p>
+      <p>{{ order.customer.first_name }} {{ order.customer.last_name }}</p>
+      <p class="muted" style="font-size:.85rem;">{{ order.customer.email }}</p>
+    </div>
+
+    <!-- Lines -->
+    <table class="table" style="margin-bottom:1.5rem;">
+      <thead>
+        <tr>
+          <th>{% trans "Item" %}</th>
+          <th>{% trans "Qty" %}</th>
+          <th style="text-align:right;">{% trans "Unit" %}</th>
+          <th style="text-align:right;">{% trans "Amount" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in order.items.all %}
+          <tr>
+            <td>{{ item.sku.product|default:item.sku }}</td>
+            <td>{{ item.quantity }}</td>
+            <td style="text-align:right;">{{ item.unit_price }} CHF</td>
+            <td style="text-align:right;">{{ item.line_total|default:item.unit_price }} CHF</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Total -->
+    <div style="display:flex;justify-content:flex-end;">
+      <table style="min-width:240px;">
+        <tr>
+          <td class="muted" style="padding:.3rem 1rem .3rem 0;">{% trans "Subtotal" %}</td>
+          <td style="text-align:right;">{{ order.subtotal|default:order.total }} CHF</td>
+        </tr>
+        <tr style="border-top:2px solid var(--c-gold);">
+          <td style="padding:.5rem 1rem .3rem 0;font-family:var(--font-title);text-transform:uppercase;font-size:.7rem;letter-spacing:.12em;">{% trans "Total (incl. VAT)" %}</td>
+          <td style="text-align:right;font-family:var(--font-display);font-size:1.3rem;color:var(--c-ink);">{{ order.total }} CHF</td>
+        </tr>
+      </table>
+    </div>
+
+    <p class="muted" style="font-size:.72rem;margin-top:2rem;text-align:center;">
+      {% trans "Lamos Chocolate · Swiss VAT included where applicable · Thank you for your order." %}
+    </p>
+  </div>
+
+</section>
+{% endblock %}

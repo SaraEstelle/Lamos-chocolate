@@ -1,0 +1,54 @@
+{% extends "customer_area/base_account.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Order" %} {{ order.order_number }} — Lamos Chocolate{% endblock %}
+
+{% block account_content %}
+  <a href="{% url 'customer_area:orders' %}" class="btn btn-outline btn-sm" style="margin-bottom:1rem;">&larr; {% trans "Back to my orders" %}</a>
+  <span class="eyebrow">{% trans "Order" %} {{ order.order_number }}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">{{ order.total_amount }} {{ order.currency }}</h1>
+  <p class="muted" style="margin-bottom:1.75rem;">{{ order.created_at|date:"d/m/Y H:i" }}</p>
+
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:2rem;align-items:start;">
+
+    {# Items #}
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);overflow:hidden;">
+      <div style="padding:.85rem 1.2rem;border-bottom:1px solid var(--c-line);"><span class="eyebrow" style="margin:0;">{% trans "Items" %}</span></div>
+      {% for item in order.items.all %}
+        <div style="display:flex;justify-content:space-between;padding:.85rem 1.2rem;border-bottom:1px solid var(--c-line);">
+          <span>{{ item.quantity }} × {{ item.sku.sku_code }}</span>
+          <span>{{ item.subtotal }} {{ order.currency }}</span>
+        </div>
+      {% endfor %}
+      <div style="display:flex;justify-content:space-between;padding:.85rem 1.2rem;font-family:var(--font-title);text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;">
+        <span>{% trans "Total" %}</span><span>{{ order.total_amount }} {{ order.currency }}</span>
+      </div>
+    </div>
+
+    {# Status + shipping #}
+    <div style="display:flex;flex-direction:column;gap:1.25rem;">
+      <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);padding:1.2rem;">
+        <span class="eyebrow">{% trans "Status" %}</span>
+        <p style="margin:.5rem 0;"><span class="badge">{{ order.get_status_display }}</span></p>
+        <ol style="list-style:none;padding:0;margin:.5rem 0 0;font-size:.82rem;color:var(--c-text-2);line-height:1.9;">
+          <li>{% if order.status == 'pending' %}&#9679;{% else %}&#10003;{% endif %} {% trans "Pending" %}</li>
+          <li>{% if order.status in 'paid,processing,shipped,delivered' %}&#10003;{% else %}&#9675;{% endif %} {% trans "Paid" %}</li>
+          <li>{% if order.status in 'shipped,delivered' %}&#10003;{% else %}&#9675;{% endif %} {% trans "Shipped" %}</li>
+          <li>{% if order.status == 'delivered' %}&#10003;{% else %}&#9675;{% endif %} {% trans "Delivered" %}</li>
+        </ol>
+      </div>
+      <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);padding:1.2rem;">
+        <span class="eyebrow">{% trans "Shipping address" %}</span>
+        <p class="muted small" style="margin:.5rem 0 0;line-height:1.7;">
+          {{ order.shipping_first_name }} {{ order.shipping_last_name }}<br>
+          {{ order.shipping_address1 }}<br>
+          {% if order.shipping_address2 %}{{ order.shipping_address2 }}<br>{% endif %}
+          {{ order.shipping_postal_code }} {{ order.shipping_city }}<br>
+          {{ order.shipping_country }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <style>@media (max-width:768px){[style*="grid-template-columns:1.6fr 1fr"]{grid-template-columns:1fr !important;}}</style>
+{% endblock %}

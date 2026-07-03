@@ -1,0 +1,33 @@
+{% extends "customer_area/base_account.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My account" %} — Lamos Chocolate{% endblock %}
+
+{% block account_content %}
+  <span class="eyebrow">{% trans "My account" %}</span>
+  <h1 class="h-display" style="margin-bottom:.25rem;">
+    {% trans "Hello" %}, {{ customer.first_name|default:customer.email }}
+  </h1>
+  <p class="muted" style="margin-bottom:2rem;">{% trans "Welcome back to your space." %}</p>
+
+  {# --- Stat cards --- #}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:2.5rem;">
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.75rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2.6rem;line-height:1;">{{ stats.total_orders }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Total orders" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.75rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2.6rem;line-height:1;">{{ stats.pending_orders }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Pending orders" %}</p>
+    </div>
+  </div>
+
+  {# --- Quick links --- #}
+  <h2 class="eyebrow">{% trans "Quick access" %}</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+    <a href="{% url 'customer_area:orders' %}" class="btn btn-outline">{% trans "My orders" %}</a>
+    <a href="{% url 'customer_area:invoices' %}" class="btn btn-outline">{% trans "My invoices" %}</a>
+    <a href="{% url 'customer_area:addresses' %}" class="btn btn-outline">{% trans "My addresses" %}</a>
+    <a href="{% url 'customer_area:profile' %}" class="btn btn-outline">{% trans "My profile" %}</a>
+  </div>
+{% endblock %}

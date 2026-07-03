@@ -1,0 +1,32 @@
+{% extends "backoffice/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Orders" %} — Backoffice{% endblock %}
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "Orders" %}</h1>
+  <table class="table table-hover align-middle">
+    <thead><tr><th>{% trans "Order" %}</th><th>{% trans "Customer" %}</th><th>{% trans "Date" %}</th><th>{% trans "Status" %}</th><th class="text-end">{% trans "Total" %}</th><th>{% trans "Change status" %}</th></tr></thead>
+    <tbody>
+      {% for order in orders %}
+      <tr>
+        <td><code>{{ order.order_number }}</code></td>
+        <td>{{ order.customer.email }}</td>
+        <td>{{ order.created_at|date:"d/m/Y" }}</td>
+        <td><span class="badge bg-secondary">{{ order.get_status_display }}</span></td>
+        <td class="text-end">{{ order.total_amount }} {{ order.currency }}</td>
+        <td>
+          <form method="post" action="{% url 'backoffice:order_status' order.id %}" class="d-flex gap-1">
+            {% csrf_token %}
+            <select name="status" class="form-select form-select-sm">
+              <option value="pending">Pending</option><option value="paid">Paid</option>
+              <option value="processing">Processing</option><option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
+              <option value="refunded">Refunded</option>
+            </select>
+            <button class="btn btn-sm btn-primary">OK</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

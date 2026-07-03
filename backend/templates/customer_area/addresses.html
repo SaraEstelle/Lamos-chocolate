@@ -1,0 +1,45 @@
+{% extends "customer_area/base_account.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My addresses" %} — Lamos Chocolate{% endblock %}
+
+{% block account_content %}
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;">
+    <div>
+      <span class="eyebrow">{% trans "My account" %}</span>
+      <h1 class="h-display" style="margin:0;">{% trans "My addresses" %}</h1>
+    </div>
+    <a href="{% url 'customer_area:address_create' %}" class="btn btn-gold btn-sm">+ {% trans "Add address" %}</a>
+  </div>
+
+  {% if addresses %}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+      {% for address in addresses %}
+        <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);padding:1.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;">
+            <strong>{{ address.label|default:address.city }}</strong>
+            {% if address.is_default %}<span class="badge badge--new">{% trans "Default" %}</span>{% endif %}
+          </div>
+          <p class="muted small" style="line-height:1.7;margin-bottom:1rem;">
+            {{ address.full_name }}<br>
+            {{ address.line1 }}<br>
+            {% if address.line2 %}{{ address.line2 }}<br>{% endif %}
+            {{ address.postal_code }} {{ address.city }}<br>
+            {{ address.country }}
+          </p>
+          <div style="display:flex;gap:.5rem;align-items:center;">
+            <a href="{% url 'customer_area:address_edit' address.id %}" class="btn btn-sm btn-outline">{% trans "Edit" %}</a>
+            <form method="post" action="{% url 'customer_area:address_delete' address.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline" style="color:var(--c-danger);border-color:transparent;">{% trans "Delete" %}</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">{% trans "You have no saved addresses yet." %}</p>
+  {% endif %}
+
+  <style>@media (max-width:768px){[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}}</style>
+{% endblock %}

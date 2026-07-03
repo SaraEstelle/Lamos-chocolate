@@ -1,0 +1,74 @@
+{% extends "backoffice/base.html" %}
+{% load i18n l10n %}
+
+{% block title %}{% trans "Backoffice dashboard" %} — Lamos Chocolate{% endblock %}
+
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:.25rem;">{% trans "Dashboard" %}</h1>
+  <p class="muted" style="margin-bottom:2rem;">{% trans "Overview of operations." %}</p>
+
+  {# --- KPI cards (same style as the customer-area stat cards) --- #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2.5rem;">
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.revenue }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Revenue" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.order_count }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Paid orders" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.avg_basket }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Avg. basket" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.low_stock_count }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Low stock" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.b2b_revenue }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "B2B revenue" %}</p>
+    </div>
+  </div>
+
+  {# --- Revenue chart --- #}
+  <h2 class="eyebrow">{% trans "Revenue (last 30 days)" %}</h2>
+  <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.25rem;background:var(--c-ivory);margin-bottom:2.5rem;">
+    <canvas id="revenueChart" height="80"></canvas>
+  </div>
+
+  {# --- Top products --- #}
+  <h2 class="eyebrow">{% trans "Top products" %}</h2>
+  <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);overflow:hidden;">
+    {% for p in top_products %}
+    <div style="display:flex;justify-content:space-between;padding:.9rem 1.25rem;border-bottom:1px solid var(--c-line);">
+      <span>{{ p.sku__product__name_fr }}</span><span>{{ p.qty }}</span>
+    </div>
+    {% empty %}
+    <p class="muted" style="padding:1.25rem;margin:0;">{% trans "No sales yet." %}</p>
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Build the revenue chart from server data
+  const revenueData = [
+    {% localize off %}
+    {% for row in revenue_30d %}
+    {x: "{{ row.day|date:'Y-m-d' }}", y: {{ row.total }}},
+    {% endfor %}
+    {% endlocalize %}
+  ];
+  const ctx = document.getElementById('revenueChart');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: revenueData.map(d => d.x),
+      datasets: [{ label: 'Revenue (CHF)', data: revenueData.map(d => d.y), borderColor: '#6f4e37', tension: 0.3 }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends "base/base.html" %}
+{% load i18n custom_tags %}
+
+{% block title %}{{ product|localized:"name" }} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="section container">
+
+  {# --- Breadcrumb (Marbre, discret) --- #}
+  <p class="muted small" style="margin-bottom:1.5rem;">
+    <a href="{% url 'shop:catalog' %}" style="color:var(--c-gold-3)">{% trans "Shop" %}</a> ·
+    <a href="{% url 'shop:category' slug=product.category.slug %}" style="color:var(--c-gold-3)">{{ product.category|localized:"name" }}</a> ·
+    <span>{{ product|localized:"name" }}</span>
+  </p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;">
+
+    {# ============ LEFT: gallery ============ #}
+    <div>
+      {% if images %}
+        <img src="{{ product.primary_image_url }}" id="main-product-image"
+             alt="{{ product|localized:'name' }}"
+             style="width:100%;border:1px solid var(--c-line);border-radius:var(--radius);margin-bottom:.75rem;">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+          {% for image in images %}
+            <img src="{{ image.image_url }}" alt="{{ image.alt_text }}"
+                 onclick="document.getElementById('main-product-image').src=this.src"
+                 style="width:72px;height:72px;object-fit:cover;border:1px solid var(--c-line);border-radius:var(--radius);cursor:pointer;">
+          {% endfor %}
+        </div>
+      {% else %}
+        <div style="height:340px;border:1px solid var(--c-line);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:var(--c-marble-2);">
+          <span class="muted">{% trans "No image" %}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    {# ============ RIGHT: story + info ============ #}
+    <div>
+      <p class="eyebrow">{{ product.category|localized:"name" }}</p>
+      <h1 class="h-display" style="margin-bottom:1rem;">{{ product|localized:"name" }}</h1>
+
+      {# 1) STORYTELLING — the product presentation paragraph #}
+      {% with description=product|localized:"description" %}
+        {% if description %}
+          <div class="muted" style="line-height:1.9;margin-bottom:1.75rem;">{{ description|linebreaks }}</div>
+        {% endif %}
+      {% endwith %}
+
+      {# 2) INGREDIENTS #}
+      {% with ingredients=product|localized:"ingredients" %}
+        {% if ingredients %}
+          <h2 class="eyebrow">{% trans "Ingredients" %}</h2>
+          <p class="muted" style="margin-bottom:1.25rem;">{{ ingredients }}</p>
+        {% endif %}
+      {% endwith %}
+
+      {# 3) ALLERGENS #}
+      {% with allergens=product|localized:"allergens" %}
+        {% if allergens %}
+          <h2 class="eyebrow">{% trans "Allergens" %}</h2>
+          <p class="muted" style="margin-bottom:1.75rem;">{{ allergens }}</p>
+        {% endif %}
+      {% endwith %}
+
+      {# 4) FORMATS / VARIANTS #}
+      <h2 class="eyebrow">{% trans "Available formats" %}</h2>
+      {% url 'cart:add' as cart_add_url %}
+      <div style="display:flex;flex-direction:column;gap:.85rem;">
+        {% for sku in skus %}
+          <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
+              <div>
+                {% comment %}
+                Show what actually distinguishes the SKUs. `format` is often identical
+                across flavours, so fall back to the unique sku_code to avoid the
+                "duplicate rows" effect seen on Truffes/Carrés. TODO: add a real
+                `variant_name`/`flavor` field on SKU to show the flavour name here.
+                {% endcomment %}
+                <strong>{{ sku.format }}</strong>
+                {% if sku.weight_g %}<span class="muted">· {{ sku.weight_g }}g</span>{% endif %}
+                <div class="muted small">{{ sku.sku_code }}</div>
+                <div style="font-family:var(--font-title);margin-top:.35rem;">{{ sku.price }} {{ sku.currency }}</div>
+                {% if sku.stock.quantity > 0 %}
+                  <span class="badge badge--new">{% trans "In stock" %}</span>
+                {% else %}
+                  <span class="badge">{% trans "Out of stock" %}</span>
+                {% endif %}
+              </div>
+              <div>
+                {% if cart_add_url %}
+                  <form action="{{ cart_add_url }}" method="post"
+                        style="display:flex;gap:.4rem;align-items:center;"
+                        data-cart-add data-added-label="{% trans 'Added to your cart.' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="sku_id" value="{{ sku.id }}">
+                    <input type="number" name="quantity" value="1" min="1"
+                           class="field-input" style="width:64px;">
+                    <button type="submit" class="btn btn-gold btn-sm"
+                            {% if sku.stock.quantity == 0 %}disabled{% endif %}>
+                      {% trans "Add to cart" %}
+                    </button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+
+            {% if sku.delivery_estimates %}
+              <div class="muted small" style="margin-top:.6rem;">
+                {% trans "Estimated delivery:" %}
+                {% for estimate in sku.delivery_estimates %}
+                  <span class="badge" style="margin-left:.25rem;">{{ estimate.zone.zone_name }}: {{ estimate.days }}{% trans "d" %}</span>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% empty %}
+          <p class="muted">{% trans "No formats available." %}</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width:768px){
+    section.section .container, /* safety */
+    div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important;}
+  }
+</style>
+{% endblock %}

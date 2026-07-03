@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block content %}
+<section class="section container">
+  <div class="account-layout">
+    <!-- Sidebar -->
+    <aside class="account-sidebar">
+      <p class="eyebrow">{% trans "My account" %}</p>
+      <nav class="account-nav" aria-label="{% trans 'Account navigation' %}">
+        <a href="{% url 'customer_area:dashboard' %}">{% trans "Overview" %}</a>
+        <a href="{% url 'customer_area:orders' %}">{% trans "Orders" %}</a>
+        <a href="{% url 'customer_area:invoices' %}">{% trans "Invoices" %}</a>
+        <a href="{% url 'customer_area:addresses' %}">{% trans "Addresses" %}</a>
+        <a href="{% url 'customer_area:profile' %}">{% trans "Profile" %}</a>
+        <a href="{% url 'customer_area:password_change' %}">{% trans "Password" %}</a>
+        <a href="{% url 'accounts:logout' %}">{% trans "Log out" %}</a>
+      </nav>
+    </aside>
+    <!-- Content -->
+    <div class="account-content">
+      {% block account_content %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,16 @@
+# ============================
+# Base dependencies (all environments)
+# ============================
+
+# Web framework
+Django==5.2
+
+# PostgreSQL database adapter
+psycopg2-binary==2.9.9
+
+# Read configuration from environment variables (.env)
+python-decouple==3.8
+
+# Stripe payment integration
+stripe==11.1.0
+django-allauth[socialaccount]>=64,<66

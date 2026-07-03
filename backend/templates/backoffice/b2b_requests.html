@@ -1,0 +1,29 @@
+{% extends "backoffice/base.html" %}
+{% load i18n %}
+{% block title %}{% trans "B2B requests" %} — Backoffice{% endblock %}
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "B2B requests" %}</h1>
+  <table class="table table-hover align-middle">
+    <thead><tr><th>{% trans "Company" %}</th><th>{% trans "Contact" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th><th>{% trans "Change" %}</th></tr></thead>
+    <tbody>
+      {% for r in requests %}
+      <tr>
+        <td>{{ r.company_name }}</td>
+        <td>{{ r.contact_name }}<br><small class="text-muted">{{ r.contact_email }}</small></td>
+        <td>{{ r.estimated_qty|default:"—" }}</td>
+        <td><span class="badge bg-secondary">{{ r.get_status_display }}</span></td>
+        <td>
+          <form method="post" action="{% url 'backoffice:b2b_status' r.id %}" class="d-flex gap-1">
+            {% csrf_token %}
+            <select name="status" class="form-select form-select-sm">
+              <option value="new">New</option><option value="in_progress">In progress</option>
+              <option value="converted">Converted</option><option value="refused">Refused</option>
+            </select>
+            <button class="btn btn-sm btn-primary">OK</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

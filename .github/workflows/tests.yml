@@ -1,0 +1,90 @@
+# =============================================================================
+#  tests.yml  —  Automated tests + coverage (reusable workflow)
+# -----------------------------------------------------------------------------
+#  Role:
+#    Spin up a real PostgreSQL database, install the project, run pytest.
+#    Coverage threshold (--cov-fail-under=70) is ALREADY defined in
+#    backend/pytest.ini, so the job fails automatically if coverage drops
+#    below 70%. You do not need to repeat it here.
+#
+#  Why a real Postgres and not SQLite?
+#    The project uses PostgreSQL-specific things (UUID PKs, JSON, etc.).
+#    Testing on the same engine as production avoids "works on my machine".
+# =============================================================================
+
+name: Tests
+
+on:
+  workflow_call:        # invoked by ci.yml
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    # A throwaway PostgreSQL container, alive only for this job.
+    # GitHub maps it to localhost:5432 on the runner.
+    services:
+      postgres:
+        image: postgres:16-alpine        # same major version as docker-compose
+        env:
+          POSTGRES_DB: lamos_chocolate
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        # Wait until Postgres is actually ready before running tests.
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Environment variables Django reads via python-decouple (config(...)).
+    # SECRET_KEY has NO default in settings/base.py, so it MUST be provided.
+    # POSTGRES_HOST is "localhost" here (NOT "postgres"): on the runner the
+    # service is reachable on localhost, unlike inside docker-compose.
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      SECRET_KEY: ci-dummy-secret-key-not-used-in-prod
+      DEBUG: "False"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      POSTGRES_DB: lamos_chocolate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # Install the test toolchain (which pulls base.txt -> Django, psycopg2...).
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/test.txt
+
+      # Run the suite. pytest.ini already sets addopts (coverage, --cov-fail-under=70).
+      - name: Run pytest
+        run: pytest
+
+      # Publish the HTML coverage report as a downloadable artifact.
+      # Handy to show the grader the exact coverage per file.
+      - name: Upload coverage report
+        if: always()                       # upload even if tests failed
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: backend/htmlcov/
+          retention-days: 7
+          if-no-files-found: ignore

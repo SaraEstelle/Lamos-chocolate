@@ -1,0 +1,14 @@
+{% extends "emails/base_email.html" %}
+{% load i18n %}
+
+{% block subject %}{% trans "Your order has shipped" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<h2 style="color: #6f4e37;">📦 {% trans "Your order is on its way!" %}</h2>
+<p>{% trans "Hello" %} {{ order.shipping_first_name|default:"" }},</p>
+<p>{% trans "Good news! Your order" %} <strong>{{ order.order_number }}</strong> {% trans "has been shipped." %}</p>
+{% if order.estimated_delivery_days %}
+<p>{% trans "Estimated delivery" %}: {{ order.estimated_delivery_days }} {% trans "days" %}.</p>
+{% endif %}
+<p>{% trans "Thank you for shopping with us!" %}</p>
+{% endblock %}

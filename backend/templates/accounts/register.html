@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign up" %} · Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="section container" style="max-width:520px;">
+  <div style="text-align:center;margin-bottom:2rem;">
+    <span class="eyebrow">{% trans "Create your account" %}</span>
+    <h1 class="h-display">{% trans "Join Lamos" %}</h1>
+    <span class="gold-line" style="margin:1rem auto 0;"></span>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">
+          {{ field.label }}{% if field.field.required %} *{% endif %}
+        </label>
+        {{ field }}
+        {% if field.help_text %}<p class="muted small">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<p class="small" style="color:var(--c-danger)">{{ field.errors|striptags }}</p>{% endif %}
+      </div>
+    {% endfor %}
+
+    {# GDPR / nLPD consent — raw input named "gdpr" (read by the view). #}
+    <label style="display:flex;align-items:flex-start;gap:.5rem;margin:1rem 0 1.25rem;font-size:.85rem;color:var(--c-text-2);">
+      <input type="checkbox" id="gdpr" name="gdpr" required style="margin-top:.2rem;">
+      <span>{% trans "I accept the" %}
+        <a href="{% url 'main:privacy' %}" target="_blank" style="color:var(--c-gold-3)">{% trans "privacy policy" %}</a>
+      </span>
+    </label>
+
+    <button type="submit" class="btn btn-gold btn-lg" style="width:100%;">{% trans "Sign up" %} &rarr;</button>
+  </form>
+
+  <p class="muted small" style="text-align:center;margin-top:1.25rem;">
+    {% trans "Already have an account?" %}
+    <a href="{% url 'accounts:login' %}" style="color:var(--c-gold-3)">{% trans "Log in" %}</a>
+  </p>
+</section>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block title %}{% trans "About Us" %} · Lamos Chocolate{% endblock %}
+
+{% block content %}
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <p class="hero-eyebrow reveal">{% trans "Our story" %}</p>
+  <h1 class="h-display h-display-center reveal delay-1" style="max-width:18ch;margin-inline:auto;">
+    {% trans "The spirit of Dubai," %}<br><em>{% trans "the nobility of Swiss chocolate" %}</em>
+  </h1>
+  <p class="hero-tagline reveal delay-2">{% trans "A house born between two worlds: oriental luxury and Helvetic excellence." %}</p>
+</section>
+
+<!-- ═══ STORY ═══ -->
+<section class="section">
+  <div class="container">
+    <div class="story-grid">
+      <div class="story-visual reveal-left">
+        <img src="{% static 'images/story-main.webp' %}" alt="Lamos Chocolate" class="story-img" width="600" height="750">
+        <div class="story-year">
+          <span class="story-year-num">2021</span>
+          <span class="story-year-label">{% trans "Founded" %}</span>
+        </div>
+      </div>
+      <div class="reveal-right">
+        <span class="gold-line gold-line-left"></span>
+        <span class="eyebrow">{% trans "The DNA of an extraordinary house" %}</span>
+        <h2 class="h-display">{% trans "A story born" %}<br><em>{% trans "long before chocolate" %}</em></h2>
+        <blockquote class="story-quote">« {% trans "LAMOS was not born from chocolate. LAMOS was born from excellence." %} »</blockquote>
+        <p class="story-body">{% trans "Before LAMOS Chocolate, there was LAMOS Sweets — a house founded in Dubai, recognised for its absolute standards in high-end pastry." %}</p>
+        <p class="story-body">{% trans "In 2021, this culture of detail met chocolate. Not as one more product, but as the natural culmination of a craft already praised by the Gulf's 5-star hotels and luxury houses." %}</p>
+        <div class="story-badges">
+          <span class="badge">Fondé 2021</span>
+          <span class="badge">Dubai · Suisse</span>
+          <span class="badge">Manufacture Artisanale</span>
+          <span class="badge">Chefs Primés</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ INGREDIENTS ═══ -->
+<section class="section section--alt">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="gold-line"></span>
+      <span class="eyebrow">{% trans "Ingredients as a statement of faith" %}</span>
+      <h2 class="h-display h-display-center">{% trans "In premium chocolate," %}<br><em>{% trans "the ingredients are the story" %}</em></h2>
+    </div>
+    <div class="ing-cards">
+      <div class="ing-card reveal">
+        <span class="ing-flag">🇨🇭 Suisse</span><div class="ing-icon">🍫</div>
+        <h3 class="ing-name">Chocolat Carma</h3>
+        <p class="ing-sub">{% trans "The absolute Swiss benchmark, chosen by the best chocolatiers in the world." %}</p>
+      </div>
+      <div class="ing-card reveal delay-2">
+        <span class="ing-flag">🇧🇪 Belgique</span><div class="ing-icon">🌿</div>
+        <h3 class="ing-name">Crème Callebaut</h3>
+        <p class="ing-sub">{% trans "An incomparable cream, prized by international pastry chefs." %}</p>
+      </div>
+      <div class="ing-card reveal delay-4">
+        <span class="ing-flag">🇮🇷 Rafsanjan</span><div class="ing-icon">🌰</div>
+        <h3 class="ing-name">Pistaches Rafsanjan</h3>
+        <p class="ing-sub">{% trans "The most sought-after pistachios in the world — deep green, rare sweetness." %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section class="section philosophy">
+  <div class="container">
+    <span class="gold-line reveal" style="margin-inline:auto;"></span>
+    <blockquote class="phil-quote reveal">
+      « {% trans "Some houses are born to sell, and some are born to" %} <em>{% trans "move us" %}</em>.<br>{% trans "LAMOS belongs to the second." %} »
+    </blockquote>
+    <p class="phil-attr reveal delay-2">— {% trans "The spirit of Lamos Chocolate" %}</p>
+    <div class="reveal delay-3" style="margin-top:2.5rem;">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-gold btn-lg">{% trans "Discover our creations" %}</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

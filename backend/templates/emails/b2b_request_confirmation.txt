@@ -1,0 +1,7 @@
+{% load i18n %}{% autoescape off %}
+{% blocktrans with name=req.contact_name %}Hello {{ name }},{% endblocktrans %}
+
+{% trans "We received your professional request and will get back to you shortly." %}
+
+{% trans "Lamos Chocolate" %}
+{% endautoescape %}

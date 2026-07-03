@@ -1,0 +1,52 @@
+# =============================================================================
+#  ci.yml  —  Main CI pipeline (orchestrator)
+# -----------------------------------------------------------------------------
+#  ROLE OF THIS FILE
+#    This is the SINGLE entry point of the pipeline. It contains no logic of
+#    its own: it "calls" three reusable workflows (lint / tests / security)
+#    and runs them as three parallel jobs. Think "conductor + musicians".
+#
+#  WHY AN ORCHESTRATOR?
+#    - One place to read the whole status on any branch or Pull Request.
+#    - No duplicated runs: lint/tests/security are `workflow_call` only, so
+#      they never run on their own — only when this file calls them.
+#
+#  IMPORTANT (this is the fix vs the previous version):
+#    It now runs on EVERY branch, not just develop/main. That way you can see
+#    the pipeline go green on your own feature branch (e.g. feature/github-
+#    actions) BEFORE opening a Pull Request or doing the demo.
+#
+#  REUSABLE REFERENCE SYNTAX
+#    jobs.<id>.uses: ./.github/workflows/<file>.yml
+#    The path MUST start with "./" and match the filename EXACTLY.
+#    The called file MUST declare `on: workflow_call` (lint/tests/security do).
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]        # ALL branches — feature branches included
+  pull_request:             # every Pull Request (the important gate for reviews)
+
+# If you push twice quickly on the same branch/PR, cancel the older run.
+# Saves CI minutes and avoids two runs racing each other.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---- 1. Code style / linting ---------------------------------------------
+  lint:
+    name: Lint (black, isort, flake8)
+    uses: ./.github/workflows/lint.yml
+
+  # ---- 2. Automated tests + coverage ---------------------------------------
+  tests:
+    name: Tests (pytest + PostgreSQL)
+    uses: ./.github/workflows/tests.yml
+
+  # ---- 3. Security scanning -------------------------------------------------
+  security:
+    name: Security (pip-audit, bandit, deploy check)
+    uses: ./.github/workflows/security.yml

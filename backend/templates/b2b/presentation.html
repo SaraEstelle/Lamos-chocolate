@@ -1,0 +1,112 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Professionals — Corporate Gifting" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="section container" style="max-width:1040px;">
+
+  <div style="text-align:center;margin-bottom:3.5rem;">
+    <span class="eyebrow">{% trans "Corporate gifting & B2B" %}</span>
+    <h1 class="h-display h-display-center">
+      {% trans "The" %} <em>{% trans "art" %}</em> {% trans "of the professional gift" %}
+    </h1>
+    <span class="gold-line" style="margin:1rem auto;"></span>
+    <p class="muted" style="max-width:620px;margin:0 auto;">
+      {% trans "Swiss chocolate elevated to a corporate signature. From a private bank's year-end gift to a luxury hotel's welcome amenity, every box carries your name — engraved, packaged and delivered to your standards." %}
+    </p>
+    <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-top:1.75rem;">
+      <a href="{% url 'b2b:request' %}" class="btn btn-gold">{% trans "Request a quote" %}</a>
+      {% if user.is_authenticated and user.b2b_account %}
+        <a href="{% url 'b2b:portal' %}" class="btn btn-outline">{% trans "Enter the pro space" %}</a>
+      {% else %}
+        <a href="{% url 'b2b:register' %}" class="btn btn-outline">{% trans "Create a pro account" %}</a>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div style="text-align:center;margin-bottom:1rem;">
+    <span class="eyebrow">{% trans "Trusted by demanding houses" %}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:3.5rem;">
+    {% comment %} Each segment = one value proposition, kept short. {% endcomment %}
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.4rem;text-align:center;background:var(--c-ivory);">
+      <div style="font-size:1.8rem;" aria-hidden="true">🏨</div>
+      <strong style="display:block;margin-top:.4rem;">{% trans "Luxury hotels" %}</strong>
+      <p class="muted" style="font-size:.82rem;margin-top:.3rem;">{% trans "Welcome amenities & suite gifts" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.4rem;text-align:center;background:var(--c-ivory);">
+      <div style="font-size:1.8rem;" aria-hidden="true">🏦</div>
+      <strong style="display:block;margin-top:.4rem;">{% trans "Private banks" %}</strong>
+      <p class="muted" style="font-size:.82rem;margin-top:.3rem;">{% trans "Client & year-end gifting" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.4rem;text-align:center;background:var(--c-ivory);">
+      <div style="font-size:1.8rem;" aria-hidden="true">⌚</div>
+      <strong style="display:block;margin-top:.4rem;">{% trans "Watchmakers" %}</strong>
+      <p class="muted" style="font-size:.82rem;margin-top:.3rem;">{% trans "Boutique & event gifting" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.4rem;text-align:center;background:var(--c-ivory);">
+      <div style="font-size:1.8rem;" aria-hidden="true">🎁</div>
+      <strong style="display:block;margin-top:.4rem;">{% trans "Corporate events" %}</strong>
+      <p class="muted" style="font-size:.82rem;margin-top:.3rem;">{% trans "Seminars, launches, galas" %}</p>
+    </div>
+  </div>
+
+
+  <div style="text-align:center;margin-bottom:.5rem;">
+    <span class="eyebrow">{% trans "Four axes of personalisation" %}</span>
+    <h2 class="h-display" style="font-size:1.9rem;">{% trans "Make it unmistakably yours" %}</h2>
+    <span class="gold-line" style="margin:.75rem auto 1.75rem;"></span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+    <div style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);border-radius:var(--radius);padding:1.4rem;background:var(--c-ivory);">
+      <strong>{% trans "1 · Engraved logo" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.4rem;">{% trans "Your emblem embossed directly onto each chocolate." %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);border-radius:var(--radius);padding:1.4rem;background:var(--c-ivory);">
+      <strong>{% trans "2 · Inner packaging" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.4rem;">{% trans "Trays, liners and dividers in your colours." %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);border-radius:var(--radius);padding:1.4rem;background:var(--c-ivory);">
+      <strong>{% trans "3 · Outer packaging" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.4rem;">{% trans "Boxes, sleeves and ribbons with your branding." %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-left:3px solid var(--c-gold);border-radius:var(--radius);padding:1.4rem;background:var(--c-ivory);">
+      <strong>{% trans "4 · Weight & format" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.4rem;">{% trans "From bite-size favours to grand presentation boxes." %}</p>
+    </div>
+  </div>
+
+
+  <div style="text-align:center;margin:3.5rem 0 1.5rem;">
+    <span class="eyebrow">{% trans "How it works" %}</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+    <div style="text-align:center;padding:1rem;">
+      <div style="font-family:var(--font-display);font-size:2rem;color:var(--c-gold);">01</div>
+      <strong>{% trans "Tell us your project" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.3rem;">{% trans "Volume, occasion, deadline and branding." %}</p>
+    </div>
+    <div style="text-align:center;padding:1rem;">
+      <div style="font-family:var(--font-display);font-size:2rem;color:var(--c-gold);">02</div>
+      <strong>{% trans "Receive a tailored quote" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.3rem;">{% trans "Priced by our team, validated by a human." %}</p>
+    </div>
+    <div style="text-align:center;padding:1rem;">
+      <div style="font-family:var(--font-display);font-size:2rem;color:var(--c-gold);">03</div>
+      <strong>{% trans "We craft & deliver" %}</strong>
+      <p class="muted" style="font-size:.85rem;margin-top:.3rem;">{% trans "Swiss-made, delivered on your schedule." %}</p>
+    </div>
+  </div>
+
+
+  <div style="text-align:center;margin-top:3rem;">
+    <a href="{% url 'b2b:request' %}" class="btn btn-gold btn-lg">{% trans "Tell us about your project" %} &rarr;</a>
+    <p class="muted" style="font-size:.8rem;margin-top:.9rem;">
+      {% trans "A dedicated account manager replies within 24–48h." %}
+    </p>
+  </div>
+
+</section>
+{% endblock %}

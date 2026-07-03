@@ -1,0 +1,40 @@
+{% extends "customer_area/base_account.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "My profile" %} — Lamos Chocolate{% endblock %}
+
+{% block account_content %}
+  <span class="eyebrow">{% trans "My account" %}</span>
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "My profile" %}</h1>
+
+  <form method="post" novalidate style="max-width:560px;">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="small" style="color:var(--c-danger)">{{ field.errors|striptags }}</p>{% endif %}
+      </div>
+    {% endfor %}
+    <div style="display:flex;gap:.75rem;align-items:center;margin-top:.5rem;">
+      <button type="submit" class="btn btn-gold">{% trans "Save changes" %}</button>
+      <a href="{% url 'customer_area:dashboard' %}" class="btn btn-outline">{% trans "Cancel" %}</a>
+    </div>
+
+    <div class="account-section mt-5">
+        <h3>Mes données personnelles</h3>
+
+        <p class="text-muted">
+            Vous pouvez télécharger une copie de toutes les données personnelles
+            enregistrées sur votre compte conformément au RGPD et à la nLPD.
+        </p>
+
+        <a href="{% url 'customer_area:data_export' %}"
+        class="btn btn-primary">
+            Télécharger mes données
+        </a>
+    </div>
+
+  </form>
+
+{% endblock %}

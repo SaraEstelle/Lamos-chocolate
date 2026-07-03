@@ -1,0 +1,25 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% block content %}
+<section class="section container">
+  <div class="account-layout">
+    <!-- Sidebar (same marble layout as the customer area) -->
+    <aside class="account-sidebar">
+      <p class="eyebrow">{% trans "Backoffice" %}</p>
+      <nav class="account-nav" aria-label="{% trans 'Backoffice navigation' %}">
+        <a href="{% url 'backoffice:dashboard' %}">{% trans "Dashboard" %}</a>
+        <a href="{% url 'backoffice:orders' %}">{% trans "Orders" %}</a>
+        <a href="{% url 'backoffice:stock' %}">{% trans "Stock" %}</a>
+        <a href="{% url 'backoffice:forecasting' %}">{% trans "Forecasting" %}</a>
+        <a href="{% url 'backoffice:b2b_requests' %}">{% trans "B2B requests" %}</a>
+        <a href="{% url 'backoffice:b2b_accounts' %}">{% trans "Pro account validation" %}</a>
+        <a href="{% url 'cockpit:dashboard' %}">{% trans "Executive cockpit" %} &rarr;</a>
+      </nav>
+    </aside>
+    <!-- Content -->
+    <div class="account-content">
+      {% block bo_content %}{% endblock %}
+    </div>
+  </div>
+</section>
+{% endblock %}

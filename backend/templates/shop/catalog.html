@@ -1,0 +1,62 @@
+{% extends "base/base.html" %}
+{% load i18n static custom_tags %}
+
+{% block title %}{% trans "Shop" %} · Lamos Chocolate{% endblock %}
+
+{% block content %}
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <p class="hero-eyebrow reveal">{% trans "Our collection" %}</p>
+  <h1 class="h-display h-display-center reveal delay-1">{% trans "The" %} <em>{% trans "creations" %}</em> LAMO'S</h1>
+  <p class="hero-tagline reveal delay-2">{% trans "Handcrafted bars, premium ingredients, packaging to match. Choose, customise, savour." %}</p>
+</section>
+
+<!-- ═══ GRID ═══ -->
+<section class="section">
+  <div class="container">
+
+    {# --- Filtres par catégorie (filtrage client, classes .filter-btn) --- #}
+    <div class="shop-filters reveal" id="shop-filters">
+      <button class="filter-btn active" data-filter="all">{% trans "View all" %}</button>
+      {% for category in categories %}
+        <button class="filter-btn" data-filter="{{ category.slug }}">{{ category|localized:"name" }}</button>
+      {% endfor %}
+    </div>
+
+    {# --- Grille produits (un produit = une carte ; détail = galerie multi-images) --- #}
+    <div class="product-grid" id="product-grid">
+      {% for product in products %}
+        <article class="product-card reveal" data-category="{{ product.category.slug }}">
+          <a href="{% url 'shop:product_detail' slug=product.slug %}" class="pc-image-wrap">
+            {% with img=product.images.first %}
+              {% if img %}
+                <img src="{{ img.image_url }}" alt="{{ product|localized:'name' }}" class="pc-image" loading="lazy">
+              {% else %}
+                {# fallback image si le produit n'a pas encore de visuel #}
+                <img src="{% static 'images/logo.webp' %}" alt="{{ product|localized:'name' }}" class="pc-image" loading="lazy" style="object-fit:contain;padding:2rem;opacity:.5;">
+              {% endif %}
+            {% endwith %}
+            {% if product.is_new %}<span class="pc-tag pc-tag--new">{% trans "New" %}</span>{% endif %}
+          </a>
+          <div class="pc-body">
+            <div class="pc-category">{{ product.category|localized:"name" }}</div>
+            <h2 class="pc-name">{{ product|localized:"name" }}</h2>
+            <p class="pc-desc">{{ product|localized:"description"|truncatewords:22 }}</p>
+            <div class="pc-footer">
+              {% with sku=product.skus.all|dictsort:"price"|first %}
+                {% if sku %}<span class="pc-price">dès CHF {{ sku.price }}</span>{% else %}<span class="pc-price">—</span>{% endif %}
+              {% endwith %}
+              <a href="{% url 'shop:product_detail' slug=product.slug %}" class="btn btn-sm btn-gold">{% trans "View" %}</a>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <p class="muted text-center" style="grid-column:1/-1;">{% trans "No products available yet. (Load the product fixtures to fill the shop.)" %}</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

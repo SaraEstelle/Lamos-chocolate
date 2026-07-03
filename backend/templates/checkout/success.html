@@ -1,0 +1,15 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Payment received" %} — Lamos Chocolate{% endblock %}
+
+{% block content %}
+<section class="section container" style="max-width:560px;text-align:center;">
+  <div style="font-size:3rem;color:var(--c-gold);">&#10003;</div>
+  <span class="eyebrow">{% trans "Order confirmed" %}</span>
+  <h1 class="h-display">{% trans "Thank you for your order!" %}</h1>
+  <span class="gold-line" style="margin:1rem auto;"></span>
+  <p class="muted">{% trans "Your payment was successful. You will receive your order details by email shortly." %}</p>
+  <a href="{% url 'shop:catalog' %}" class="btn btn-gold" style="margin-top:1.5rem;">{% trans "Continue shopping" %}</a>
+</section>
+{% endblock %}

@@ -1,0 +1,245 @@
+{% extends "base/base.html" %}
+{% load i18n static %}
+
+{% block title %}Lamos Chocolate · {% trans "The spirit of Dubai, the nobility of Swiss chocolate" %}{% endblock %}
+{% block meta_description %}{% trans "LAMO'S CHOCOLATE — Artisan manufacture founded in Dubai in 2021. Pistachio & Kunafa, Pecan Praline, Matcha. Dubai · Switzerland." %}{% endblock %}
+
+{% block content %}
+
+<!-- ═══ HERO (fond vidéo de production, auto-hébergé) ═══ -->
+<section class="hero hero--video">
+  {# Vidéo de fond : muted + autoplay + playsinline = lecture auto autorisée.   #}
+  {# preload="metadata" = on ne télécharge pas tout d'un coup. poster = fallback. #}
+  <video class="hero-video" autoplay muted loop playsinline preload="metadata"
+         poster="{% static 'images/hero-poster.webp' %}" aria-hidden="true" tabindex="-1">
+    <source src="{% static 'videos/production.webm' %}" type="video/webm">
+    <source src="{% static 'videos/production.mp4' %}"  type="video/mp4">
+  </video>
+
+  {# Voile dégradé : assombrit juste ce qu'il faut pour garder le texte lisible.  #}
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  {# Contenu au-dessus de la vidéo (plus de couronne ni de gros logo LAMO'S).     #}
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal">Dubai · Switzerland · Since 2021</p>
+    <div class="hero-divider reveal delay-1"></div>
+    <p class="hero-tagline reveal delay-2">
+      {% trans "The spirit of Dubai, the nobility of Swiss chocolate. An artisan manufacture born at the crossroads of East and West." %}
+    </p>
+    <div class="hero-actions reveal delay-3">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-gold btn-lg">{% trans "Discover our creations" %}</a>
+      <a href="{% url 'main:about' %}" class="btn btn-outline-light btn-lg">{% trans "Our story" %}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARQUEE ═══ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-inner">
+    <span class="marquee-item">Pistachio &amp; Kunafa</span>
+    <span class="marquee-item">Manufacture Artisanale</span>
+    <span class="marquee-item">Dubai Chocolate Original</span>
+    <span class="marquee-item">Chocolat Carma Suisse</span>
+    <span class="marquee-item">Pistaches Rafsanjan</span>
+    <span class="marquee-item">Crème Callebaut</span>
+    <span class="marquee-item">100% Personnalisable</span>
+    <!-- duplicata pour boucle continue -->
+    <span class="marquee-item">Pistachio &amp; Kunafa</span>
+    <span class="marquee-item">Manufacture Artisanale</span>
+    <span class="marquee-item">Dubai Chocolate Original</span>
+    <span class="marquee-item">Chocolat Carma Suisse</span>
+    <span class="marquee-item">Pistaches Rafsanjan</span>
+    <span class="marquee-item">Crème Callebaut</span>
+    <span class="marquee-item">100% Personnalisable</span>
+  </div>
+</div>
+
+<!-- ═══ INTRO ═══ -->
+<section class="section-sm">
+  <div class="container">
+    <div class="intro-grid">
+      <div class="intro-block reveal">
+        <div class="intro-icon">🌍</div>
+        <div class="intro-label">{% trans "Origin" %}</div>
+        <div class="intro-value">{% trans "Founded in Dubai, arrived in Switzerland" %}</div>
+      </div>
+      <div class="intro-sep"></div>
+      <div class="intro-block reveal delay-2">
+        <div class="intro-icon">✦</div>
+        <div class="intro-label">{% trans "Philosophy" %}</div>
+        <div class="intro-value">{% trans "The original, not the imitator" %}</div>
+      </div>
+      <div class="intro-sep"></div>
+      <div class="intro-block reveal delay-4">
+        <div class="intro-icon">🎁</div>
+        <div class="intro-label">{% trans "Customization" %}</div>
+        <div class="intro-value">{% trans "100% bespoke, from the bar to the packaging" %}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STORY ═══ -->
+<section class="section section--alt">
+  <div class="container">
+    <div class="story-grid">
+      <div class="story-visual reveal-left">
+        <img src="{% static 'images/story-main.webp' %}" alt="Lamos Chocolate" class="story-img" width="600" height="750">
+        <div class="story-year">
+          <span class="story-year-num">2021</span>
+          <span class="story-year-label">{% trans "Founded" %}</span>
+        </div>
+      </div>
+      <div class="story-text-side reveal-right">
+        <span class="gold-line gold-line-left"></span>
+        <span class="eyebrow">{% trans "The DNA of an extraordinary house" %}</span>
+        <h2 class="h-display">{% trans "Born long before" %} <em>{% trans "chocolate" %}</em></h2>
+        <blockquote class="story-quote">
+          « {% trans "LAMOS was not born from chocolate. LAMOS was born from excellence." %} »
+        </blockquote>
+        <p class="story-body">{% trans "Before LAMOS Chocolate, there was LAMOS Sweets — a house founded in Dubai, built on a rare obsession in fine gastronomy: the absolute excellence of high-end pastry." %}</p>
+        <p class="story-body">{% trans "In 2021, this culture of detail met chocolate — not as one more product, but as the natural culmination of a craft already proven with the Gulf's 5-star hotels, private banks and jewellery houses." %}</p>
+        <div class="story-badges">
+          <span class="badge">Fondé 2021</span>
+          <span class="badge">Dubai · Suisse</span>
+          <span class="badge">Manufacture Artisanale</span>
+          <span class="badge">Chefs Primés</span>
+        </div>
+        <div style="margin-top:2rem;">
+          <a href="{% url 'main:about' %}" class="btn btn-outline">{% trans "Read our full story" %}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURED ═══ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="gold-line"></span>
+      <span class="eyebrow">{% trans "Our signature creations" %}</span>
+      <h2 class="h-display h-display-center">{% trans "The art of" %} <em>{% trans "exceptional chocolate" %}</em></h2>
+      <p class="muted">{% trans "Each bar is handcrafted by award-winning chefs, with ingredients selected from the four corners of the world." %}</p>
+    </div>
+
+    <div class="product-grid">
+      <article class="product-card reveal">
+        <div class="pc-image-wrap">
+          <img src="{% static 'images/pistachio-200g.webp' %}" alt="Pistachio &amp; Kunafa" class="pc-image" loading="lazy">
+          <span class="pc-tag">Signature</span>
+        </div>
+        <div class="pc-body">
+          <div class="pc-category">Chocolat Dubai · Milk</div>
+          <h3 class="pc-name">Pistachio &amp; Kunafa</h3>
+          <p class="pc-desc">{% trans "Artisan pistachio-kunafa cream (35%) in a silky Carma milk chocolate. The original LAMOS technique — the one that started it all." %}</p>
+          <div class="pc-footer">
+            <span class="pc-price">dès CHF 9.50<small>45g · 80g · 200g</small></span>
+            <a href="{% url 'shop:catalog' %}" class="btn btn-sm btn-gold">{% trans "Order" %}</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card reveal delay-2">
+        <div class="pc-image-wrap">
+          <img src="{% static 'images/pecan-praline.webp' %}" alt="Pecan Praline" class="pc-image" loading="lazy">
+        </div>
+        <div class="pc-body">
+          <div class="pc-category">Chocolat Noir · Dark</div>
+          <h3 class="pc-name">Pecan Praline</h3>
+          <p class="pc-desc">{% trans "Intense dark couverture (55.2%) with a silky pecan praline (55%). Woody softness, bold character, absolute finesse." %}</p>
+          <div class="pc-footer">
+            <span class="pc-price">CHF 15.90<small>80g</small></span>
+            <a href="{% url 'shop:catalog' %}" class="btn btn-sm btn-gold">{% trans "Order" %}</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-card reveal delay-3">
+        <div class="pc-image-wrap">
+          <img src="{% static 'images/matcha.webp' %}" alt="Matcha" class="pc-image" loading="lazy">
+          <span class="pc-tag pc-tag--new">{% trans "New" %}</span>
+        </div>
+        <div class="pc-body">
+          <div class="pc-category">Collection Exclusive</div>
+          <h3 class="pc-name">Matcha</h3>
+          <p class="pc-desc">{% trans "Grade A ceremonial matcha meeting Swiss Carma white chocolate. From Japan to Geneva, via Dubai." %}</p>
+          <div class="pc-footer">
+            <span class="pc-price">CHF 16.90<small>80g</small></span>
+            <a href="{% url 'shop:catalog' %}" class="btn btn-sm btn-gold">{% trans "Order" %}</a>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="text-center reveal" style="margin-top:3.5rem;">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-outline btn-lg">{% trans "See the whole collection →" %}</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ STATS ═══ -->
+<section class="section stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal"><span class="stat-num">126M</span><span class="stat-label">{% trans "TikTok views — Dubai Chocolate phenomenon" %}</span></div>
+      <div class="stat-item reveal delay-1"><span class="stat-num">4.5/5</span><span class="stat-label">{% trans "UAE rating — premium platforms" %}</span></div>
+      <div class="stat-item reveal delay-2"><span class="stat-num">+1259%</span><span class="stat-label">{% trans "Growth in Dubai Chocolate conversations in 1 year" %}</span></div>
+      <div class="stat-item reveal delay-3"><span class="stat-num">100%</span><span class="stat-label">{% trans "Customization — chocolate & packaging" %}</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ INGREDIENTS ═══ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <span class="gold-line"></span>
+      <span class="eyebrow">{% trans "Ingredients as a statement of faith" %}</span>
+      <h2 class="h-display h-display-center">{% trans "In premium chocolate," %}<br><em>{% trans "the ingredients are the story" %}</em></h2>
+    </div>
+    <div class="ing-cards">
+      <div class="ing-card reveal">
+        <span class="ing-flag">🇨🇭 Suisse</span>
+        <div class="ing-icon">🍫</div>
+        <h3 class="ing-name">Chocolat Carma</h3>
+        <p class="ing-sub">{% trans "One of the most respected couvertures in the world. The absolute Swiss benchmark, trusted by the planet's finest chocolatiers." %}</p>
+      </div>
+      <div class="ing-card reveal delay-2">
+        <span class="ing-flag">🇧🇪 Belgique</span>
+        <div class="ing-icon">🌿</div>
+        <h3 class="ing-name">Crème Callebaut</h3>
+        <p class="ing-sub">{% trans "An incomparable cream, the favourite of the world's great pastry chefs. Texture, flavour, perfection." %}</p>
+      </div>
+      <div class="ing-card reveal delay-4">
+        <span class="ing-flag">🇮🇷 Rafsanjan</span>
+        <div class="ing-icon">🌰</div>
+        <h3 class="ing-name">Pistaches Rafsanjan</h3>
+        <p class="ing-sub">{% trans "The pistachios of Rafsanjan, considered the finest in the world. Sweet, rich, deep green — the ones great chefs fight over." %}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PHILOSOPHY ═══ -->
+<section class="section philosophy">
+  <div class="container">
+    <span class="gold-line reveal" style="margin-inline:auto;"></span>
+    <blockquote class="phil-quote reveal">
+      « {% trans "Some houses are born to sell, and some are born to" %} <em>{% trans "move us" %}</em>. {% trans "LAMOS belongs to the second." %} »
+    </blockquote>
+    <p class="phil-attr reveal delay-2">— {% trans "The spirit of Lamos Chocolate" %}</p>
+    <div class="city-chain reveal delay-3">
+      <span class="city">Dubai</span><span class="city-dot"></span>
+      <span class="city">Sharjah</span><span class="city-dot"></span>
+      <span class="city">Abu Dhabi</span><span class="city-dot"></span>
+      <span class="city">Genève</span><span class="city-dot"></span>
+      <span class="city">Suisse</span>
+    </div>
+    <div class="reveal delay-4" style="margin-top:3rem;">
+      <a href="{% url 'main:contact' %}" class="btn btn-gold btn-lg">{% trans "Order · Partnership · Gifts" %}</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
