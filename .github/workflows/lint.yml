@@ -1,49 +1,65 @@
+YML
 # =============================================================================
-#  ci.yml  —  Main CI pipeline (orchestrator)
+#  lint.yml  —  Code style checks (reusable workflow)
 # -----------------------------------------------------------------------------
-#  Role:
-#    This is the ONE pipeline that runs on every push and every pull request.
-#    It does not contain the logic itself: it "calls" three reusable workflows
-#    (lint.yml, tests.yml, security.yml) in a controlled order.
-#    Think of it as the conductor; the other files are the musicians.
+#  ⚠️  THIS IS THE FILE THAT WAS BROKEN ON YOUR BRANCH.
+#      On feature/github-actions, lint.yml accidentally contained a COPY of
+#      ci.yml (it started with `name: CI` and called itself), which made
+#      GitHub reject it as an "Invalid workflow file". This is the correct
+#      content: `name: Lint`, no self-reference.
 #
-#  Why an orchestrator?
-#    - No duplicated runs: lint/tests/security are triggered ONLY from here,
-#      so you never pay twice for the same commit.
-#    - One place to read the whole pipeline status on a Pull Request.
+#  ROLE OF THIS FILE
+#    Verify the code respects the project's formatting rules WITHOUT changing
+#    any file. It only reports; it never rewrites your code.
+#      - black   -> formatting  (line length 88, config in pyproject.toml)
+#      - isort   -> import order (profile "black")
+#      - flake8  -> style / unused imports (config in backend/setup.cfg)
 #
-#  Reusable workflow reference syntax:
-#    jobs.<id>.uses: ./.github/workflows/<file>.yml
-#    The path MUST start with "./" and match the filename exactly.
+#  "Reusable" (`on: workflow_call`) means it does NOT run on its own push:
+#    it only runs when ci.yml calls it. That avoids duplicate runs.
 # =============================================================================
 
-name: CI
+name: Lint
 
-# When does this pipeline run?
 on:
-  push:
-    branches: [develop, main]     # every commit landing on the two long-lived branches
-  pull_request:
-    branches: [develop, main]     # every PR targeting them (the important one for reviews)
-
-# Cancel an older run if you push again quickly on the same branch/PR.
-# Saves CI minutes and avoids confusing "two runs at once".
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  workflow_call:        # invoked by ci.yml — no standalone trigger
 
 jobs:
-  # ---- 1. Code style / linting ---------------------------------------------
   lint:
-    name: Lint (black, isort, flake8)
-    uses: ./.github/workflows/lint.yml
+    runs-on: ubuntu-latest
 
-  # ---- 2. Automated tests + coverage ---------------------------------------
-  tests:
-    name: Tests (pytest + PostgreSQL)
-    uses: ./.github/workflows/tests.yml
+    # All the code lives under backend/, so run every command from there.
+    defaults:
+      run:
+        working-directory: backend
 
-  # ---- 3. Security scanning -------------------------------------------------
-  security:
-    name: Security (pip-audit, bandit, deploy check)
-    uses: ./.github/workflows/security.yml
+    steps:
+      # 1. Get the repository onto the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install the exact Python version used by the project (see Dockerfile).
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # 3. Install ONLY the lint tools (fast: no full app dependencies needed).
+      - name: Install lint tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black==24.8.0 isort==5.13.2 flake8==7.1.1
+
+      # 4. Check formatting. `--check` = report only, fails if it WOULD reformat.
+      #    It never edits your files.
+      - name: black --check
+        run: black --check .
+
+      # 5. Check import ordering (same "report only" idea).
+      - name: isort --check-only
+        run: isort --check-only .
+
+      # 6. Lint (unused imports, style). Config read from setup.cfg.
+      - name: flake8
+        run: flake8 .
