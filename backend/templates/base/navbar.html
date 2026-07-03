@@ -26,6 +26,35 @@
     </ul>
 
     <div class="nav-actions">
+      {# ================================================================= #}
+      {# Language switcher — native <details>, no JS, no Bootstrap.        #}
+      {# Reads settings.LANGUAGES via the i18n context processor and posts #}
+      {# to Django's set_language view. `next` keeps the visitor on the    #}
+      {# same page (Django rewrites the language prefix for us).           #}
+      {# ================================================================= #}
+      {% get_current_language as CURRENT_LANG %}
+      {% get_available_languages as AVAILABLE_LANGS %}
+      <details class="lang-switch">
+        <summary aria-label="{% trans 'Change language' %}">
+          {{ CURRENT_LANG|upper }}   {# e.g. FR / EN / DE-CH / IT-CH #}
+        </summary>
+        <ul class="lang-menu" role="list">
+          {% for code, name in AVAILABLE_LANGS %}
+            <li>
+              <form action="{% url 'set_language' %}" method="post">
+                {% csrf_token %}
+                {# Return to the current URL after switching. #}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <input type="hidden" name="language" value="{{ code }}">
+                <button type="submit"
+                        class="lang-item {% if code == CURRENT_LANG %}is-active{% endif %}">
+                  {{ name }}
+                </button>
+              </form>
+            </li>
+          {% endfor %}
+        </ul>
+      </details>
 
       {# --- Bouton COMPTE unique (icône personne) --- #}
       {% if request.user.is_authenticated %}

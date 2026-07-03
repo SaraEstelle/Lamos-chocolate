@@ -297,3 +297,70 @@ p{color:var(--c-text)}
 /* ---- 23. Items visibles uniquement dans le menu burger ----------------- */
 .nav-only-mobile{display:none}
 @media (max-width:992px){ .nav-only-mobile{display:block} }
+
+/* ============================================================ */
+/* Language switcher (native <details>, no JS)                  */
+/* Colours reuse existing Marble design tokens from :root.      */
+/* ============================================================ */
+.lang-switch { position: relative; }
+
+/* The clickable pill; height tuned to align with .nav-icon-btn (42px). */
+.lang-switch > summary {
+  list-style: none;               /* hide default disclosure marker (Firefox) */
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  height: 42px;
+  padding: 0 .7rem;
+  font-family: var(--font-title);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--c-text-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  transition: color var(--dur), border-colorvar(--dur);
+}
+.lang-switch > summary::-webkit-details-marker { display: none; } /* hide marker (WebKit) */
+.lang-switch > summary:hover {
+  color: var(--c-ink);
+  border-color: var(--c-gold);
+}
+
+/* The dropdown panel: absolutely positioned so it never shifts the navbar. */
+.lang-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + .35rem);
+  z-index: 1100;
+  min-width: 190px;
+  margin: 0;
+  padding: .35rem;
+  list-style: none;
+  background: var(--c-ivory-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-2);
+}
+.lang-menu li { margin: 0; }
+.lang-menu .lang-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: .5rem .7rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: .85rem;
+  color: var(--c-text);
+  border-radius: var(--radius);
+}
+.lang-menu .lang-item:hover {
+  background: var(--c-gold-soft);
+  color: var(--c-ink);
+}
+.lang-menu .lang-item.is-active {
+  color: var(--c-gold-3);
+  font-weight: 700;
+}
