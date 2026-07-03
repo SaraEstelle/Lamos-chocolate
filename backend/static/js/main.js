@@ -104,3 +104,15 @@
   var manage = document.getElementById("manage-cookies");
   if (manage) manage.addEventListener("click", function (e) { e.preventDefault(); banner.hidden = false; });
 })();
+
+/* Close the language <details> menu when clicking outside of it. */
+(function () {
+  "use strict";
+  document.addEventListener("click", function (event) {
+    document.querySelectorAll("details.lang-switch[open]").forEach(function (details) {
+      if (!details.contains(event.target)) {
+        details.removeAttribute("open");
+      }
+    });
+  });
+})();

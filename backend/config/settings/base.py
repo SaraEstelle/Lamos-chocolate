@@ -137,9 +137,15 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = config("LANGUAGE_CODE", default="fr")
 TIME_ZONE = config("TIME_ZONE", default="Europe/Paris")
 
+# Site languages offered to visitors.
+# NOTE: language CODES use lowercase + hyphen (Django convention): "de-ch", "it-ch".
+# The matching translation FOLDERS in locale/ use underscore + UPPER region
+# ("de_CH", "it_CH"); Django maps one to the other automatically.
 LANGUAGES = [
     ("fr", "Français"),
     ("en", "English"),
+    ("de-CH", "Deutsch (Schweiz)"),
+    ("it-CH", "Italiano (Svizzera)"),
 ]
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
