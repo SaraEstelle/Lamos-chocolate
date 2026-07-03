@@ -9,8 +9,7 @@
 
 {% block content %}
 <section class="auth-wrap">
-  {# active_panel = "register" -> the card opens on the sign-up side (used when
-     the sign-up form has errors, so the user sees them). #}
+
   <div class="auth-card {% if active_panel == 'register' %}mode-register{% endif %}" id="authCard">
 
     {# ══════════════ LEFT COLUMN : SIGN IN ══════════════ #}
@@ -21,7 +20,7 @@
       </svg>
       <h2 class="auth-title">{% trans "Sign in" %}</h2>
 
-    
+
       <div class="auth-social">
         <a href="{% provider_login_url 'google' %}" class="auth-social-btn" aria-label="Google">G</a>
         {% if FACEBOOK_ENABLED %}<a href="{% provider_login_url 'facebook' %}" class="auth-social-btn" aria-label="Facebook">f</a>{% endif %}
