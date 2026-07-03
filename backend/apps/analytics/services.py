@@ -7,6 +7,7 @@ Helpers to record events from anywhere, without ever breaking the calling flow.
 import logging
 
 from apps.analytics.models import Event
+from apps.common.consent import analytics_allowed
 
 logger = logging.getLogger(__name__)
 
@@ -53,3 +54,9 @@ def track_purchase(order):
         order_id=order.order_number,
         lines=lines,
     )
+
+def track_event_if_consented(request, event_type, **kwargs):
+    """Track only if the visitor accepted analytics cookies."""
+    if analytics_allowed(request):
+        return track_event(event_type, **kwargs)
+    return None
