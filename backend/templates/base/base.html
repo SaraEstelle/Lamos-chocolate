@@ -32,5 +32,6 @@
   <!-- No Bootstrap JS anymore -->
   <script src="{% static 'js/main.js' %}" defer></script>
   {% block extra_scripts %}{% endblock %}
+  {% include "base/cookie_banner.html" %}
 </body>
 </html>

@@ -1,0 +1,21 @@
+{% load i18n %}
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-live="polite"
+     aria-label="{% trans 'Cookie consent' %}" hidden>
+  <div class="cookie-banner__text">
+    <p><strong>{% trans "We value your privacy." %}</strong>
+       {% trans "We use strictly necessary cookies and, with your consent, analytics cookies. No data leaves Switzerland/EU." %}
+       <a href="{% url 'main:privacy' %}" style="color:var(--c-gold-3)">{% trans "Privacy policy" %}</a></p>
+  </div>
+  <div class="cookie-banner__actions">
+    <button class="btn btn-outline" data-consent="reject">{% trans "Reject non-essential" %}</button>
+    <button class="btn btn-outline" data-consent="customize">{% trans "Customize" %}</button>
+    <button class="btn btn-gold" data-consent="accept">{% trans "Accept all" %}</button>
+  </div>
+
+  <div class="cookie-banner__prefs" hidden>
+    <label><input type="checkbox" checked disabled> {% trans "Strictly necessary (always on)" %}</label>
+    <label><input type="checkbox" id="consent-analytics"> {% trans "Analytics" %}</label>
+    <label><input type="checkbox" id="consent-marketing"> {% trans "Marketing" %}</label>
+    <button class="btn btn-gold" data-consent="save">{% trans "Save choices" %}</button>
+  </div>
+</div>
