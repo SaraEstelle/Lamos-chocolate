@@ -23,9 +23,10 @@ from .services import add_to_cart, calculate_total, remove_from_cart, update_qua
 
 
 def _wants_json(request) -> bool:
-    return (
-        request.headers.get("x-requested-with") == "XMLHttpRequest"
-        or request.headers.get("accept", "").startswith("application/json")
+    return request.headers.get(
+        "x-requested-with"
+    ) == "XMLHttpRequest" or request.headers.get("accept", "").startswith(
+        "application/json"
     )
 
 

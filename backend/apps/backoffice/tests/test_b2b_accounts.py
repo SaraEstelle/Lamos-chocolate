@@ -8,27 +8,28 @@ import pytest
 from django.urls import reverse
 
 from apps.accounts.models import B2BAccount, Customer
-from apps.common.constants import (
-    B2BAccountStatusChoices,
-    CustomerTypeChoices,
-)
+from apps.common.constants import B2BAccountStatusChoices, CustomerTypeChoices
 
 
 def make_staff():
     """A staff user who can reach the backoffice."""
     return Customer.objects.create_user(
-        email="staff@lamos.ch", password="StrongP@ss1!", is_staff=True,
+        email="staff@lamos.ch",
+        password="StrongP@ss1!",
+        is_staff=True,
     )
 
 
 def make_pending_account(email="prospect@test.com"):
     """A self-registered pro waiting for validation."""
     customer = Customer.objects.create_user(
-        email=email, password="StrongP@ss1!",
+        email=email,
+        password="StrongP@ss1!",
         customer_type=CustomerTypeChoices.B2B_DISTRIBUTOR,
     )
     return B2BAccount.objects.create(
-        customer=customer, company_name="Prospect SA",
+        customer=customer,
+        company_name="Prospect SA",
         status=B2BAccountStatusChoices.PENDING,
     )
 
@@ -39,7 +40,8 @@ class TestB2BAccountValidation:
     def test_list_requires_staff(self, client):
         """A non-staff user must not reach the validation page."""
         c = Customer.objects.create_user(
-            email="b2c@test.com", password="StrongP@ss1!",
+            email="b2c@test.com",
+            password="StrongP@ss1!",
         )
         client.force_login(c)
         resp = client.get(reverse("backoffice:b2b_accounts"))
@@ -80,7 +82,5 @@ class TestB2BAccountValidation:
         account = make_pending_account()
         client.force_login(make_staff())
         # A GET must NOT change state.
-        resp = client.get(
-            reverse("backoffice:b2b_account_decision", args=[account.id])
-        )
+        resp = client.get(reverse("backoffice:b2b_account_decision", args=[account.id]))
         assert resp.status_code == 405  # Method Not Allowed

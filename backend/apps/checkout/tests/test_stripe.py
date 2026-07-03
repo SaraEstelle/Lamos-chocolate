@@ -7,7 +7,6 @@ read).
 """
 
 import json
-from decimal import Decimal
 from unittest.mock import patch
 
 import pytest
@@ -71,7 +70,9 @@ class TestCreateCheckoutSession:
     ):
         items = _cart_items(sample_product)
         with patch("stripe.checkout.Session.create") as mock_create:
-            mock_create.return_value = type("S", (), {"id": "cs_test_1", "url": "https://stripe/cs_test_1"})()
+            mock_create.return_value = type(
+                "S", (), {"id": "cs_test_1", "url": "https://stripe/cs_test_1"}
+            )()
             session = checkout_stripe.create_checkout_session(
                 customer=sample_customer,
                 cart_items=items,

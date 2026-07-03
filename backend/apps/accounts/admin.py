@@ -6,13 +6,15 @@ Django admin interface for Customer and PasswordResetToken.
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from .models import Customer, PasswordResetToken
 from apps.accounts.models import B2BAccount  # add near the other imports
-from django.utils import timezone
-from apps.common.constants import B2BAccountStatusChoices
 from apps.b2b.services import notify_b2b_account_validated  # email hook (Guide 3)
+from apps.common.constants import B2BAccountStatusChoices
+
+from .models import Customer, PasswordResetToken
+
 
 @admin.register(Customer)
 class CustomerAdmin(BaseUserAdmin):
@@ -43,44 +45,77 @@ class CustomerAdmin(BaseUserAdmin):
 
     # Detail view (override BaseUserAdmin defaults to match our fields)
     fieldsets = (
-        (_("Identity"), {
-            "fields": ("id", "email", "password"),
-        }),
-        (_("Personal"), {
-            "fields": ("first_name", "last_name", "phone"),
-        }),
-        (_("Business"), {
-            "fields": ("is_b2b", "company_name"),
-        }),
-        (_("Preferences"), {
-            "fields": ("preferred_language",),
-        }),
-        (_("Permissions"), {
-            "fields": (
-                "is_active", "is_staff", "is_superuser",
-                "groups", "user_permissions",
-            ),
-        }),
-        (_("Dates"), {
-            "fields": ("created_at", "updated_at", "last_login"),
-            "classes": ("collapse",),
-        }),
-        (_("Segmentation & KPI"), {
-            "fields": ("customer_type", "npa", "canton", "source_acquisition"),
-        }),
-        (_("Consent (nLPD)"), {
-            "fields": ("consent_nlpd", "consent_nlpd_at"),
-        }),
+        (
+            _("Identity"),
+            {
+                "fields": ("id", "email", "password"),
+            },
+        ),
+        (
+            _("Personal"),
+            {
+                "fields": ("first_name", "last_name", "phone"),
+            },
+        ),
+        (
+            _("Business"),
+            {
+                "fields": ("is_b2b", "company_name"),
+            },
+        ),
+        (
+            _("Preferences"),
+            {
+                "fields": ("preferred_language",),
+            },
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (
+            _("Dates"),
+            {
+                "fields": ("created_at", "updated_at", "last_login"),
+                "classes": ("collapse",),
+            },
+        ),
+        (
+            _("Segmentation & KPI"),
+            {
+                "fields": ("customer_type", "npa", "canton", "source_acquisition"),
+            },
+        ),
+        (
+            _("Consent (nLPD)"),
+            {
+                "fields": ("consent_nlpd", "consent_nlpd_at"),
+            },
+        ),
     )
 
     add_fieldsets = (
-        (None, {
-            "classes": ("wide",),
-            "fields": (
-                "email", "password1", "password2",
-                "first_name", "last_name",
-            ),
-        }),
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "email",
+                    "password1",
+                    "password2",
+                    "first_name",
+                    "last_name",
+                ),
+            },
+        ),
     )
 
     filter_horizontal = ("groups", "user_permissions")
@@ -98,6 +133,7 @@ class PasswordResetTokenAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+
 
 @admin.register(B2BAccount)
 class B2BAccountAdmin(admin.ModelAdmin):

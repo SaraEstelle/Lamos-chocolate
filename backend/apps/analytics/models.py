@@ -18,6 +18,7 @@ from apps.common.constants import ChannelChoices
 
 class EventTypeChoices(models.TextChoices):
     """Tracked event names (snake_case, per the data plan)."""
+
     PRODUCT_VIEW = "product_view", "Product view"
     ADD_TO_CART = "add_to_cart", "Add to cart"
     REMOVE_FROM_CART = "remove_from_cart", "Remove from cart"
@@ -43,18 +44,25 @@ class Event(models.Model):
     customer = models.ForeignKey(
         "accounts.Customer",
         on_delete=models.SET_NULL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name="events",
     )
 
     # Promoted KPI dimensions (nullable so any event type can be stored).
     channel = models.CharField(
-        max_length=3, choices=ChannelChoices.choices, blank=True, default="",
+        max_length=3,
+        choices=ChannelChoices.choices,
+        blank=True,
+        default="",
     )
     canton = models.CharField(max_length=2, blank=True, default="")
     campaign_period = models.CharField(max_length=50, blank=True, default="")
     value_chf = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
     )
 
     # Flexible payload (sku list, qty, etc.).

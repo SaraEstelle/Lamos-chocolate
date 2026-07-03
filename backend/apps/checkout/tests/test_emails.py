@@ -18,7 +18,9 @@ class TestTransactionalEmails:
         order = Order.objects.create(
             customer=customer,
             order_number=Order.generate_order_number(),
-            total_amount="29.90", currency="EUR", status="paid",
+            total_amount="29.90",
+            currency="EUR",
+            status="paid",
         )
         send_order_confirmation(order)
         assert len(mail.outbox) == 1
@@ -29,7 +31,9 @@ class TestTransactionalEmails:
         order = Order.objects.create(
             customer=customer,
             order_number=Order.generate_order_number(),
-            total_amount="10.00", currency="EUR", status="shipped",
+            total_amount="10.00",
+            currency="EUR",
+            status="shipped",
         )
         send_order_shipped(order)
         assert len(mail.outbox) == 1

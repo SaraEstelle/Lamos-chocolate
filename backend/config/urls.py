@@ -23,11 +23,11 @@ Règulation Suisse (RGPD) :
 - Droit d'accès aux données
 """
 
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.i18n import i18n_patterns
 from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import include, path
 
 # ============================================================================
 # ROUTES AVEC SUPPORT i18n (FR/EN/DE/IT)
@@ -38,37 +38,30 @@ i18n_urlpatterns = [
     # App principale — homepage, about, brand story, pages statiques
     # =========================================================================
     path("", include("apps.main.urls", namespace="main")),
-
     # =========================================================================
     # Catalogue produits — listing, détail produit, filtres
     # =========================================================================
     path("shop/", include("apps.shop.urls", namespace="shop")),
-
     # =========================================================================
     # Panier — ajouter/retirer articles, voir le panier
     # =========================================================================
     path("cart/", include("apps.cart.urls", namespace="cart")),
-
     # =========================================================================
     # Paiement — checkout, confirmation, intégration Stripe
     # =========================================================================
     path("checkout/", include("apps.checkout.urls", namespace="checkout")),
-
     # =========================================================================
     # Authentification client — login, register, reset password
     # =========================================================================
     path("accounts/", include("apps.accounts.urls", namespace="accounts")),
-
     # =========================================================================
     # Espace client — mon compte, historique commandes, adresses
     # =========================================================================
     path("my-account/", include("apps.customer_area.urls", namespace="customer_area")),
-
     # =========================================================================
     # Portail B2B — formulaire corporate, demande de devis
     # =========================================================================
     path("b2b/", include("apps.b2b.urls", namespace="b2b")),
-
     # ========================================================================
     # Login Google (social login accounts)
     # =======================================================================
@@ -85,26 +78,22 @@ urlpatterns = [
     # /admin/login, /admin/users, /admin/products, etc.
     # =========================================================================
     path("admin/", admin.site.urls),
-
     # =========================================================================
     # Webhook Stripe — réception des paiements (requête POST raw de Stripe)
     # ⚠️ IMPORTANT : sans CSRF car Stripe envoie une requête raw
     # Cette route traite les événements payment_intent.succeeded, etc.
     # =========================================================================
     path("checkout/webhook/", include("apps.checkout.urls_webhook")),
-
     # =========================================================================
     # Admin personnalisé — tableau de bord, gestion produits, stocks
     # Accessible seulement aux staff/superusers
     # =========================================================================
     path("backoffice/", include("apps.backoffice.urls", namespace="backoffice")),
-
     # =========================================================================
     # Sélecteur de langue — formulaire Django pour changer la langue
     # POST vers /i18n/setlang/ avec next=URL_retour
     # =========================================================================
     path("i18n/", include("django.conf.urls.i18n")),
-
     # --- Consent endpoint (no /fr/ or /en/ prefix, callable from any page) ---
     path("consent/", include("apps.common.urls_consent")),
 ]
@@ -133,9 +122,9 @@ urlpatterns += i18n_patterns(
 # Exemple : si un utilisateur accède à /invalid-path/,
 # Django appelle handler404 qui affiche une page custom 404.html
 # ============================================================================
-handler404 = "apps.main.views.page_not_found"          # 404 - Page non trouvée
-handler500 = "apps.main.views.server_error"            # 500 - Erreur serveur
-handler403 = "apps.main.views.permission_denied"       # 403 - Accès refusé
+handler404 = "apps.main.views.page_not_found"  # 404 - Page non trouvée
+handler500 = "apps.main.views.server_error"  # 500 - Erreur serveur
+handler403 = "apps.main.views.permission_denied"  # 403 - Accès refusé
 
 # ============================================================================
 # FICHIERS STATIQUES ET MÉDIA (images, uploads, CSS, JS)

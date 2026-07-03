@@ -49,8 +49,7 @@ def get_revenue_last_30_days():
     """Return daily revenue for the last 30 days (for a chart)."""
     since = timezone.now() - timedelta(days=30)
     orders = (
-        Order.objects
-        .filter(status__in=PAID_STATUSES, created_at__gte=since)
+        Order.objects.filter(status__in=PAID_STATUSES, created_at__gte=since)
         .annotate(day=TruncDate("created_at"))
         .values("day")
         .annotate(total=Sum("total_amount"))
@@ -62,8 +61,7 @@ def get_revenue_last_30_days():
 def get_top_products(limit=5):
     """Return the best-selling products by quantity."""
     return list(
-        OrderItem.objects
-        .values("sku__product__name_fr")
+        OrderItem.objects.values("sku__product__name_fr")
         .annotate(qty=Sum("quantity"))
         .order_by("-qty")[:limit]
     )

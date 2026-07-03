@@ -87,6 +87,7 @@ def sample_admin(db):
     admin.save()
     return admin
 
+
 @pytest.fixture
 def customer_factory(db):
     """

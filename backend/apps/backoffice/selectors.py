@@ -20,15 +20,12 @@ def get_pending_b2b_accounts():
     avoid one extra query per row in the template (N+1 protection).
     """
     return (
-        B2BAccount.objects
-        .filter(status=B2BAccountStatusChoices.PENDING)
+        B2BAccount.objects.filter(status=B2BAccountStatusChoices.PENDING)
         .select_related("customer")
-        .order_by("created_at")   # first-come, first-served
+        .order_by("created_at")  # first-come, first-served
     )
 
 
 def count_pending_b2b_accounts():
     """Small helper for the dashboard KPI card."""
-    return B2BAccount.objects.filter(
-        status=B2BAccountStatusChoices.PENDING
-    ).count()
+    return B2BAccount.objects.filter(status=B2BAccountStatusChoices.PENDING).count()

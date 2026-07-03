@@ -14,9 +14,13 @@ from apps.checkout.models import Order
 def staff_customer(db):
     """A staff customer who can access the backoffice."""
     from apps.accounts.models import Customer
+
     return Customer.objects.create_user(
-        email="staff@test.com", password="StrongP@ss123!",
-        first_name="Staff", last_name="User", is_staff=True,
+        email="staff@test.com",
+        password="StrongP@ss123!",
+        first_name="Staff",
+        last_name="User",
+        is_staff=True,
     )
 
 
@@ -39,15 +43,21 @@ class TestBackofficeAccess:
 
 @pytest.mark.integration
 class TestOrderStatusUpdate:
-    def test_staff_can_update_order_status(self, client, staff_customer, customer_factory):
+    def test_staff_can_update_order_status(
+        self, client, staff_customer, customer_factory
+    ):
         order = Order.objects.create(
             customer=customer_factory(),
             order_number=Order.generate_order_number(),
-            total_amount="10.00", currency="EUR", status="pending",
+            total_amount="10.00",
+            currency="EUR",
+            status="pending",
         )
         client.force_login(staff_customer)
-        resp = client.post(reverse("backoffice:order_status", args=[order.id]),
-                           data={"status": "shipped"})
+        resp = client.post(
+            reverse("backoffice:order_status", args=[order.id]),
+            data={"status": "shipped"},
+        )
         assert resp.status_code == 302
         order.refresh_from_db()
         assert order.status == "shipped"

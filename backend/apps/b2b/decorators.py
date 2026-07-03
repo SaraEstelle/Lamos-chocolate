@@ -18,6 +18,7 @@ def b2b_account_required(view_func):
     leak about protected resources). The account is attached to request for
     convenience as request.b2b_account.
     """
+
     @wraps(view_func)
     @login_required(login_url="accounts:login")
     def _wrapped(request, *args, **kwargs):
@@ -31,6 +32,7 @@ def b2b_account_required(view_func):
 
     return _wrapped
 
+
 def b2b_login_required(view_func):
     """
     Lighter gate than b2b_account_required: the user must be authenticated and
@@ -40,12 +42,13 @@ def b2b_login_required(view_func):
     e.g. the downloadable B2B catalogue. Ordering/quoting stays behind
     b2b_account_required (active only).
     """
+
     @wraps(view_func)
     @login_required(login_url="accounts:login")
     def _wrapped(request, *args, **kwargs):
         account = getattr(request.user, "b2b_account", None)
         if account is None:
-            return redirect("b2b:presentation")   # not a pro → public page
+            return redirect("b2b:presentation")  # not a pro → public page
         request.b2b_account = account
         return view_func(request, *args, **kwargs)
 

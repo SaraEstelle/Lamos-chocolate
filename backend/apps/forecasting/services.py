@@ -19,10 +19,12 @@ def get_production_estimates():
     """
     result = []
     for sku in SKU.objects.filter(is_active=True).select_related("product"):
-        result.append({
-            "sku": sku,
-            "estimates": get_delivery_estimates(sku, quantity=1),
-        })
+        result.append(
+            {
+                "sku": sku,
+                "estimates": get_delivery_estimates(sku, quantity=1),
+            }
+        )
     return result
 
 
@@ -36,9 +38,11 @@ def get_stockout_risks():
     for stock in Stock.objects.select_related("sku__product"):
         # Stock.is_low is a @property, so no parentheses.
         if stock.is_low:
-            risks.append({
-                "sku": stock.sku,
-                "quantity": stock.quantity,
-                "threshold": stock.threshold_alert,
-            })
+            risks.append(
+                {
+                    "sku": stock.sku,
+                    "quantity": stock.quantity,
+                    "threshold": stock.threshold_alert,
+                }
+            )
     return risks

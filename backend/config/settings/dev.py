@@ -2,9 +2,7 @@ from .base import *  # noqa: F401,F403
 
 DEBUG = True
 
-EMAIL_BACKEND = (
-    "django.core.mail.backends.console.EmailBackend"
-)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -19,9 +17,7 @@ INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
 
 # DebugToolbarMiddleware must run as early as possible, right after the
 # security middleware, so it sees the final rendered response.
-MIDDLEWARE.insert(  # noqa: F405
-    1, "debug_toolbar.middleware.DebugToolbarMiddleware"
-)
+MIDDLEWARE.insert(1, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa: F405
 
 
 def show_toolbar(request):

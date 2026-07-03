@@ -10,10 +10,14 @@ from apps.b2b.forms import B2BRequestForm, ConfiguratorForm
 from apps.b2b.models import B2BProductInfo
 
 VALID = {
-    "company_name": "Hotel Beau-Rivage", "contact_name": "Jean Dupont",
-    "contact_email": "jean@beaurivage.ch", "contact_phone": "+41 22 000 00 00",
-    "sector": "Hospitality", "estimated_qty": 200,
-    "occasion": "Christmas", "message": "We need branded chocolates.",
+    "company_name": "Hotel Beau-Rivage",
+    "contact_name": "Jean Dupont",
+    "contact_email": "jean@beaurivage.ch",
+    "contact_phone": "+41 22 000 00 00",
+    "sector": "Hospitality",
+    "estimated_qty": 200,
+    "occasion": "Christmas",
+    "message": "We need branded chocolates.",
 }
 
 

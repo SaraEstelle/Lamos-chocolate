@@ -17,7 +17,9 @@ def revenue_by_canton(days=30):
     since = timezone.now() - timedelta(days=days)
     return list(
         Event.objects.filter(event_type="purchase", created_at__gte=since)
-        .values("canton").annotate(total=Sum("value_chf")).order_by("-total")
+        .values("canton")
+        .annotate(total=Sum("value_chf"))
+        .order_by("-total")
     )
 
 
@@ -35,5 +37,6 @@ def channel_split(days=30):
     since = timezone.now() - timedelta(days=days)
     return list(
         Event.objects.filter(event_type="purchase", created_at__gte=since)
-        .values("channel").annotate(total=Sum("value_chf"), count=Count("id"))
+        .values("channel")
+        .annotate(total=Sum("value_chf"), count=Count("id"))
     )

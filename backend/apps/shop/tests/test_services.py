@@ -1,7 +1,5 @@
 """Tests for shop services (per-zone delivery estimates)."""
 
-import pytest
-
 from apps.shop import services
 
 

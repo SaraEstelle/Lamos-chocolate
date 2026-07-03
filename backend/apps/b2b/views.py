@@ -3,41 +3,42 @@ apps/b2b/views.py
 =================
 B2B views: L0 public funnel + L1 pro space + L2 configurator.
 """
-import csv
-from django.http import HttpResponse
-from apps.b2b.selectors import (
-    get_b2b_orders_in_progress, get_exclusive_products, get_b2b_dashboard_kpis,
-)
 
+import csv
 from decimal import Decimal
 
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils.translation import gettext as _
-from django.views.decorators.http import require_http_methods
-
-from apps.analytics.services import track_event
-from apps.b2b.decorators import b2b_account_required
-from apps.b2b.forms import B2BRequestForm
-from apps.b2b.selectors import has_recent_duplicate
-from apps.b2b.services import create_b2b_request, get_client_ip, is_rate_limited
-
-from apps.b2b.models import QuoteSimulation
-from apps.b2b.selectors import get_b2b_orders, get_pro_catalogue
-from apps.b2b.services import notify_quote_request, simulate_quote
-from apps.checkout.models import Order
-
-from apps.b2b.forms import ConfiguratorForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from apps.b2b.forms import B2BRegisterForm
-from apps.b2b.services import notify_b2b_account_pending  # email hook (Guide 3 wires SMTP)
-from apps.b2b.decorators import b2b_account_required, b2b_login_required
-
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods
+
 from apps.accounts.forms import LoginForm
 from apps.accounts.redirects import post_auth_redirect_target
-
+from apps.analytics.services import track_event
+from apps.b2b.decorators import b2b_account_required, b2b_login_required
+from apps.b2b.forms import B2BRegisterForm, B2BRequestForm, ConfiguratorForm
+from apps.b2b.models import QuoteSimulation
+from apps.b2b.selectors import (
+    get_b2b_dashboard_kpis,
+    get_b2b_orders,
+    get_b2b_orders_in_progress,
+    get_exclusive_products,
+    get_pro_catalogue,
+    has_recent_duplicate,
+)
+from apps.b2b.services import (  # email hook (Guide 3 wires SMTP)
+    create_b2b_request,
+    get_client_ip,
+    is_rate_limited,
+    notify_b2b_account_pending,
+    notify_quote_request,
+    simulate_quote,
+)
+from apps.checkout.models import Order
 
 
 @require_http_methods(["GET", "POST"])
@@ -47,9 +48,10 @@ def register_view(request):
         form = B2BRegisterForm(request.POST)
         if form.is_valid():
             customer, account = form.save()
-            notify_b2b_account_pending(account)      # email staff + applicant
-            login(request, customer,
-                  backend="django.contrib.auth.backends.ModelBackend")
+            notify_b2b_account_pending(account)  # email staff + applicant
+            login(
+                request, customer, backend="django.contrib.auth.backends.ModelBackend"
+            )
             return redirect("b2b:pending")
     else:
         form = B2BRegisterForm()
@@ -62,8 +64,10 @@ def pending_view(request):
     """Shown while a pro account awaits validation."""
     account = getattr(request.user, "b2b_account", None)
     if account and account.status == "active":
-        return redirect("b2b:portal")          # already validated
+        return redirect("b2b:portal")  # already validated
     return render(request, "b2b/pending.html", {"account": account})
+
+
 # ----------------------------------------------------------------------------
 # L0 — Public funnel (no login)
 # ----------------------------------------------------------------------------
@@ -79,13 +83,13 @@ def request_form_view(request):
     if request.method == "POST":
         form = B2BRequestForm(data=request.POST)
         if form.is_valid():
-            if form.is_bot():                       # honeypot → fake success
+            if form.is_bot():  # honeypot → fake success
                 return redirect("b2b:success")
             ip = get_client_ip(request)
-            if is_rate_limited(ip):                 # flood protection
+            if is_rate_limited(ip):  # flood protection
                 messages.error(request, _("Too many requests. Please try again later."))
                 return render(request, "b2b/request_form.html", {"form": form})
-            if has_recent_duplicate(                # double-submit guard
+            if has_recent_duplicate(  # double-submit guard
                 contact_email=form.cleaned_data["contact_email"],
                 company_name=form.cleaned_data["company_name"],
             ):
@@ -104,6 +108,7 @@ def success_view(request):
     """Confirmation page after submission."""
     return render(request, "b2b/success.html")
 
+
 @require_http_methods(["GET", "POST"])
 @csrf_protect
 def access_view(request):
@@ -121,11 +126,13 @@ def access_view(request):
     if request.method == "POST":
         login_form = LoginForm(request.POST)
         if login_form.is_valid():
-            customer = login_form.customer           # set in LoginForm.clean()
+            customer = login_form.customer  # set in LoginForm.clean()
             login(request, customer)
             return redirect(post_auth_redirect_target(customer))
 
     return render(request, "b2b/access.html", {"login_form": login_form})
+
+
 # ----------------------------------------------------------------------------
 # L1 — Pro space (login + B2BAccount required)
 # ----------------------------------------------------------------------------
@@ -134,22 +141,31 @@ def access_view(request):
 def portal_home_view(request):
     """Pro dashboard home = 'Profil' tab: account info + KPIs + recent orders."""
     account = request.b2b_account
-    return render(request, "b2b/portal/home.html", {
-        "account": account,
-        "kpis": get_b2b_dashboard_kpis(account),
-        "orders": get_b2b_orders(account, limit=5),
-        "catalogue": get_pro_catalogue()[:6],
-    })
+    return render(
+        request,
+        "b2b/portal/home.html",
+        {
+            "account": account,
+            "kpis": get_b2b_dashboard_kpis(account),
+            "orders": get_b2b_orders(account, limit=5),
+            "catalogue": get_pro_catalogue()[:6],
+        },
+    )
+
 
 @b2b_account_required
 @require_http_methods(["GET"])
 def in_progress_view(request):
     """'Commandes en cours' tab: orders still moving (pending..shipped)."""
     account = request.b2b_account
-    return render(request, "b2b/portal/in_progress.html", {
-        "account": account,
-        "orders": get_b2b_orders_in_progress(account),
-    })
+    return render(
+        request,
+        "b2b/portal/in_progress.html",
+        {
+            "account": account,
+            "orders": get_b2b_orders_in_progress(account),
+        },
+    )
 
 
 @b2b_account_required
@@ -157,10 +173,14 @@ def in_progress_view(request):
 def exclusive_view(request):
     """'Produits exclusifs & pré-commandes' tab (pro-only NEW / COMING_SOON)."""
     account = request.b2b_account
-    return render(request, "b2b/portal/exclusive.html", {
-        "account": account,
-        "products": get_exclusive_products(),
-    })
+    return render(
+        request,
+        "b2b/portal/exclusive.html",
+        {
+            "account": account,
+            "products": get_exclusive_products(),
+        },
+    )
 
 
 @b2b_account_required
@@ -180,14 +200,17 @@ def history_export_view(request):
     writer = csv.writer(response, delimiter=";")
     writer.writerow(["Order", "Date", "Amount", "Currency", "Status"])
     for o in get_b2b_orders(account, limit=1000):
-        writer.writerow([
-            o.order_number,
-            o.created_at.strftime("%d.%m.%Y"),
-            o.total_amount,
-            o.currency,
-            o.get_status_display(),
-        ])
+        writer.writerow(
+            [
+                o.order_number,
+                o.created_at.strftime("%d.%m.%Y"),
+                o.total_amount,
+                o.currency,
+                o.get_status_display(),
+            ]
+        )
     return response
+
 
 @b2b_login_required
 @require_http_methods(["GET"])
@@ -195,13 +218,22 @@ def portal_catalogue_view(request):
     """Pro catalogue with real-time stock per SKU."""
     account = request.b2b_account
     # The pro consulted live stock → track it (feeds B2B engagement KPIs).
-    track_event("b2b_stock_viewed", customer=request.user, channel="b2b",
-                account=str(account.id))
+    track_event(
+        "b2b_stock_viewed",
+        customer=request.user,
+        channel="b2b",
+        account=str(account.id),
+    )
     can_order = account.status == "active"
-    return render(request, "b2b/portal/catalogue.html", {
-        "account": account, "catalogue": get_pro_catalogue(),
-        "can_order": can_order,
-    })
+    return render(
+        request,
+        "b2b/portal/catalogue.html",
+        {
+            "account": account,
+            "catalogue": get_pro_catalogue(),
+            "can_order": can_order,
+        },
+    )
 
 
 @b2b_account_required
@@ -209,9 +241,14 @@ def portal_catalogue_view(request):
 def portal_history_view(request):
     """Pro order history (scoped to the account owner)."""
     account = request.b2b_account
-    return render(request, "b2b/portal/history.html", {
-        "account": account, "orders": get_b2b_orders(account),
-    })
+    return render(
+        request,
+        "b2b/portal/history.html",
+        {
+            "account": account,
+            "orders": get_b2b_orders(account),
+        },
+    )
 
 
 @b2b_account_required
@@ -227,7 +264,10 @@ def reorder_view(request, order_id):
     account = request.b2b_account
     # Order.id is a BigAutoField (int). Scope to the owner to prevent IDOR.
     order = get_object_or_404(
-        Order, id=order_id, customer=account.customer, channel="b2b",
+        Order,
+        id=order_id,
+        customer=account.customer,
+        channel="b2b",
     )
     lines = [
         {"sku": it.sku.sku_code, "qty": it.quantity, "price": str(it.unit_price)}
@@ -235,10 +275,18 @@ def reorder_view(request, order_id):
     ]
     estimated = sum(Decimal(line["price"]) * line["qty"] for line in lines)
     QuoteSimulation.objects.create(
-        account=account, cart_json=lines, estimated_value=estimated, moq_reached=True,
+        account=account,
+        cart_json=lines,
+        estimated_value=estimated,
+        moq_reached=True,
     )
-    track_event("reorder_clicked", customer=request.user, channel="b2b",
-                order_id=order.order_number, value_chf=estimated)
+    track_event(
+        "reorder_clicked",
+        customer=request.user,
+        channel="b2b",
+        order_id=order.order_number,
+        value_chf=estimated,
+    )
     messages.success(request, _("Reorder prepared. Our team will confirm pricing."))
     return redirect("b2b:history")
 
@@ -266,9 +314,12 @@ def configurator_view(request):
             qty = form.cleaned_data["quantity"]
             simulation = simulate_quote(account, sku=sku, quantity=qty)
             track_event(
-                "quote_simulated", customer=request.user, channel="b2b",
+                "quote_simulated",
+                customer=request.user,
+                channel="b2b",
                 value_chf=simulation["estimated"],
-                moq_reached=simulation["moq_reached"], sku=sku.sku_code,
+                moq_reached=simulation["moq_reached"],
+                sku=sku.sku_code,
             )
 
             if request.POST.get("action") == "request_quote":
@@ -280,36 +331,56 @@ def configurator_view(request):
                 simulation["sim"].save(update_fields=["converted"])
                 notify_quote_request(account, customization, simulation["estimated"])
                 track_event(
-                    "quote_requested", customer=request.user, channel="b2b",
-                    value_chf=simulation["estimated"], sku=sku.sku_code,
+                    "quote_requested",
+                    customer=request.user,
+                    channel="b2b",
+                    value_chf=simulation["estimated"],
+                    sku=sku.sku_code,
                 )
-                messages.success(request, _("Quote requested. Our team will contact you."))
+                messages.success(
+                    request, _("Quote requested. Our team will contact you.")
+                )
                 return redirect("b2b:configurator")
     else:
         form = ConfiguratorForm()
         # Opening the configurator is the start of a customization journey.
         track_event("customization_started", customer=request.user, channel="b2b")
 
-    return render(request, "b2b/configurator.html", {
-        "account": account, "form": form, "simulation": simulation,
-    })
+    return render(
+        request,
+        "b2b/configurator.html",
+        {
+            "account": account,
+            "form": form,
+            "simulation": simulation,
+        },
+    )
+
 
 @b2b_account_required
 @require_http_methods(["GET"])
 def documents_view(request):
     """Pro documents (invoices/quotes). Reuses orders + quote simulations."""
     account = request.b2b_account
-    return render(request, "b2b/portal/documents.html", {
-        "account": account,
-        "orders": get_b2b_orders(account),
-        "quotes": account.quote_simulations.all()[:20],
-    })
+    return render(
+        request,
+        "b2b/portal/documents.html",
+        {
+            "account": account,
+            "orders": get_b2b_orders(account),
+            "quotes": account.quote_simulations.all()[:20],
+        },
+    )
+
 
 @b2b_account_required
 @require_http_methods(["GET"])
 def notifications_view(request):
     """Account-level notifications (validation, quote status…)."""
-    return render(request, "b2b/portal/notifications.html", {"account": request.b2b_account})
+    return render(
+        request, "b2b/portal/notifications.html", {"account": request.b2b_account}
+    )
+
 
 @b2b_account_required
 @require_http_methods(["GET", "POST"])
@@ -317,7 +388,9 @@ def company_profile_view(request):
     """Edit company info (name, payment terms read-only for the pro)."""
     account = request.b2b_account
     if request.method == "POST":
-        account.company_name = request.POST.get("company_name", account.company_name).strip()
+        account.company_name = request.POST.get(
+            "company_name", account.company_name
+        ).strip()
         account.save(update_fields=["company_name"])
         messages.success(request, _("Company profile updated."))
         return redirect("b2b:profile")

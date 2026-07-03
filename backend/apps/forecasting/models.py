@@ -27,8 +27,10 @@ Utilisation :
 """
 
 import uuid
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
 from apps.shop.models import Product
 
 
@@ -51,18 +53,11 @@ class Forecast(models.Model):
     """
 
     # Identifiant
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Produit
     product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='forecasts',
-        help_text="Produit"
+        Product, on_delete=models.CASCADE, related_name="forecasts", help_text="Produit"
     )
 
     # Date de la prévision
@@ -80,19 +75,18 @@ class Forecast(models.Model):
         max_digits=3,
         decimal_places=2,
         default=0.0,
-        help_text="Confiance du modèle (0.0 à 1.0)"
+        help_text="Confiance du modèle (0.0 à 1.0)",
     )
 
     # Date de création
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date du calcul de la prévision"
+        auto_now_add=True, help_text="Date du calcul de la prévision"
     )
 
     class Meta:
         verbose_name = _("Forecast")
         verbose_name_plural = _("Forecasts")
-        ordering = ['-forecast_date']
+        ordering = ["-forecast_date"]
 
     def __str__(self):
         return f"Prévision {self.product.name} ({self.forecast_date})"
@@ -121,56 +115,43 @@ class Alert(models.Model):
     """
 
     SEVERITY_CHOICES = [
-        ('low', _('Low')),
-        ('medium', _('Medium')),
-        ('high', _('High')),
-        ('critical', _('Critical')),
+        ("low", _("Low")),
+        ("medium", _("Medium")),
+        ("high", _("High")),
+        ("critical", _("Critical")),
     ]
 
     # Identifiant
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Produit
     product = models.ForeignKey(
-        Product,
-        on_delete=models.CASCADE,
-        related_name='alerts',
-        help_text="Produit"
+        Product, on_delete=models.CASCADE, related_name="alerts", help_text="Produit"
     )
 
     # Prévision
     forecast = models.ForeignKey(
         Forecast,
         on_delete=models.CASCADE,
-        related_name='alerts',
-        help_text="Prévision associée"
+        related_name="alerts",
+        help_text="Prévision associée",
     )
 
     # Message
-    message = models.TextField(
-        help_text="Description de l'alerte"
-    )
+    message = models.TextField(help_text="Description de l'alerte")
 
     # Sévérité
     severity = models.CharField(
-        max_length=20,
-        choices=SEVERITY_CHOICES,
-        help_text="Niveau de sévérité"
+        max_length=20, choices=SEVERITY_CHOICES, help_text="Niveau de sévérité"
     )
 
     # Date
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = _("Alert")
         verbose_name_plural = _("Alerts")
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Alerte {self.product.name} - {self.severity}"

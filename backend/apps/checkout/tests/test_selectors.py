@@ -9,11 +9,7 @@ import pytest
 
 from apps.accounts.models import Customer
 from apps.checkout.models import Order
-from apps.checkout.selectors import (
-    PAID_STATUSES,
-    channel_revenue,
-    revenue_by_channel,
-)
+from apps.checkout.selectors import PAID_STATUSES, channel_revenue, revenue_by_channel
 
 
 def make_order(customer, channel, amount, status="paid", number="LM-TEST-1"):
@@ -31,13 +27,14 @@ class TestChannelRevenue:
 
     def _customer(self):
         return Customer.objects.create_user(
-            email="buyer@test.com", password="StrongP@ss1!",
+            email="buyer@test.com",
+            password="StrongP@ss1!",
         )
 
     def test_channel_revenue_sums_only_paid_orders(self):
         c = self._customer()
         make_order(c, "b2b", 100, status="paid", number="LM-1")
-        make_order(c, "b2b", 50, status="shipped", number="LM-2")   # counts
+        make_order(c, "b2b", 50, status="shipped", number="LM-2")  # counts
         make_order(c, "b2b", 999, status="pending", number="LM-3")  # ignored
         make_order(c, "b2c", 30, status="paid", number="LM-4")
 

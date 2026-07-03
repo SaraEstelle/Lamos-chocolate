@@ -6,16 +6,16 @@ persistence side-effects, email notifications and event tracking.
 """
 
 import logging
+from decimal import Decimal
 
 from django.conf import settings
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
-from decimal import Decimal
-from apps.b2b.models import DEFAULT_B2B_MOQ, QuoteSimulation
 
 from apps.analytics.services import track_event
+from apps.b2b.models import DEFAULT_B2B_MOQ, QuoteSimulation
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,9 @@ def notify_b2b_request(b2b_request, *, wants_marketing=False):
     try:
         send_mail(
             subject="Lamos Chocolate — Request received",
-            message=render_to_string("emails/b2b_request_confirmation.txt", {"req": b2b_request}),
+            message=render_to_string(
+                "emails/b2b_request_confirmation.txt", {"req": b2b_request}
+            ),
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[b2b_request.contact_email],
             fail_silently=True,
@@ -85,9 +87,11 @@ def create_b2b_request(form, *, request):
     b2b_request.save()
 
     notify_b2b_request(b2b_request, wants_marketing=wants_marketing)
-    track_event("b2b_request_submitted", channel="b2b",
-                company=b2b_request.company_name)
+    track_event(
+        "b2b_request_submitted", channel="b2b", company=b2b_request.company_name
+    )
     return b2b_request
+
 
 def simulate_quote(account, *, sku, quantity):
     """
@@ -104,12 +108,17 @@ def simulate_quote(account, *, sku, quantity):
     lines = [{"sku": sku.sku_code, "qty": quantity, "price": str(unit_price)}]
 
     sim = QuoteSimulation.objects.create(
-        account=account, cart_json=lines,
-        estimated_value=estimated, moq_reached=moq_reached,
+        account=account,
+        cart_json=lines,
+        estimated_value=estimated,
+        moq_reached=moq_reached,
     )
     return {
-        "sim": sim, "moq": moq, "moq_reached": moq_reached,
-        "unit_price": unit_price, "estimated": estimated,
+        "sim": sim,
+        "moq": moq,
+        "moq_reached": moq_reached,
+        "unit_price": unit_price,
+        "estimated": estimated,
     }
 
 
@@ -137,15 +146,19 @@ def notify_quote_request(account, customization, estimated):
         logger.exception("Failed to send B2B quote-request email")
         return False
 
+
 def notify_b2b_account_pending(account):
     """Notify staff a new pro account awaits validation (+ ack to applicant)."""
     send_mail(
         subject="[Lamos B2B] New pro account pending validation",
         message=f"Company:{account.company_name}\nEmail:{account.customer.email}",
         from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "no-reply@lamos.ch"),
-        recipient_list=[getattr(settings, "B2B_NOTIFY_EMAIL", "contact@lamos-chocolate.ch")],
+        recipient_list=[
+            getattr(settings, "B2B_NOTIFY_EMAIL", "contact@lamos-chocolate.ch")
+        ],
         fail_silently=True,
     )
+
 
 def notify_b2b_account_validated(account):
     """Tell the pro their account is active."""

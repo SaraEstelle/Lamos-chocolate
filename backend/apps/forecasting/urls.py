@@ -20,12 +20,9 @@ Ces opérations sont lancées :
 Pas de routes HTTP nécessaires.
 """
 
-from django.urls import path
-
 # Nom de cette app
-app_name = 'forecasting'
+app_name = "forecasting"
 
 # Cette app n'a pas de routes publiques
 # Elle fonctionne uniquement en arrière-plan
-urlpatterns = [
-]
+urlpatterns = []

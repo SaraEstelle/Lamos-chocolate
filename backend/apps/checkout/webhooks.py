@@ -65,7 +65,7 @@ def _fulfill_checkout(session):
         return
 
     shipping = {
-        key[len(SHIP_PREFIX):]: value
+        key[len(SHIP_PREFIX) :]: value
         for key, value in metadata.items()
         if key.startswith(SHIP_PREFIX)
     }

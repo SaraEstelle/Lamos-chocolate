@@ -6,13 +6,13 @@ from django.db import models
 from django.utils import timezone
 
 from apps.common.constants import (
+    ChannelChoices,
     CurrencyChoices,
     LanguageChoices,
     OrderStatusChoices,
     PaymentStatusChoices,
 )
 
-from apps.common.constants import ChannelChoices
 
 class Order(models.Model):
     customer = models.ForeignKey(
@@ -65,7 +65,9 @@ class Order(models.Model):
         help_text="Sales channel (b2c/b2b) for cockpit splitting",
     )
     campaign_period = models.CharField(
-        max_length=50, blank=True, default="",
+        max_length=50,
+        blank=True,
+        default="",
         help_text="Seasonal campaign (e.g. Noel, Saint-Valentin) for seasonality KPI",
     )
 

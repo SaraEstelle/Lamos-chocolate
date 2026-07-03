@@ -3,7 +3,9 @@ apps/common/tests/test_consent.py
 =================================
 Tests for the cookie-consent endpoint and proof logging.
 """
+
 import json
+
 import pytest
 from django.test import Client
 from django.urls import reverse
@@ -39,6 +41,7 @@ class TestConsent:
         log = ConsentLog.objects.latest("created_at")
         assert log.analytics is False and log.marketing is False
 
+
 @pytest.mark.integration
 class TestConsentExtra:
     def test_accept_records_policy_version(self, client, db):
@@ -50,18 +53,18 @@ class TestConsentExtra:
         )
         assert resp.status_code == 200
         log = ConsentLog.objects.latest("created_at")
-        assert log.policy_version           # non vide (ex. "1.0")
-        assert log.necessary is True        # strictement nécessaire toujours vrai
+        assert log.policy_version  # non vide (ex. "1.0")
+        assert log.necessary is True  # strictement nécessaire toujours vrai
 
     def test_endpoint_rejects_post_without_csrf(self, db):
         """
         Avec CSRF ACTIVÉ (comme un vrai navigateur SANS token), l'endpoint doit
         renvoyer 403. Cela documente le fait que l'endpoint est bien protégé.
         """
-        csrf_client = Client(enforce_csrf_checks=True)   # 👈 CSRF réellement vérifié
+        csrf_client = Client(enforce_csrf_checks=True)  # 👈 CSRF réellement vérifié
         resp = csrf_client.post(
             reverse("consent:set"),
             data=json.dumps({"analytics": True, "marketing": False}),
             content_type="application/json",
         )
-        assert resp.status_code == 403      # protégé : bon signe de sécurité
+        assert resp.status_code == 403  # protégé : bon signe de sécurité

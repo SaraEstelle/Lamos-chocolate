@@ -1,13 +1,14 @@
-import logging
 import json
+import logging
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
-from apps.common.consent import write_consent, CONSENT_POLICY_VERSION
 from apps.accounts.models import ConsentLog
+from apps.common.consent import CONSENT_POLICY_VERSION, write_consent
 
 logger = logging.getLogger(__name__)
+
 
 @require_POST
 def set_consent_view(request):
@@ -22,7 +23,7 @@ def set_consent_view(request):
     response = JsonResponse({"ok": True})
     consent_id = write_consent(response, analytics=analytics, marketing=marketing)
 
-# 2) Store the immutable proof in DB (never breaks the response if it fails).
+    # 2) Store the immutable proof in DB (never breaks the response if it fails).
     try:
         ConsentLog.objects.create(
             customer=request.user if request.user.is_authenticated else None,

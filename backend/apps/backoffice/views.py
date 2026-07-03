@@ -47,10 +47,14 @@ def orders_list_view(request):
     orders = Order.objects.select_related("customer").order_by("-created_at")
     if status:
         orders = orders.filter(status=status)
-    return render(request, "backoffice/orders.html", {
-        "orders": orders,
-        "current_status": status,
-    })
+    return render(
+        request,
+        "backoffice/orders.html",
+        {
+            "orders": orders,
+            "current_status": status,
+        },
+    )
 
 
 @staff_member_required
@@ -59,8 +63,15 @@ def order_update_status_view(request, order_id):
     """Update an order's status from the backoffice."""
     order = get_object_or_404(Order, id=order_id)
     new_status = request.POST.get("status")
-    valid = {"pending", "paid", "processing", "shipped", "delivered",
-             "cancelled", "refunded"}
+    valid = {
+        "pending",
+        "paid",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+        "refunded",
+    }
     if new_status in valid:
         order.status = new_status
         order.save(update_fields=["status", "updated_at"])
@@ -71,9 +82,13 @@ def order_update_status_view(request, order_id):
 @require_http_methods(["GET"])
 def stock_view(request):
     """Show stock levels and low-stock alerts."""
-    return render(request, "backoffice/stock.html", {
-        "low_stock": get_low_stock_items(),
-    })
+    return render(
+        request,
+        "backoffice/stock.html",
+        {
+            "low_stock": get_low_stock_items(),
+        },
+    )
 
 
 @staff_member_required
@@ -84,10 +99,14 @@ def b2b_requests_view(request):
     requests_qs = B2BRequest.objects.order_by("-created_at")
     if status:
         requests_qs = requests_qs.filter(status=status)
-    return render(request, "backoffice/b2b_requests.html", {
-        "requests": requests_qs,
-        "current_status": status,
-    })
+    return render(
+        request,
+        "backoffice/b2b_requests.html",
+        {
+            "requests": requests_qs,
+            "current_status": status,
+        },
+    )
 
 
 @staff_member_required
@@ -124,9 +143,13 @@ def b2b_accounts_view(request):
     This is the human step of the B2B onboarding: a staff member reviews each
     pending company and grants or denies portal access.
     """
-    return render(request, "backoffice/b2b_accounts.html", {
-        "pending_accounts": get_pending_b2b_accounts(),
-    })
+    return render(
+        request,
+        "backoffice/b2b_accounts.html",
+        {
+            "pending_accounts": get_pending_b2b_accounts(),
+        },
+    )
 
 
 @staff_member_required
