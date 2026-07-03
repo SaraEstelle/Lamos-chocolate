@@ -105,6 +105,7 @@ urlpatterns = [
     # =========================================================================
     path("i18n/", include("django.conf.urls.i18n")),
 
+    # --- Consent endpoint (no /fr/ or /en/ prefix, callable from any page) ---
     path("consent/", include("apps.common.urls_consent")),
 ]
 
