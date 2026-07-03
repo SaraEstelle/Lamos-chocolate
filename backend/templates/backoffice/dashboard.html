@@ -1,64 +1,53 @@
-{% extends "base/base.html" %}
-{% load i18n %}
+{% extends "backoffice/base.html" %}
+{% load i18n l10n %}
 
-{% block title %}{% trans "Backoffice" %} — Lamos Chocolate{% endblock %}
+{% block title %}{% trans "Backoffice dashboard" %} — Lamos Chocolate{% endblock %}
 
-{% block content %}
-<div class="container my-5">
-  <h1 class="mb-4">{% trans "Backoffice dashboard" %}</h1>
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:.25rem;">{% trans "Dashboard" %}</h1>
+  <p class="muted" style="margin-bottom:2rem;">{% trans "Overview of operations." %}</p>
 
-  {% comment %}
-    KPIs — responsive auto-fit grid so the 5 cards stay on one row on wide
-    screens and wrap cleanly on narrow ones (the marble grid has no 5-up
-    class, so we use a self-contained CSS grid instead of touching it).
-  {% endcomment %}
-  <div class="mb-4"
-       style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
-    <div class="card text-center shadow-sm"><div class="card-body">
-      <h3>{{ kpis.revenue }} €</h3><p class="text-muted mb-0">{% trans "Revenue" %}</p>
-    </div></div>
-    <div class="card text-center shadow-sm"><div class="card-body">
-      <h3>{{ kpis.order_count }}</h3><p class="text-muted mb-0">{% trans "Paid orders" %}</p>
-    </div></div>
-    <div class="card text-center shadow-sm"><div class="card-body">
-      <h3>{{ kpis.avg_basket }} €</h3><p class="text-muted mb-0">{% trans "Avg. basket" %}</p>
-    </div></div>
-    <div class="card text-center shadow-sm"><div class="card-body">
-      <h3 class="text-warning">{{ kpis.low_stock_count }}</h3><p class="text-muted mb-0">{% trans "Low stock" %}</p>
-    </div></div>
-    <div class="card text-center shadow-sm"><div class="card-body">
-      <h3>{{ kpis.b2b_revenue }} €</h3><p class="text-muted mb-0">{% trans "B2B revenue" %}</p>
-    </div></div>
+  {# --- KPI cards (same style as the customer-area stat cards) --- #}
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2.5rem;">
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.revenue }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Revenue" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.order_count }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Paid orders" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.avg_basket }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Avg. basket" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.low_stock_count }}</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "Low stock" %}</p>
+    </div>
+    <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.5rem;background:var(--c-ivory);text-align:center;">
+      <div class="h-display" style="font-size:2rem;line-height:1;">{{ kpis.b2b_revenue }} CHF</div>
+      <p class="muted small" style="margin-top:.4rem;">{% trans "B2B revenue" %}</p>
+    </div>
   </div>
 
-  <div class="row g-3 mb-4">
-    <div class="col-md-4"><a href="{% url 'backoffice:orders' %}" class="btn btn-outline-dark w-100">📦 {% trans "Manage orders" %} ({{ kpis.pending_orders }} {% trans "pending" %})</a></div>
-    <div class="col-md-4"><a href="{% url 'backoffice:stock' %}" class="btn btn-outline-dark w-100">📊 {% trans "Stock" %}</a></div>
-    <div class="col-md-4"><a href="{% url 'backoffice:forecasting' %}" class="btn btn-outline-dark w-100">📈 {% trans "Forecasting" %}</a></div>
-    <div class="col-md-4"><a href="{% url 'backoffice:b2b_requests' %}" class="btn btn-outline-dark w-100">🏢 {% trans "B2B requests" %} ({{ kpis.new_b2b_count }} {% trans "new" %})</a></div>
-    <div class="col-md-4"><a href="{% url 'backoffice:b2b_accounts' %}" class="btn btn-outline-dark w-100">🧾 {% trans "Validate pro accounts" %} ({{ kpis.pending_b2b_accounts }} {% trans "pending" %})</a></div>
+  {# --- Revenue chart --- #}
+  <h2 class="eyebrow">{% trans "Revenue (last 30 days)" %}</h2>
+  <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1.25rem;background:var(--c-ivory);margin-bottom:2.5rem;">
+    <canvas id="revenueChart" height="80"></canvas>
   </div>
 
-  <!-- Revenue chart -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-header">{% trans "Revenue (last 30 days)" %}</div>
-    <div class="card-body"><canvas id="revenueChart" height="80"></canvas></div>
+  {# --- Top products --- #}
+  <h2 class="eyebrow">{% trans "Top products" %}</h2>
+  <div style="border:1px solid var(--c-line);border-radius:var(--radius);background:var(--c-ivory);overflow:hidden;">
+    {% for p in top_products %}
+    <div style="display:flex;justify-content:space-between;padding:.9rem 1.25rem;border-bottom:1px solid var(--c-line);">
+      <span>{{ p.sku__product__name_fr }}</span><span>{{ p.qty }}</span>
+    </div>
+    {% empty %}
+    <p class="muted" style="padding:1.25rem;margin:0;">{% trans "No sales yet." %}</p>
+    {% endfor %}
   </div>
-
-  <!-- Top products -->
-  <div class="card shadow-sm">
-    <div class="card-header">{% trans "Top products" %}</div>
-    <ul class="list-group list-group-flush">
-      {% for p in top_products %}
-      <li class="list-group-item d-flex justify-content-between">
-        <span>{{ p.sku__product__name_fr }}</span><span>{{ p.qty }}</span>
-      </li>
-      {% empty %}
-      <li class="list-group-item text-muted">{% trans "No sales yet." %}</li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
 {% endblock %}
 
 {% block extra_scripts %}
@@ -66,16 +55,18 @@
 <script>
   // Build the revenue chart from server data
   const revenueData = [
+    {% localize off %}
     {% for row in revenue_30d %}
-    {x: "{{ row.day }}", y: {{ row.total }}},
+    {x: "{{ row.day|date:'Y-m-d' }}", y: {{ row.total }}},
     {% endfor %}
+    {% endlocalize %}
   ];
   const ctx = document.getElementById('revenueChart');
   new Chart(ctx, {
     type: 'line',
     data: {
       labels: revenueData.map(d => d.x),
-      datasets: [{ label: 'Revenue (€)', data: revenueData.map(d => d.y), borderColor: '#6f4e37', tension: 0.3 }]
+      datasets: [{ label: 'Revenue (CHF)', data: revenueData.map(d => d.y), borderColor: '#6f4e37', tension: 0.3 }]
     },
     options: { responsive: true, plugins: { legend: { display: false } } }
   });

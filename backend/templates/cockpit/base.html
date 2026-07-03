@@ -78,6 +78,7 @@
     <aside class="sidebar">
       <div class="brand">Lamos<span>Cockpit</span></div>
       <nav>
+        <a href="{% url 'backoffice:dashboard' %}">&larr; {% trans "Backoffice" %}</a>
         <a href="{% url 'cockpit:dashboard' %}" class="{% if active == 'home' %}active{% endif %}">{% trans "Synthèse" %}</a>
         <a href="{% url 'cockpit:products' %}" class="{% if active == 'products' %}active{% endif %}">{% trans "Produits" %}</a>
         <a href="{% url 'cockpit:inventory' %}" class="{% if active == 'inventory' %}active{% endif %}">{% trans "Stock & prévisions" %}</a>

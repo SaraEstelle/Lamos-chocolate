@@ -1,10 +1,8 @@
-{% extends "base/base.html" %}
+{% extends "backoffice/base.html" %}
 {% load i18n %}
 {% block title %}{% trans "B2B requests" %} — Backoffice{% endblock %}
-{% block content %}
-<div class="container my-5">
-  <a href="{% url 'backoffice:dashboard' %}" class="btn btn-link mb-3">← {% trans "Back to dashboard" %}</a>
-  <h1 class="mb-4">{% trans "B2B requests" %}</h1>
+{% block bo_content %}
+  <h1 class="h-display" style="margin-bottom:1.5rem;">{% trans "B2B requests" %}</h1>
   <table class="table table-hover align-middle">
     <thead><tr><th>{% trans "Company" %}</th><th>{% trans "Contact" %}</th><th>{% trans "Qty" %}</th><th>{% trans "Status" %}</th><th>{% trans "Change" %}</th></tr></thead>
     <tbody>
@@ -28,5 +26,4 @@
       {% endfor %}
     </tbody>
   </table>
-</div>
 {% endblock %}
