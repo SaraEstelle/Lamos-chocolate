@@ -74,7 +74,7 @@ def _fulfill_checkout(session):
         customer=customer,
         items=items,
         shipping=shipping,
-        currency=metadata.get("currency", CurrencyChoices.EUR),
+        currency=metadata.get("currency", CurrencyChoices.CHF),
         language=metadata.get("language", LanguageChoices.FR),
         channel=metadata.get("channel", ChannelChoices.B2C),
         stripe_session_id=session.get("id"),

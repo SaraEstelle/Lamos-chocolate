@@ -1,0 +1,105 @@
+{% load i18n %}<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'fr' }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% trans "Cockpit exécutif" %}{% endblock %} — Lamos Chocolate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --gold: #C8A96E;
+      --ink: #1A1A1A;
+      --muted: #8a8174;
+      --line: #e7e0d5;
+      --card: #ffffff;
+      --b2c: #C8A96E;
+      --b2b: #1A1A1A;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--cream); color: var(--ink);
+      font-family: "Inter", system-ui, sans-serif; font-weight: 400;
+    }
+
+    /* --- Shell: fixed sidebar + scrolling main --- */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 232px; flex-shrink: 0; background: var(--ink); color: #f3ede1;
+      padding: 28px 0; position: sticky; top: 0; height: 100vh;
+    }
+    .sidebar .brand {
+      font-family: "Playfair Display", serif; font-weight: 600; font-size: 22px;
+      line-height: 1.1; padding: 0 24px 24px; border-bottom: 1px solid rgba(243,237,225,.12);
+    }
+    .sidebar .brand span { display: block; font-size: 12px; font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin-top: 6px; }
+    .sidebar nav { margin-top: 16px; }
+    .sidebar nav a {
+      display: block; padding: 12px 24px; color: #cfc7b8; text-decoration: none;
+      font-size: 14px; border-left: 3px solid transparent;
+    }
+    .sidebar nav a:hover { color: #fff; background: rgba(243,237,225,.05); }
+    .sidebar nav a.active { color: var(--gold); background: rgba(200,169,110,.14); border-left-color: var(--gold); font-weight: 500; }
+
+    .main { flex: 1; min-width: 0; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 32px 64px; }
+    header.cockpit { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+    header.cockpit h1 { font-family: "Playfair Display", serif; font-weight: 600; font-size: 28px; margin: 0; letter-spacing: .3px; }
+    header.cockpit .meta { color: var(--muted); font-size: 13px; }
+    h2.section { font-family: "Playfair Display", serif; font-weight: 500; font-size: 18px; margin: 36px 0 14px; }
+
+    .pulse { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+    .kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .kpi .value { font-family: "Playfair Display", serif; font-size: 30px; font-weight: 600; margin: 8px 0 4px; }
+    .kpi .target { font-size: 12px; color: var(--muted); }
+    .bar { height: 6px; background: var(--line); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; background: var(--gold); border-radius: 4px; }
+
+    .grid-2 { display: grid; grid-template-columns: 360px 1fr; gap: 24px; align-items: start; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+    .card h3 { margin: 0 0 14px; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); }
+    th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .empty { color: var(--muted); font-style: italic; padding: 16px 6px; }
+    .legend { display: flex; gap: 18px; margin-top: 14px; font-size: 13px; }
+    .legend span { display: inline-flex; align-items: center; gap: 7px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    {% block extra_css %}{% endblock %}
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="brand">Lamos<span>Cockpit</span></div>
+      <nav>
+        <a href="{% url 'backoffice:dashboard' %}">&larr; {% trans "Backoffice" %}</a>
+        <a href="{% url 'cockpit:dashboard' %}" class="{% if active == 'home' %}active{% endif %}">{% trans "Synthèse" %}</a>
+        <a href="{% url 'cockpit:products' %}" class="{% if active == 'products' %}active{% endif %}">{% trans "Produits" %}</a>
+        <a href="{% url 'cockpit:inventory' %}" class="{% if active == 'inventory' %}active{% endif %}">{% trans "Stock & prévisions" %}</a>
+        <a href="{% url 'cockpit:heatmap' %}" class="{% if active == 'heatmap' %}active{% endif %}">{% trans "Heatmap cantonale" %}</a>
+        <a href="{% url 'cockpit:etude' %}" class="{% if active == 'etude' %}active{% endif %}">{% trans "Étude" %}</a>
+        <a href="{% url 'cockpit:pilotage' %}" class="{% if active == 'pilotage' %}active{% endif %}">{% trans "Pilotage" %}</a>
+      </nav>
+    </aside>
+
+    <div class="main">
+      <div class="wrap">
+        <header class="cockpit">
+          <h1>{% block heading %}{% trans "Cockpit exécutif" %}{% endblock %}</h1>
+          <div class="meta">{% block meta %}Lamos Chocolate · {% trans "données consolidées" %} · CHF{% endblock %}</div>
+        </header>
+
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

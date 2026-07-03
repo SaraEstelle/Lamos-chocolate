@@ -1,0 +1,139 @@
+{% extends "cockpit/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Stock & prévisions" %}{% endblock %}
+{% block heading %}{% trans "Stock & prévisions" %}{% endblock %}
+{% block meta %}{% trans "Vélocité sur" %} {{ inventory.window_days }} {% trans "jours" %} · {% trans "jours avant rupture & relance production" %}{% endblock %}
+
+{% block extra_css %}
+    .summary-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+    .badge.critical { background: #b3261e; color: #fff; }
+    .badge.warning { background: #c8851e; color: #fff; }
+    .badge.ok { background: #e7e0d5; color: var(--muted); }
+    tr.row-critical td { background: rgba(179,38,30,.06); }
+    tr.row-warning td { background: rgba(200,133,30,.06); }
+    .alert-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+    .alert-item:last-child { border-bottom: 0; }
+    .alert-item .sku { font-weight: 500; }
+    .alert-item .meta { color: var(--muted); font-size: 12px; }
+    .restock { font-variant-numeric: tabular-nums; }
+{% endblock %}
+
+{% block content %}
+    <!-- Summary -->
+    <div class="summary-3">
+      <div class="kpi">
+        <div class="label">{% trans "SKU suivis" %}</div>
+        <div class="value">{{ inventory.sku_count }}</div>
+        <div class="target">{% trans "actifs avec stock" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Rupture imminente" %}</div>
+        <div class="value" style="color: #b3261e;">{{ inventory.critical_count }}</div>
+        <div class="target">{% trans "runway ≤ délai de production" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "À surveiller" %}</div>
+        <div class="value" style="color: #c8851e;">{{ inventory.warning_count }}</div>
+        <div class="target">{% trans "stock bas ou runway court" %}</div>
+      </div>
+    </div>
+
+    <!-- KPI 6 — production relaunch alerts -->
+    <div class="card">
+      <h3>{% trans "Alertes de relance production" %}</h3>
+      {% for a in inventory.alerts %}
+      <div class="alert-item">
+        <div>
+          <span class="sku">{{ a.code }}</span>
+          <span class="meta">· {{ a.product }}{% if a.flavor %} · {{ a.flavor }}{% endif %}</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <span class="meta restock">{% trans "stock" %} {{ a.stock }}
+            {% if a.days_left is not None %}· {{ a.days_left }} {% trans "j restants" %}{% endif %}
+            · {% trans "relancer" %} ~{{ a.batch_size }} u.</span>
+          <span class="badge {{ a.status }}">{% if a.status == 'critical' %}{% trans "Critique" %}{% else %}{% trans "Surveiller" %}{% endif %}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty">{% trans "Aucune relance nécessaire — tous les stocks sont confortables." %}</div>
+      {% endfor %}
+    </div>
+
+    <!-- KPI 5 — days until stockout per SKU -->
+    <h2 class="section">{% trans "Jours avant rupture par SKU" %}</h2>
+    <div class="card">
+      {% if inventory.rows %}
+      <canvas id="runwayChart" height="100"></canvas>
+      {% endif %}
+      <table style="margin-top: 18px;">
+        <thead>
+          <tr>
+            <th>SKU</th><th>{% trans "Produit" %}</th>
+            <th class="num">{% trans "Stock" %}</th>
+            <th class="num">{% trans "Vélocité (u/j)" %}</th>
+            <th class="num">{% trans "Jours restants" %}</th>
+            <th class="num">{% trans "Délai prod." %}</th>
+            <th>{% trans "Statut" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in inventory.rows %}
+          <tr class="row-{{ r.status }}">
+            <td>{{ r.code }}</td>
+            <td>{{ r.product }}{% if r.flavor %} · {{ r.flavor }}{% endif %}</td>
+            <td class="num">{{ r.stock }}</td>
+            <td class="num">{{ r.velocity }}</td>
+            <td class="num">{% if r.days_left is not None %}{{ r.days_left }}{% else %}—{% endif %}</td>
+            <td class="num">{{ r.lead_days }} j</td>
+            <td><span class="badge {{ r.status }}">{% if r.status == 'critical' %}{% trans "Critique" %}{% elif r.status == 'warning' %}{% trans "Surveiller" %}{% else %}{% trans "OK" %}{% endif %}</span></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="empty">{% trans "Aucun SKU actif avec stock." %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ inventory.rows|json_script:"inventory-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const inv = JSON.parse(document.getElementById("inventory-data").textContent);
+    const el = document.getElementById("runwayChart");
+    // Only SKUs with a finite runway, shortest first (most urgent on top).
+    const rows = inv.filter(r => r.days_left !== null).slice(0, 12);
+    const colorByStatus = { critical: "#b3261e", warning: "#c8851e", ok: "#C8A96E" };
+    if (el && rows.length) {
+      new Chart(el, {
+        type: "bar",
+        data: {
+          labels: rows.map(r => r.code),
+          datasets: [{
+            label: "{% trans "Jours avant rupture" %}",
+            data: rows.map(r => r.days_left),
+            backgroundColor: rows.map(r => colorByStatus[r.status] || "#8a8174"),
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          indexAxis: "y",
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => {
+                  const r = rows[ctx.dataIndex];
+                  return `${r.product}: ${r.days_left} j (stock ${r.stock}, ${r.velocity} u/j)`;
+                },
+              },
+            },
+          },
+          scales: { x: { beginAtZero: true, title: { display: true, text: "{% trans "Jours" %}" } } },
+        },
+      });
+    }
+  </script>
+{% endblock %}

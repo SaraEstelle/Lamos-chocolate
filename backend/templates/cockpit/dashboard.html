@@ -1,0 +1,116 @@
+{% extends "cockpit/base.html" %}
+{% load i18n l10n %}
+
+{% block heading %}{% trans "Synthèse" %}{% endblock %}
+
+{% block content %}
+    <!-- Pulse band (PRD §8.1) -->
+    <div class="pulse">
+      <div class="kpi">
+        <div class="label">{% trans "CA du jour" %}</div>
+        <div class="value">{{ pulse.revenue_today|floatformat:0 }} <small>CHF</small></div>
+        <div class="target">{% trans "objectif" %} {{ pulse.revenue_today_target }} · {{ pulse.revenue_today_pct }}%</div>
+        <div class="bar"><span style="width: {% if pulse.revenue_today_pct > 100 %}100{% else %}{{ pulse.revenue_today_pct|unlocalize }}{% endif %}%"></span></div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "CA du mois (MTD)" %}</div>
+        <div class="value">{{ pulse.revenue_mtd|floatformat:0 }} <small>CHF</small></div>
+        <div class="target">{% trans "objectif" %} {{ pulse.revenue_mtd_target }} · {{ pulse.revenue_mtd_pct }}%</div>
+        <div class="bar"><span style="width: {% if pulse.revenue_mtd_pct > 100 %}100{% else %}{{ pulse.revenue_mtd_pct|unlocalize }}{% endif %}%"></span></div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Commandes aujourd'hui" %}</div>
+        <div class="value">{{ pulse.orders_today }}</div>
+        <div class="target">{% trans "tous canaux" %}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">{% trans "Unités expédiées (MTD)" %}</div>
+        <div class="value">{{ pulse.units_mtd }}</div>
+        <div class="target">{% trans "capacité" %} {{ pulse.capacity_units }} · {{ pulse.units_mtd_pct }}%</div>
+        <div class="bar"><span style="width: {% if pulse.units_mtd_pct > 100 %}100{% else %}{{ pulse.units_mtd_pct|unlocalize }}{% endif %}%"></span></div>
+      </div>
+    </div>
+
+    <!-- Channel split + Top SKUs -->
+    <div class="grid-2" style="margin-top: 36px;">
+      <div class="card">
+        <h3>{% trans "Répartition canal (30 j)" %}</h3>
+        <canvas id="channelChart" height="220"></canvas>
+        <div class="legend">
+          <span><span class="dot" style="background: var(--b2c)"></span> B2C</span>
+          <span><span class="dot" style="background: var(--b2b)"></span> B2B</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>{% trans "Top produits (30 j)" %}</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>SKU</th><th>{% trans "Produit" %}</th>
+              <th class="num">{% trans "Unités" %}</th><th class="num">CA (CHF)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in top_skus %}
+            <tr>
+              <td>{{ s.sku__sku_code }}</td>
+              <td>{{ s.sku__product__name_fr }}{% if s.sku__flavor %} · {{ s.sku__flavor }}{% endif %}</td>
+              <td class="num">{{ s.units }}</td>
+              <td class="num">{{ s.revenue|floatformat:0 }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">{% trans "Aucune vente sur la période." %}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Revenue trend -->
+    <h2 class="section">{% trans "Chiffre d'affaires — 30 derniers jours" %}</h2>
+    <div class="card">
+      <canvas id="revenueChart" height="90"></canvas>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+  {{ channel_split|json_script:"channel-data" }}
+  {{ revenue_trend|json_script:"revenue-data" }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const channelData = JSON.parse(document.getElementById("channel-data").textContent);
+    const revenueData = JSON.parse(document.getElementById("revenue-data").textContent);
+
+    const labelByChannel = { b2c: "B2C", b2b: "B2B" };
+    const colorByChannel = { b2c: "#C8A96E", b2b: "#1A1A1A" };
+
+    new Chart(document.getElementById("channelChart"), {
+      type: "doughnut",
+      data: {
+        labels: channelData.map(d => labelByChannel[d.channel] || d.channel || "—"),
+        datasets: [{
+          data: channelData.map(d => Number(d.revenue)),
+          backgroundColor: channelData.map(d => colorByChannel[d.channel] || "#8a8174"),
+          borderWidth: 0,
+        }],
+      },
+      options: { plugins: { legend: { display: false } }, cutout: "62%" },
+    });
+
+    new Chart(document.getElementById("revenueChart"), {
+      type: "line",
+      data: {
+        labels: revenueData.map(d => d.day),
+        datasets: [{
+          label: "CA (CHF)",
+          data: revenueData.map(d => Number(d.total)),
+          borderColor: "#C8A96E",
+          backgroundColor: "rgba(200,169,110,0.12)",
+          fill: true, tension: 0.3, pointRadius: 0,
+        }],
+      },
+      options: { responsive: true, plugins: { legend: { display: false } },
+                 scales: { y: { beginAtZero: true } } },
+    });
+  </script>
+{% endblock %}

@@ -92,7 +92,7 @@ class TestPayment:
             order=order, stripe_payment_intent="pi_test_123", amount=Decimal("25.80")
         )
         assert payment.status == "pending"
-        assert payment.currency == "EUR"
+        assert payment.currency == "CHF"
         assert payment.paid_at is None
 
     def test_payment_one_to_one_reverse(self, db, sample_customer):

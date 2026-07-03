@@ -4,6 +4,7 @@ apps/accounts/redirects.py
 Single source of truth for "where does a user land right after auth?".
 
 Routing rules:
+  - Staff (is_staff) -> the operational backoffice dashboard.
   - A user who owns a B2BAccount is a professional:
       * active account  -> the pro portal
       * any other status -> the pending/validation page
@@ -17,6 +18,10 @@ def post_auth_redirect_target(user):
     Kept as a route name (not a resolved URL) so callers can pass it straight
     to django.shortcuts.redirect(), and allauth can reverse it too.
     """
+    # Staff members run operations from the backoffice, not the customer area.
+    if getattr(user, "is_staff", False):
+        return "backoffice:dashboard"
+
     # getattr avoids a RelatedObjectDoesNotExist explosion when there is no
     # B2BAccount attached to this user.
     account = getattr(user, "b2b_account", None)
