@@ -71,11 +71,12 @@
           <div style="border:1px solid var(--c-line);border-radius:var(--radius);padding:1rem 1.2rem;background:var(--c-ivory);">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
               <div>
-                {# Show what actually distinguishes the SKUs. `format` is often
-                   identical across flavours, so fall back to the unique sku_code
-                   to avoid the "duplicate rows" effect seen on Truffes/Carrés.
-                   TODO: add a real `variant_name`/`flavor` field on SKU to show
-                   the flavour name here (see GUIDE_FIXES §4b). #}
+                {% comment %}
+                Show what actually distinguishes the SKUs. `format` is often identical
+                across flavours, so fall back to the unique sku_code to avoid the
+                "duplicate rows" effect seen on Truffes/Carrés. TODO: add a real
+                `variant_name`/`flavor` field on SKU to show the flavour name here.
+                {% endcomment %}
                 <strong>{{ sku.format }}</strong>
                 {% if sku.weight_g %}<span class="muted">· {{ sku.weight_g }}g</span>{% endif %}
                 <div class="muted small">{{ sku.sku_code }}</div>
