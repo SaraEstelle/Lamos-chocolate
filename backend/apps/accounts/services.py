@@ -22,6 +22,8 @@ from django.conf import settings
 from apps.accounts.models import Customer, PasswordResetToken
 from apps.accounts.tokens import create_reset_token
 
+import uuid as _uuid
+from django.db import transaction
 
 # Logger for failed attempts
 logger = logging.getLogger('apps.accounts')
@@ -245,3 +247,31 @@ def authenticate_customer(email: str, password: str) -> Customer | None:
         # ❌ Server error
         logger.error(f"Error during authentication:{str(e)}")
         return None
+
+@transaction.atomic
+def anonymize_customer(customer) -> None:
+    """
+    GDPR/nLPD erasure that respects Swiss accounting retention:
+    - wipe personal identifiers on the Customer (deactivate it),
+    - anonymize linked orders' personal data but keep financial records.
+    """
+    anon = f"deleted-{_uuid.uuid4().hex[:12]}@anonymized.invalid"
+    customer.email = anon
+    customer.first_name = ""
+    customer.last_name = ""
+    customer.phone = ""
+    customer.npa = ""
+    customer.canton = ""
+    customer.is_active = False
+    customer.set_unusable_password()
+    customer.save()
+
+    # Anonymize order PII while keeping totals/invoice numbers for legal retention.
+    from apps.checkout.models import Order
+    for order in Order.objects.filter(customer=customer):
+        # adapt field names to your Order/Address schema
+        if hasattr(order, "shipping_full_name"):
+            order.shipping_full_name = "ANONYMIZED"
+        if hasattr(order, "shipping_phone"):
+            order.shipping_phone = ""
+        order.save()
