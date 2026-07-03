@@ -1,4 +1,5 @@
 """Smoke tests for internationalization (i18n) routing and language switching."""
+
 import pytest
 from django.urls import reverse
 
