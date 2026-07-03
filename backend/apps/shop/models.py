@@ -1,11 +1,12 @@
 import math
 import uuid
+from decimal import Decimal
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from apps.common.constants import CurrencyChoices
-from decimal import Decimal
+
 
 class Category(models.Model):
     name_fr = models.CharField(max_length=100)
@@ -111,11 +112,16 @@ class SKU(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     cost_chf = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
         help_text="Production cost in CHF (for margin KPI)",
     )
     flavor = models.CharField(
-        max_length=100, blank=True, default="",
+        max_length=100,
+        blank=True,
+        default="",
         help_text="Flavor variant (e.g. pistache, coffee, caramel)",
     )
 

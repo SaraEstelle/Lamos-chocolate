@@ -9,32 +9,37 @@ Forms for the public B2B funnel (quote / bulk-order requests).
 """
 
 from django import forms
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from apps.b2b.models import B2BRequest
-
-from apps.b2b.models import CustomizationRequest
-from apps.shop.models import SKU
-from django.db import transaction
-
 from apps.accounts.models import Customer
+from apps.b2b.models import B2BRequest, CustomizationRequest
 from apps.common.constants import (
-    CustomerTypeChoices, B2BSegmentChoices, B2BAccountStatusChoices,
+    B2BAccountStatusChoices,
+    B2BSegmentChoices,
+    CustomerTypeChoices,
 )
+from apps.shop.models import SKU
+
 
 class B2BRequestForm(forms.ModelForm):
     """Public form for a professional to request a quote / bulk order."""
 
     website = forms.CharField(  # honeypot, not a model field
         required=False,
-        widget=forms.TextInput(attrs={
-            "tabindex": "-1", "autocomplete": "off",
-            "class": "d-none", "aria-hidden": "true",
-        }),
+        widget=forms.TextInput(
+            attrs={
+                "tabindex": "-1",
+                "autocomplete": "off",
+                "class": "d-none",
+                "aria-hidden": "true",
+            }
+        ),
         label="",
     )
     wants_marketing = forms.BooleanField(
-        required=False, initial=False,
+        required=False,
+        initial=False,
         label=_("I agree to receive commercial offers from Lamos Chocolate"),
         widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
@@ -42,16 +47,26 @@ class B2BRequestForm(forms.ModelForm):
     class Meta:
         model = B2BRequest
         fields = (
-            "company_name", "contact_name", "contact_email", "contact_phone",
-            "sector", "estimated_qty", "occasion", "message",
+            "company_name",
+            "contact_name",
+            "contact_email",
+            "contact_phone",
+            "sector",
+            "estimated_qty",
+            "occasion",
+            "message",
         )
         widgets = {
             "company_name": forms.TextInput(attrs={"class": "form-control"}),
             "contact_name": forms.TextInput(attrs={"class": "form-control"}),
             "contact_email": forms.EmailInput(attrs={"class": "form-control"}),
-            "contact_phone": forms.TextInput(attrs={"class": "form-control", "placeholder": "+41 (XX) XXX XX XX"}),
+            "contact_phone": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "+41 (XX) XXX XX XX"}
+            ),
             "sector": forms.TextInput(attrs={"class": "form-control"}),
-            "estimated_qty": forms.NumberInput(attrs={"class": "form-control", "min": 1}),
+            "estimated_qty": forms.NumberInput(
+                attrs={"class": "form-control", "min": 1}
+            ),
             "occasion": forms.TextInput(attrs={"class": "form-control"}),
             "message": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
         }
@@ -66,14 +81,19 @@ class B2BRequestForm(forms.ModelForm):
             raise forms.ValidationError(_("Quantity must be at least 1."))
         return qty
 
+
 class ConfiguratorForm(forms.ModelForm):
     """4-axis personalisation form (logo / inner / outer packaging / grammage)."""
 
     class Meta:
         model = CustomizationRequest
         fields = (
-            "sku", "logo_engraved", "inner_packaging",
-            "outer_packaging", "grammage", "quantity",
+            "sku",
+            "logo_engraved",
+            "inner_packaging",
+            "outer_packaging",
+            "grammage",
+            "quantity",
         )
         widgets = {
             "sku": forms.Select(attrs={"class": "form-select"}),
@@ -88,7 +108,8 @@ class ConfiguratorForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Only B2B-available SKUs can be configured.
         self.fields["sku"].queryset = SKU.objects.filter(
-            is_active=True, b2b_info__is_b2b_available=True,
+            is_active=True,
+            b2b_info__is_b2b_available=True,
         )
 
     def clean_quantity(self):
@@ -97,15 +118,17 @@ class ConfiguratorForm(forms.ModelForm):
             raise forms.ValidationError(_("Quantity must be at least 1."))
         return qty
 
+
 class B2BRegisterForm(forms.Form):
     """Self-service B2B registration. Creates a pending pro account."""
-    first_name   = forms.CharField(max_length=150)
-    last_name    = forms.CharField(max_length=150)
-    email        = forms.EmailField()
+
+    first_name = forms.CharField(max_length=150)
+    last_name = forms.CharField(max_length=150)
+    email = forms.EmailField()
     company_name = forms.CharField(max_length=200)
-    sector       = forms.ChoiceField(choices=B2BSegmentChoices.choices)
-    phone        = forms.CharField(max_length=20, required=False)
-    password     = forms.CharField(min_length=12, widget=forms.PasswordInput)
+    sector = forms.ChoiceField(choices=B2BSegmentChoices.choices)
+    phone = forms.CharField(max_length=20, required=False)
+    password = forms.CharField(min_length=12, widget=forms.PasswordInput)
     password_confirm = forms.CharField(widget=forms.PasswordInput)
     preferred_language = forms.ChoiceField(
         choices=[
@@ -127,10 +150,16 @@ class B2BRegisterForm(forms.Form):
 
     def clean_password(self):
         p = self.cleaned_data.get("password", "")
-        checks = [any(c.isupper() for c in p), any(c.islower() for c in p),
-                  any(c.isdigit() for c in p), any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p)]
+        checks = [
+            any(c.isupper() for c in p),
+            any(c.islower() for c in p),
+            any(c.isdigit() for c in p),
+            any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p),
+        ]
         if not all(checks):
-            raise forms.ValidationError("Password must contain uppercase, lowercase, digit and special char.")
+            raise forms.ValidationError(
+                "Password must contain uppercase, lowercase, digit and special char."
+            )
         return p
 
     def clean(self):
@@ -157,6 +186,7 @@ class B2BRegisterForm(forms.Form):
         customer.save()
 
         from apps.accounts.models import B2BAccount
+
         account = B2BAccount.objects.create(
             customer=customer,
             company_name=data["company_name"],

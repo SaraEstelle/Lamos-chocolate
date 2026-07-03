@@ -15,15 +15,22 @@ Règulation Suisse (RGPD) :
 """
 
 import uuid
-from django.db import models
+
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from apps.common.constants import CustomerTypeChoices, SwissCantonChoices
-from apps.common.constants import B2BSegmentChoices, B2BAccountStatusChoices
+
+from apps.common.constants import (
+    B2BAccountStatusChoices,
+    B2BSegmentChoices,
+    CustomerTypeChoices,
+    SwissCantonChoices,
+)
+
 
 class CustomerManager(BaseUserManager):
     """
@@ -38,7 +45,7 @@ class CustomerManager(BaseUserManager):
         Créer un client normal.
         """
         if not email:
-            raise ValueError(_('Email is required'))
+            raise ValueError(_("Email is required"))
 
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
@@ -50,8 +57,8 @@ class CustomerManager(BaseUserManager):
         """
         Créer un superuser (admin).
         """
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
         return self.create_user(email, password, **extra_fields)
 
 
@@ -81,57 +88,47 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         primary_key=True,
         default=uuid.uuid4,
         editable=False,
-        help_text="Identifiant unique du client (UUID)"
+        help_text="Identifiant unique du client (UUID)",
     )
 
     # Email (utilisé pour login au lieu de username)
-    email = models.EmailField(
-        unique=True,
-        help_text="Email unique du client"
-    )
+    email = models.EmailField(unique=True, help_text="Email unique du client")
 
     # Informations personnelles
     first_name = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text="Prénom du client"
+        max_length=150, blank=True, help_text="Prénom du client"
     )
 
     last_name = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text="Nom de famille du client"
+        max_length=150, blank=True, help_text="Nom de famille du client"
     )
 
     phone = models.CharField(
         max_length=20,
         blank=True,
-        help_text="Numéro de téléphone (format: +41 XX XXX XX XX)"
+        help_text="Numéro de téléphone (format: +41 XX XXX XX XX)",
     )
 
     # B2B
     company_name = models.CharField(
-        max_length=255,
-        blank=True,
-        help_text="Nom de l'entreprise (si client B2B)"
+        max_length=255, blank=True, help_text="Nom de l'entreprise (si client B2B)"
     )
 
     is_b2b = models.BooleanField(
-        default=False,
-        help_text="Vrai si c'est un client B2B (professionnel)"
+        default=False, help_text="Vrai si c'est un client B2B (professionnel)"
     )
 
     # Langue préférée
     preferred_language = models.CharField(
         max_length=10,
-        default='fr',
+        default="fr",
         choices=[
-            ('fr', 'Français'),
-            ('en', 'English'),
-            ('de-ch', 'Deutsch (Schweiz)'),
-            ('it-ch', 'Italiano (Svizzera)'),
+            ("fr", "Français"),
+            ("en", "English"),
+            ("de-ch", "Deutsch (Schweiz)"),
+            ("it-ch", "Italiano (Svizzera)"),
         ],
-        help_text="Langue préférée du client"
+        help_text="Langue préférée du client",
     )
 
     # --- Strategic fields for KPIs and the executive cockpit ---
@@ -142,16 +139,22 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         help_text="Segment used across KPIs (B2C / B2B distributor / B2B hospitality)",
     )
     npa = models.CharField(
-        max_length=10, blank=True, default="",
+        max_length=10,
+        blank=True,
+        default="",
         help_text="Swiss postal code (NPA)",
     )
     canton = models.CharField(
-        max_length=2, blank=True, default="",
+        max_length=2,
+        blank=True,
+        default="",
         choices=SwissCantonChoices.choices,
         help_text="Swiss canton (for the sales heatmap)",
     )
     source_acquisition = models.CharField(
-        max_length=100, blank=True, default="",
+        max_length=100,
+        blank=True,
+        default="",
         help_text="Acquisition source (utm_source or similar)",
     )
     consent_nlpd = models.BooleanField(
@@ -159,43 +162,40 @@ class Customer(AbstractBaseUser, PermissionsMixin):
         help_text="Swiss nLPD data-processing consent",
     )
     consent_nlpd_at = models.DateTimeField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         help_text="When nLPD consent was given",
     )
 
     # Statut
     is_active = models.BooleanField(
-        default=True,
-        help_text="Le compte est-il actif ? (False = compte suspendu)"
+        default=True, help_text="Le compte est-il actif ? (False = compte suspendu)"
     )
 
     is_staff = models.BooleanField(
-        default=False,
-        help_text="Accès à l'interface admin (/admin/)"
+        default=False, help_text="Accès à l'interface admin (/admin/)"
     )
 
     # Dates
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date de création du compte"
+        auto_now_add=True, help_text="Date de création du compte"
     )
 
     updated_at = models.DateTimeField(
-        auto_now=True,
-        help_text="Date de dernière modification"
+        auto_now=True, help_text="Date de dernière modification"
     )
 
     # Gestionnaire personnalisé
     objects = CustomerManager()
 
     # Champs utilisés pour l'authentification et l'admin
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _("Customer")
         verbose_name_plural = _("Customers")
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         """Affichage du client dans l'admin"""
@@ -224,48 +224,38 @@ class PasswordResetToken(models.Model):
     """
 
     # Identifiant
-    id = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False
-    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     # Client concerné
     customer = models.ForeignKey(
         Customer,
         on_delete=models.CASCADE,
-        related_name='password_reset_tokens',
-        help_text="Client qui demande la réinitialisation"
+        related_name="password_reset_tokens",
+        help_text="Client qui demande la réinitialisation",
     )
 
     # Token unique (chaîne aléatoire)
     token = models.CharField(
-        max_length=255,
-        unique=True,
-        help_text="Token aléatoire envoyé par email"
+        max_length=255, unique=True, help_text="Token aléatoire envoyé par email"
     )
 
     # Expiration (1h)
-    expires_at = models.DateTimeField(
-        help_text="Date d.expiration du token (1h)"
-    )
+    expires_at = models.DateTimeField(help_text="Date d.expiration du token (1h)")
 
     # Création
     created_at = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date de création du token"
+        auto_now_add=True, help_text="Date de création du token"
     )
 
     # Flag d'utilisation
     is_used = models.BooleanField(
-        default=False,
-        help_text="True si le token a déjà été utilisé"
+        default=False, help_text="True si le token a déjà été utilisé"
     )
 
     class Meta:
         verbose_name = _("Password Reset Token")
         verbose_name_plural = _("Password Reset Tokens")
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Reset token for {self.customer.email}"
@@ -290,6 +280,7 @@ class PasswordResetToken(models.Model):
 
         return True
 
+
 class B2BAccount(models.Model):
     """
     Professional account details, one-to-one with a B2B Customer.
@@ -302,7 +293,7 @@ class B2BAccount(models.Model):
     customer = models.OneToOneField(
         "accounts.Customer",
         on_delete=models.CASCADE,
-        related_name="b2b_account",   # access via customer.b2b_account
+        related_name="b2b_account",  # access via customer.b2b_account
     )
     company_name = models.CharField(max_length=200)
     client_number = models.CharField(max_length=50, blank=True, default="")
@@ -325,6 +316,7 @@ class B2BAccount(models.Model):
 
     def __str__(self):
         return f"{self.company_name} ({self.get_segment_display()})"
+
 
 class ConsentLog(models.Model):
     """
@@ -364,8 +356,12 @@ class ConsentLog(models.Model):
     )
 
     # Catégories de consentement (consentement granulaire exigé par le RGPD/nLPD).
-    necessary = models.BooleanField(default=True)   # strictement nécessaire : toujours actif
-    analytics = models.BooleanField(default=False)  # la personne a-t-elle accepté l'analytics ?
+    necessary = models.BooleanField(
+        default=True
+    )  # strictement nécessaire : toujours actif
+    analytics = models.BooleanField(
+        default=False
+    )  # la personne a-t-elle accepté l'analytics ?
     marketing = models.BooleanField(default=False)  # a-t-elle accepté le marketing ?
 
     # Version de la politique acceptée : indispensable en conformité. Si tu changes
@@ -385,4 +381,7 @@ class ConsentLog(models.Model):
 
     def __str__(self):
         who = self.customer_id or self.consent_id
-        return f"Consent {who} a={self.analytics} m={self.marketing} @ {self.created_at:%Y-%m-%d %H:%M}"
+        return (
+            f"Consent {who} a={self.analytics} m={self.marketing}"
+            f"@ {self.created_at:%Y-%m-%d %H:%M}"
+        )

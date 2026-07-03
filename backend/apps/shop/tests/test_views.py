@@ -46,14 +46,19 @@ class TestCatalogView:
 
         for i in range(15):
             Product.objects.create(
-                slug=f"p-{i}", name_fr=f"P{i}", name_en=f"P{i}", category=sample_category
+                slug=f"p-{i}",
+                name_fr=f"P{i}",
+                name_en=f"P{i}",
+                category=sample_category,
             )
         response = client.get(reverse("shop:catalog"))
         assert response.context["is_paginated"] is True
         assert len(response.context["products"]) == 12
 
     def test_filter_by_category_query_param(self, client, products, sample_category):
-        response = client.get(reverse("shop:catalog"), {"category": sample_category.slug})
+        response = client.get(
+            reverse("shop:catalog"), {"category": sample_category.slug}
+        )
         assert response.status_code == 200
         assert len(response.context["products"]) == 3
 
@@ -86,9 +91,7 @@ class TestSearchView:
 
 class TestProductDetailView:
     def test_active_product_returns_200(self, client, products):
-        response = client.get(
-            reverse("shop:product_detail", kwargs={"slug": "prod-0"})
-        )
+        response = client.get(reverse("shop:product_detail", kwargs={"slug": "prod-0"}))
         assert response.status_code == 200
         assert "Produit 0" in response.content.decode()
 
@@ -105,7 +108,5 @@ class TestProductDetailView:
         assert response.status_code == 404
 
     def test_context_exposes_active_skus(self, client, products):
-        response = client.get(
-            reverse("shop:product_detail", kwargs={"slug": "prod-0"})
-        )
+        response = client.get(reverse("shop:product_detail", kwargs={"slug": "prod-0"}))
         assert len(response.context["skus"]) == 1

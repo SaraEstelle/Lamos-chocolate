@@ -10,12 +10,17 @@ Tests:
 - mark_token_as_used(): one-time use
 """
 
+from datetime import timedelta
+
 import pytest
 from django.utils import timezone
-from datetime import timedelta
-from apps.accounts.models import Customer, PasswordResetToken
+
+from apps.accounts.models import Customer
 from apps.accounts.tokens import (
-    generate_reset_token, create_reset_token, verify_reset_token, mark_token_as_used
+    create_reset_token,
+    generate_reset_token,
+    mark_token_as_used,
+    verify_reset_token,
 )
 
 
@@ -26,8 +31,7 @@ class TestTokens:
     def setup_method(self):
         """Create a customer."""
         self.customer = Customer.objects.create_user(
-            email='john@example.com',
-            password='SecurePass123!'
+            email="john@example.com", password="SecurePass123!"
         )
 
     def test_generate_reset_token_format(self):
@@ -46,7 +50,7 @@ class TestTokens:
         """Create a token."""
         token = create_reset_token(self.customer)
         assert token.customer == self.customer
-        assert token.is_used == False
+        assert token.is_used is False
         assert token.expires_at > timezone.now()
 
     def test_verify_reset_token_valid(self):
@@ -58,7 +62,7 @@ class TestTokens:
 
     def test_verify_reset_token_invalid(self):
         """Verify an invalid token."""
-        verified = verify_reset_token('invalid-token-xyz')
+        verified = verify_reset_token("invalid-token-xyz")
         assert verified is None
 
     def test_verify_reset_token_expired(self):
@@ -81,8 +85,8 @@ class TestTokens:
     def test_mark_token_as_used(self):
         """Mark a token as used."""
         token = create_reset_token(self.customer)
-        assert token.is_used == False
+        assert token.is_used is False
 
         mark_token_as_used(token)
         token.refresh_from_db()
-        assert token.is_used == True
+        assert token.is_used is True

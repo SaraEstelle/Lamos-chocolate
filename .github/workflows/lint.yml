@@ -1,0 +1,64 @@
+# =============================================================================
+#  lint.yml  —  Code style checks (reusable workflow)
+# -----------------------------------------------------------------------------
+#  ⚠️  THIS IS THE FILE THAT WAS BROKEN ON YOUR BRANCH.
+#      On feature/github-actions, lint.yml accidentally contained a COPY of
+#      ci.yml (it started with `name: CI` and called itself), which made
+#      GitHub reject it as an "Invalid workflow file". This is the correct
+#      content: `name: Lint`, no self-reference.
+#
+#  ROLE OF THIS FILE
+#    Verify the code respects the project's formatting rules WITHOUT changing
+#    any file. It only reports; it never rewrites your code.
+#      - black   -> formatting  (line length 88, config in pyproject.toml)
+#      - isort   -> import order (profile "black")
+#      - flake8  -> style / unused imports (config in backend/setup.cfg)
+#
+#  "Reusable" (`on: workflow_call`) means it does NOT run on its own push:
+#    it only runs when ci.yml calls it. That avoids duplicate runs.
+# =============================================================================
+
+name: Lint
+
+on:
+  workflow_call:        # invoked by ci.yml — no standalone trigger
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    # All the code lives under backend/, so run every command from there.
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      # 1. Get the repository onto the runner.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Install the exact Python version used by the project (see Dockerfile).
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      # 3. Install ONLY the lint tools (fast: no full app dependencies needed).
+      - name: Install lint tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black==24.8.0 isort==5.13.2 flake8==7.1.1
+
+      # 4. Check formatting. `--check` = report only, fails if it WOULD reformat.
+      #    It never edits your files.
+      - name: black --check
+        run: black --check .
+
+      # 5. Check import ordering (same "report only" idea).
+      - name: isort --check-only
+        run: isort --check-only .
+
+      # 6. Lint (unused imports, style). Config read from setup.cfg.
+      - name: flake8
+        run: flake8 .

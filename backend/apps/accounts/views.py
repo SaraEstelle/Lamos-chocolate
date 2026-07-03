@@ -18,30 +18,34 @@ Security:
 """
 
 import logging
-from django.shortcuts import render, redirect
+
+from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_protect
-from apps.accounts.forms import (
-    RegisterForm, LoginForm, PasswordResetForm, PasswordResetConfirmForm
-)
-from apps.accounts.services import (
-    create_customer, send_password_reset_email, authenticate_customer
-)
-from apps.accounts.tokens import create_reset_token, verify_reset_token, mark_token_as_used
-from apps.accounts.models import Customer
-from apps.accounts.redirects import post_auth_redirect_target
-from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_http_methods
-from django.shortcuts import render, redirect
-
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_http_methods
 
+from apps.accounts.forms import (
+    LoginForm,
+    PasswordResetConfirmForm,
+    PasswordResetForm,
+    RegisterForm,
+)
+from apps.accounts.models import Customer
+from apps.accounts.redirects import post_auth_redirect_target
+from apps.accounts.services import create_customer, send_password_reset_email
+from apps.accounts.tokens import (
+    create_reset_token,
+    mark_token_as_used,
+    verify_reset_token,
+)
 
-logger = logging.getLogger('apps.accounts')
+logger = logging.getLogger("apps.accounts")
+
 
 @require_http_methods(["GET"])
 def connect_view(request):
@@ -49,6 +53,7 @@ def connect_view(request):
     if request.user.is_authenticated:
         return redirect(post_auth_redirect_target(request.user))
     return render(request, "accounts/connect.html")
+
 
 @require_http_methods(["GET", "POST"])
 @csrf_protect
@@ -68,12 +73,12 @@ def register_view(request):
     Template: accounts/register.html
     """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         # Display the form
         form = RegisterForm()
-        return render(request, 'accounts/register.html', {'form': form})
+        return render(request, "accounts/register.html", {"form": form})
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         # Process registration
         form = RegisterForm(request.POST)
 
@@ -81,11 +86,13 @@ def register_view(request):
             try:
                 # Create the customer
                 customer = create_customer(
-                    email=form.cleaned_data['email'],
-                    password=form.cleaned_data['password'],
-                    first_name=form.cleaned_data['first_name'],
-                    last_name=form.cleaned_data['last_name'],
-                    preferred_language=form.cleaned_data.get('preferred_language', 'fr')
+                    email=form.cleaned_data["email"],
+                    password=form.cleaned_data["password"],
+                    first_name=form.cleaned_data["first_name"],
+                    last_name=form.cleaned_data["last_name"],
+                    preferred_language=form.cleaned_data.get(
+                        "preferred_language", "fr"
+                    ),
                 )
 
                 logger.info(f"New customer registered:{customer.email}")
@@ -93,32 +100,28 @@ def register_view(request):
                 # Success message
                 messages.success(
                     request,
-                    "Registration successful! Check your email. "
-                    "You can now log in."
+                    "Registration successful! Check your email. " "You can now log in.",
                 )
 
                 # Redirect to login
-                return redirect('accounts:login')
+                return redirect("accounts:login")
 
             except ValueError as e:
                 # Email already exists
                 logger.warning(f"Registration failed:{str(e)}")
                 messages.error(request, str(e))
-                return render(request, 'accounts/register.html', {'form': form})
+                return render(request, "accounts/register.html", {"form": form})
 
             except Exception as e:
                 # Server error
                 logger.error(f"Registration error:{str(e)}")
-                messages.error(
-                    request,
-                    "An error occurred. Please try again later."
-                )
-                return render(request, 'accounts/register.html', {'form': form})
+                messages.error(request, "An error occurred. Please try again later.")
+                return render(request, "accounts/register.html", {"form": form})
 
         else:
             # Form is invalid
             logger.warning(f"Invalid registration form:{form.errors}")
-            return render(request, 'accounts/register.html', {'form': form})
+            return render(request, "accounts/register.html", {"form": form})
 
 
 @require_http_methods(["GET", "POST"])
@@ -139,11 +142,11 @@ def login_view(request):
     Template: accounts/login.html
     """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         form = LoginForm()
-        return render(request, 'accounts/login.html', {'form': form})
+        return render(request, "accounts/login.html", {"form": form})
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         form = LoginForm(request.POST)
 
         if form.is_valid():
@@ -154,7 +157,7 @@ def login_view(request):
             login(request, customer)
 
             # Handle "stay logged in"
-            if form.cleaned_data.get('remember_me'):
+            if form.cleaned_data.get("remember_me"):
                 # Session valid for 2 weeks
                 request.session.set_expiry(1209600)  # 14 days in seconds
 
@@ -165,7 +168,7 @@ def login_view(request):
 
             # Redirect to "next" only if it is a safe internal URL.
             # Prevents Open Redirect attacks (e.g. ?next=https://evil.com).
-            next_url = request.GET.get('next')
+            next_url = request.GET.get("next")
             if next_url and url_has_allowed_host_and_scheme(
                 url=next_url,
                 allowed_hosts={request.get_host()},
@@ -176,9 +179,12 @@ def login_view(request):
 
         else:
             # Form is invalid (incorrect email/password)
-            logger.warning(f"Failed login attempt from{request.META.get('REMOTE_ADDR')}")
+            logger.warning(
+                f"Failed login attempt from{request.META.get('REMOTE_ADDR')}"
+            )
             messages.error(request, "Incorrect email or password.")
-            return render(request, 'accounts/login.html', {'form': form})
+            return render(request, "accounts/login.html", {"form": form})
+
 
 @require_http_methods(["GET", "POST"])
 @csrf_protect
@@ -222,7 +228,9 @@ def access_view(request):
                         password=register_form.cleaned_data["password"],
                         first_name=register_form.cleaned_data["first_name"],
                         last_name=register_form.cleaned_data["last_name"],
-                        preferred_language=register_form.cleaned_data.get("preferred_language", "fr"),
+                        preferred_language=register_form.cleaned_data.get(
+                            "preferred_language", "fr"
+                        ),
                     )
                     # Store consent WITH a timestamp (Swiss nLPD proof of consent).
                     customer.consent_nlpd = True
@@ -257,14 +265,19 @@ def access_view(request):
                     return redirect(next_url)
                 return redirect(post_auth_redirect_target(customer))
 
-    return render(request, "accounts/access.html", {
-        "login_form": login_form,
-        "register_form": register_form,
-        "active_panel": active_panel,
-    })
+    return render(
+        request,
+        "accounts/access.html",
+        {
+            "login_form": login_form,
+            "register_form": register_form,
+            "active_panel": active_panel,
+        },
+    )
+
 
 @require_http_methods(["GET"])
-@login_required(login_url='accounts:login')
+@login_required(login_url="accounts:login")
 def logout_view(request):
     """
     User logout view.
@@ -277,13 +290,13 @@ def logout_view(request):
     # Logout
     logout(request)
 
-    logger.info(f"Customer logged out")
+    logger.info("Customer logged out")
 
     # Success message
     messages.success(request, "You have been logged out. See you! 👋")
 
     # Redirect to home
-    return redirect('main:home')
+    return redirect("main:home")
 
 
 @require_http_methods(["GET", "POST"])
@@ -307,15 +320,15 @@ def password_reset_view(request):
     Template: accounts/password_reset.html
     """
 
-    if request.method == 'GET':
+    if request.method == "GET":
         form = PasswordResetForm()
-        return render(request, 'accounts/password_reset.html', {'form': form})
+        return render(request, "accounts/password_reset.html", {"form": form})
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         form = PasswordResetForm(request.POST)
 
         if form.is_valid():
-            email = form.cleaned_data['email']
+            email = form.cleaned_data["email"]
 
             try:
                 # Find the customer
@@ -342,14 +355,14 @@ def password_reset_view(request):
             # Always show same message (security)
             messages.success(
                 request,
-                "If this email is registered, you will receive a password reset link."
+                "If this email is registered, you will receive a password reset link.",
             )
 
             # Redirect to login
-            return redirect('accounts:login')
+            return redirect("accounts:login")
 
         else:
-            return render(request, 'accounts/password_reset.html', {'form': form})
+            return render(request, "accounts/password_reset.html", {"form": form})
 
 
 @require_http_methods(["GET", "POST"])
@@ -384,18 +397,16 @@ def password_reset_confirm_view(request, token):
         # Token is invalid, expired, or already used
         logger.warning(f"Invalid password reset token:{token}")
         messages.error(
-            request,
-            "This link is invalid or expired. "
-            "Please request a new link."
+            request, "This link is invalid or expired. " "Please request a new link."
         )
-        return redirect('accounts:password_reset')
+        return redirect("accounts:password_reset")
 
-    if request.method == 'GET':
+    if request.method == "GET":
         # Display the form
         form = PasswordResetConfirmForm()
-        return render(request, 'accounts/password_reset_confirm.html', {'form': form})
+        return render(request, "accounts/password_reset_confirm.html", {"form": form})
 
-    elif request.method == 'POST':
+    elif request.method == "POST":
         form = PasswordResetConfirmForm(request.POST)
 
         if form.is_valid():
@@ -404,7 +415,7 @@ def password_reset_confirm_view(request, token):
                 customer = token_obj.customer
 
                 # Save the new password
-                customer.set_password(form.cleaned_data['new_password'])
+                customer.set_password(form.cleaned_data["new_password"])
                 customer.save()
 
                 # Mark the token as used
@@ -413,18 +424,20 @@ def password_reset_confirm_view(request, token):
                 logger.info(f"Password reset successful for{customer.email}")
 
                 messages.success(
-                    request,
-                    "Your password has been reset. "
-                    "You can now log in."
+                    request, "Your password has been reset. " "You can now log in."
                 )
 
                 # Redirect to login
-                return redirect('accounts:login')
+                return redirect("accounts:login")
 
             except Exception as e:
                 logger.error(f"Password reset confirm error:{str(e)}")
                 messages.error(request, "An error occurred. Please try again.")
-                return render(request, 'accounts/password_reset_confirm.html', {'form': form})
+                return render(
+                    request, "accounts/password_reset_confirm.html", {"form": form}
+                )
 
         else:
-            return render(request, 'accounts/password_reset_confirm.html', {'form': form})
+            return render(
+                request, "accounts/password_reset_confirm.html", {"form": form}
+            )

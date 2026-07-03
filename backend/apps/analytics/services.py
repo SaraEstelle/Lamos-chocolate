@@ -12,8 +12,16 @@ from apps.common.consent import analytics_allowed
 logger = logging.getLogger(__name__)
 
 
-def track_event(event_type, *, customer=None, channel="", canton="",
-                campaign_period="", value_chf=None, **properties):
+def track_event(
+    event_type,
+    *,
+    customer=None,
+    channel="",
+    canton="",
+    campaign_period="",
+    value_chf=None,
+    **properties,
+):
     """
     Record a single event. NEVER raises to the caller.
 
@@ -54,6 +62,7 @@ def track_purchase(order):
         order_id=order.order_number,
         lines=lines,
     )
+
 
 def track_event_if_consented(request, event_type, **kwargs):
     """Track only if the visitor accepted analytics cookies."""

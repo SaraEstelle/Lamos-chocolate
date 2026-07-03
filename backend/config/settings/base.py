@@ -122,7 +122,9 @@ DATABASES = {
 # ============================================================================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"  # noqa: E501
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -256,7 +258,11 @@ LOGGING = {
         },
     },
     "handlers": {
-        "console": {"class": "logging.StreamHandler", "level": "DEBUG", "formatter": "simple"},
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "DEBUG",
+            "formatter": "simple",
+        },
         "file_error": {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(LOGS_DIR, "django_errors.log"),
@@ -283,10 +289,26 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {"handlers": ["console", "file_all", "file_error"], "level": "INFO", "propagate": False},
-        "django.request": {"handlers": ["file_access", "console"], "level": "INFO", "propagate": False},
-        "django.db.backends": {"handlers": ["console"], "level": "DEBUG" if DEBUG else "INFO", "propagate": False},
-        "apps": {"handlers": ["console", "file_all", "file_error"], "level": "DEBUG", "propagate": False},
+        "django": {
+            "handlers": ["console", "file_all", "file_error"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["file_access", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "DEBUG" if DEBUG else "INFO",
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console", "file_all", "file_error"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
     },
     "root": {"handlers": ["console", "file_all", "file_error"], "level": "INFO"},
 }

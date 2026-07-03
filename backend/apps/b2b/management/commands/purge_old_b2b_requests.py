@@ -24,6 +24,8 @@ class Command(BaseCommand):
         qs = B2BRequest.objects.filter(created_at__lt=cutoff)
         count = qs.count()
         qs.delete()
-        self.stdout.write(self.style.SUCCESS(
-            f"Deleted {count} B2B requests older than {options['years']} years."
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Deleted {count} B2B requests older than {options['years']} years."
+            )
+        )

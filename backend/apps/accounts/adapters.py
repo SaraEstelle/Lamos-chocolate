@@ -5,9 +5,10 @@ Custom allauth adapter: ensures social sign-ups create well-formed B2C
 Customers (first/last name filled, B2C type) and never escalate privileges.
 """
 
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.urls import reverse
+
 from apps.accounts.redirects import post_auth_redirect_target
 from apps.common.constants import CustomerTypeChoices
 
@@ -25,6 +26,7 @@ class LamosSocialAccountAdapter(DefaultSocialAccountAdapter):
     def is_open_for_signup(self, request, sociallogin):
         # B2C social sign-up is allowed. (B2B never self-creates via social.)
         return True
+
 
 class LamosAccountAdapter(DefaultAccountAdapter):
     """Route users to the right area after an allauth (e.g. Google) login."""

@@ -26,9 +26,12 @@ class TestPublicPages:
         assert client.get(reverse("main:contact")).status_code == 200
 
     def test_contact_post_valid_redirects(self, client):
-        resp = client.post(reverse("main:contact"), data={
-            "name": "Test",
-            "email": "test@example.com",
-            "message": "Hello",
-        })
+        resp = client.post(
+            reverse("main:contact"),
+            data={
+                "name": "Test",
+                "email": "test@example.com",
+                "message": "Hello",
+            },
+        )
         assert resp.status_code == 302

@@ -18,6 +18,7 @@ Security:
 
 from django import forms
 from django.contrib.auth import authenticate
+
 from apps.accounts.models import Customer
 
 
@@ -40,49 +41,51 @@ class RegisterForm(forms.ModelForm):
     # Password field 1 (hidden)
     password = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Minimum 12 characters',
-            'autocomplete': 'off'
-        }),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Minimum 12 characters",
+                "autocomplete": "off",
+            }
+        ),
         min_length=12,
-        help_text="Minimum 12 characters with uppercase, lowercase, digits and special characters"
+        help_text=(
+            "Minimum 12 characters with uppercase, lowercase,"
+            "digits and special characters",
+        ),
     )
 
     # Password field 2 (confirmation)
     password_confirm = forms.CharField(
         label="Confirm password",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Repeat your password',
-            'autocomplete': 'off'
-        })
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Repeat your password",
+                "autocomplete": "off",
+            }
+        ),
     )
 
     class Meta:
         model = Customer
-        fields = ('email', 'first_name', 'last_name', 'preferred_language')
+        fields = ("email", "first_name", "last_name", "preferred_language")
         widgets = {
-            'email': forms.EmailInput(attrs={
-                'class': 'field-input',
-                'placeholder': 'your@email.ch'
-            }),
-            'first_name': forms.TextInput(attrs={
-                'class': 'field-input',
-                'placeholder': 'John'
-            }),
-            'last_name': forms.TextInput(attrs={
-                'class': 'field-input',
-                'placeholder': 'Doe'
-            }),
-            'preferred_language': forms.Select(attrs={
-                'class': 'field-input'
-            })
+            "email": forms.EmailInput(
+                attrs={"class": "field-input", "placeholder": "your@email.ch"}
+            ),
+            "first_name": forms.TextInput(
+                attrs={"class": "field-input", "placeholder": "John"}
+            ),
+            "last_name": forms.TextInput(
+                attrs={"class": "field-input", "placeholder": "Doe"}
+            ),
+            "preferred_language": forms.Select(attrs={"class": "field-input"}),
         }
 
     def clean_email(self):
         """Check that email is unique."""
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
 
         if Customer.objects.filter(email=email).exists():
             raise forms.ValidationError(
@@ -93,7 +96,7 @@ class RegisterForm(forms.ModelForm):
 
     def clean_password(self):
         """Check password complexity."""
-        password = self.cleaned_data.get('password')
+        password = self.cleaned_data.get("password")
 
         if not password:
             return password
@@ -102,7 +105,7 @@ class RegisterForm(forms.ModelForm):
         has_upper = any(c.isupper() for c in password)
         has_lower = any(c.islower() for c in password)
         has_digit = any(c.isdigit() for c in password)
-        has_special = any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password)
 
         if not (has_upper and has_lower and has_digit and has_special):
             raise forms.ValidationError(
@@ -115,14 +118,12 @@ class RegisterForm(forms.ModelForm):
     def clean(self):
         """Check that both passwords match."""
         cleaned_data = super().clean()
-        password = cleaned_data.get('password')
-        password_confirm = cleaned_data.get('password_confirm')
+        password = cleaned_data.get("password")
+        password_confirm = cleaned_data.get("password_confirm")
 
         if password and password_confirm:
             if password != password_confirm:
-                raise forms.ValidationError(
-                    "The two passwords do not match."
-                )
+                raise forms.ValidationError("The two passwords do not match.")
 
         return cleaned_data
 
@@ -131,7 +132,7 @@ class RegisterForm(forms.ModelForm):
         customer = super().save(commit=False)
 
         # Hash the password automatically
-        customer.set_password(self.cleaned_data['password'])
+        customer.set_password(self.cleaned_data["password"])
 
         if commit:
             customer.save()
@@ -151,44 +152,44 @@ class LoginForm(forms.Form):
 
     email = forms.EmailField(
         label="Email",
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'your@email.ch',
-            'autocomplete': 'email'
-        })
+        widget=forms.EmailInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "your@email.ch",
+                "autocomplete": "email",
+            }
+        ),
     )
 
     password = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Your password',
-            'autocomplete': 'current-password'
-        })
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Your password",
+                "autocomplete": "current-password",
+            }
+        ),
     )
 
     remember_me = forms.BooleanField(
         label="Stay logged in for 2 weeks",
         required=False,
-        widget=forms.CheckboxInput(attrs={
-            'class': 'form-check-input'
-        })
+        widget=forms.CheckboxInput(attrs={"class": "form-check-input"}),
     )
 
     def clean(self):
         """Check that email and password are correct."""
         cleaned_data = super().clean()
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
+        email = cleaned_data.get("email")
+        password = cleaned_data.get("password")
 
         if email and password:
             # Try to authenticate
             customer = authenticate(username=email, password=password)
 
             if customer is None:
-                raise forms.ValidationError(
-                    "Incorrect email or password."
-                )
+                raise forms.ValidationError("Incorrect email or password.")
 
             # Store the customer for the view
             self.customer = customer
@@ -208,15 +209,14 @@ class PasswordResetForm(forms.Form):
 
     email = forms.EmailField(
         label="Email",
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'your@email.ch'
-        })
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "placeholder": "your@email.ch"}
+        ),
     )
 
     def clean_email(self):
         """Check that the email exists."""
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
 
         # Email exists?
         if not Customer.objects.filter(email=email).exists():
@@ -240,26 +240,30 @@ class PasswordResetConfirmForm(forms.Form):
 
     new_password = forms.CharField(
         label="New password",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Minimum 12 characters',
-            'autocomplete': 'off'
-        }),
-        min_length=12
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Minimum 12 characters",
+                "autocomplete": "off",
+            }
+        ),
+        min_length=12,
     )
 
     new_password_confirm = forms.CharField(
         label="Confirm password",
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Repeat your password',
-            'autocomplete': 'off'
-        })
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Repeat your password",
+                "autocomplete": "off",
+            }
+        ),
     )
 
     def clean_new_password(self):
         """Check complexity."""
-        password = self.cleaned_data.get('new_password')
+        password = self.cleaned_data.get("new_password")
 
         if not password:
             return password
@@ -267,7 +271,7 @@ class PasswordResetConfirmForm(forms.Form):
         has_upper = any(c.isupper() for c in password)
         has_lower = any(c.islower() for c in password)
         has_digit = any(c.isdigit() for c in password)
-        has_special = any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password)
+        has_special = any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password)
 
         if not (has_upper and has_lower and has_digit and has_special):
             raise forms.ValidationError(
@@ -280,16 +284,15 @@ class PasswordResetConfirmForm(forms.Form):
     def clean(self):
         """Check that both passwords match."""
         cleaned_data = super().clean()
-        new_password = cleaned_data.get('new_password')
-        new_password_confirm = cleaned_data.get('new_password_confirm')
+        new_password = cleaned_data.get("new_password")
+        new_password_confirm = cleaned_data.get("new_password_confirm")
 
         if new_password and new_password_confirm:
             if new_password != new_password_confirm:
-                raise forms.ValidationError(
-                    "The two passwords do not match."
-                )
+                raise forms.ValidationError("The two passwords do not match.")
 
         return cleaned_data
+
 
 class ProfileForm(forms.ModelForm):
     """
@@ -301,29 +304,49 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = Customer
-        fields = ("first_name", "last_name", "phone", "npa", "canton", "preferred_language")
+        fields = (
+            "first_name",
+            "last_name",
+            "phone",
+            "npa",
+            "canton",
+            "preferred_language",
+        )
         widgets = {
             "first_name": forms.TextInput(attrs={"class": "field-input"}),
-            "last_name":  forms.TextInput(attrs={"class": "field-input"}),
-            "phone":      forms.TextInput(attrs={"class": "field-input", "placeholder": "+41 (XX) XXX XX XX"}),
-            "npa":        forms.TextInput(attrs={"class": "field-input", "placeholder": "1201"}),
-            "canton":     forms.Select(attrs={"class": "field-input"}),
+            "last_name": forms.TextInput(attrs={"class": "field-input"}),
+            "phone": forms.TextInput(
+                attrs={"class": "field-input", "placeholder": "+41 (XX) XXX XX XX"}
+            ),
+            "npa": forms.TextInput(
+                attrs={"class": "field-input", "placeholder": "1201"}
+            ),
+            "canton": forms.Select(attrs={"class": "field-input"}),
             "preferred_language": forms.Select(attrs={"class": "field-input"}),
         }
 
+
 class PasswordChangeForm(forms.Form):
     """Logged-in password change: requires the current password."""
+
     current_password = forms.CharField(
         label="Current password",
-        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "current-password"}),
+        widget=forms.PasswordInput(
+            attrs={"class": "field-input", "autocomplete": "current-password"}
+        ),
     )
     new_password = forms.CharField(
-        label="New password", min_length=12,
-        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "new-password"}),
+        label="New password",
+        min_length=12,
+        widget=forms.PasswordInput(
+            attrs={"class": "field-input", "autocomplete": "new-password"}
+        ),
     )
     new_password_confirm = forms.CharField(
         label="Confirm new password",
-        widget=forms.PasswordInput(attrs={"class": "field-input", "autocomplete": "new-password"}),
+        widget=forms.PasswordInput(
+            attrs={"class": "field-input", "autocomplete": "new-password"}
+        ),
     )
 
     def __init__(self, *args, user=None, **kwargs):
@@ -338,11 +361,17 @@ class PasswordChangeForm(forms.Form):
 
     def clean_new_password(self):
         p = self.cleaned_data.get("new_password", "")
-        checks = [any(c.isupper() for c in p), any(c.islower() for c in p),
-                  any(c.isdigit() for c in p), any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p)]
+        checks = [
+            any(c.isupper() for c in p),
+            any(c.islower() for c in p),
+            any(c.isdigit() for c in p),
+            any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in p),
+        ]
         if not all(checks):
             raise forms.ValidationError(
-                "Password must contain uppercase, lowercase, digit and special character.")
+                "Password must contain uppercase, lowercase, digit"
+                "and special character."
+            )
         return p
 
     def clean(self):

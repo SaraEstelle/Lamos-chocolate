@@ -19,8 +19,10 @@ Security:
 
 import secrets
 from datetime import timedelta
+
 from django.utils import timezone
-from apps.accounts.models import PasswordResetToken, Customer
+
+from apps.accounts.models import Customer, PasswordResetToken
 
 
 def generate_reset_token() -> str:
@@ -66,10 +68,7 @@ def create_reset_token(customer: Customer) -> PasswordResetToken:
 
     # Create in DB
     token = PasswordResetToken.objects.create(
-        customer=customer,
-        token=token_string,
-        expires_at=expires_at,
-        is_used=False
+        customer=customer, token=token_string, expires_at=expires_at, is_used=False
     )
 
     return token

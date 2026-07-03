@@ -6,7 +6,7 @@ Defensive tests for the final catalog (and the Nestlé trademark ban).
 
 import pytest
 
-from apps.shop.models import Category, Product, SKU
+from apps.shop.models import SKU, Category, Product
 
 
 @pytest.mark.django_db
@@ -14,6 +14,7 @@ class TestNewCatalog:
     def test_three_b2c_families_loaded(self):
         # loaddata works inside tests via the django_db fixture + call_command
         from django.core.management import call_command
+
         call_command("loaddata", "categories", "products", "skus", verbosity=0)
         assert Category.objects.count() == 3
         assert Product.objects.filter(slug="kunafa").exists()

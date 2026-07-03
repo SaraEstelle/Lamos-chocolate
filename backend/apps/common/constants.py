@@ -45,6 +45,7 @@ class PaymentStatusChoices(models.TextChoices):
 
 class CustomerTypeChoices(models.TextChoices):
     """Customer segmentation used across KPIs and the executive cockpit."""
+
     B2C = "b2c", "Particulier (B2C)"
     B2B_DISTRIBUTOR = "b2b_distributor", "Distributeur (B2B)"
     B2B_HOSPITALITY = "b2b_hospitality", "Hôtel / Corporate (B2B)"
@@ -52,12 +53,14 @@ class CustomerTypeChoices(models.TextChoices):
 
 class ChannelChoices(models.TextChoices):
     """Sales channel for an order (used to split cockpit views)."""
+
     B2C = "b2c", "B2C"
     B2B = "b2b", "B2B"
 
 
 class SwissCantonChoices(models.TextChoices):
     """The 26 Swiss cantons (for the sales heatmap), in official order."""
+
     ZH = "ZH", "Zürich"
     BE = "BE", "Berne"
     LU = "LU", "Lucerne"
@@ -89,6 +92,7 @@ class SwissCantonChoices(models.TextChoices):
 
 class B2BSegmentChoices(models.TextChoices):
     """B2B account segment."""
+
     DISTRIBUTOR = "distributor", "Distributeur"
     HOTEL = "hotel", "Hôtel"
     CORPORATE = "corporate", "Corporate"
@@ -96,8 +100,8 @@ class B2BSegmentChoices(models.TextChoices):
 
 class B2BAccountStatusChoices(models.TextChoices):
     """Lifecycle status of a B2B account."""
-    PENDING  = "pending", "En attente de validation"
+
+    PENDING = "pending", "En attente de validation"
     PROSPECT = "prospect", "Prospect"
     ACTIVE = "active", "Actif"
     DORMANT = "dormant", "Dormant"
-

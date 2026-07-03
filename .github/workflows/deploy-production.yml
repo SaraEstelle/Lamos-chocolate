@@ -1,0 +1,67 @@
+# =============================================================================
+#  deploy-production.yml  —  Build & publish image, deploy to PRODUCTION
+# -----------------------------------------------------------------------------
+#  Role:
+#    Publish a versioned production image and deploy it — but only for a real
+#    release. It triggers on a version tag (e.g. v1.0.0) or a manual dispatch,
+#    NOT on every commit. Production must be deliberate.
+#
+#  Safety gate:
+#    `environment: production` makes GitHub require a MANUAL APPROVAL before the
+#    job runs, IF you enable "Required reviewers" on that environment in
+#    Settings > Environments. This is the human checkpoint before anything
+#    reaches customers — important for a payment-handling site.
+#
+#  HONEST LIMITATION:
+#    Same as staging — the server-deploy step is a documented PLACEHOLDER until
+#    you have a production host and its secrets. Image build + push is real.
+# =============================================================================
+
+name: Deploy Production
+
+on:
+  push:
+    tags: ["v*"]                # e.g. git tag v1.0.0 && git push origin v1.0.0
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # Ties the job to the "production" environment (approval + secrets scope).
+    environment: production
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tag with the git ref name (the tag, e.g. v1.0.0) AND "latest".
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infrastructure/docker/django/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+
+      # ---- PLACEHOLDER: real server deployment -------------------------------
+      # Replace with your production SSH/rollout step once the host exists.
+      # Remember to run migrations there:
+      #   docker compose run --rm django python manage.py migrate --noinput
+      - name: Deploy to production (placeholder)
+        run: |
+          echo "Production image pushed: ghcr.io/${{ github.repository }}:${{ github.ref_name }}"
+          echo "No production server configured yet — deployment step skipped on purpose."

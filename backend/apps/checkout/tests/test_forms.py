@@ -38,8 +38,14 @@ class TestShippingForm:
     def test_required_fields_missing(self):
         form = ShippingForm(data={})
         assert not form.is_valid()
-        for field in ("first_name", "last_name", "address1", "city",
-                      "postal_code", "country"):
+        for field in (
+            "first_name",
+            "last_name",
+            "address1",
+            "city",
+            "postal_code",
+            "country",
+        ):
             assert field in form.errors
 
     def test_as_shipping_dict_shape(self):

@@ -1,13 +1,13 @@
 from django.db import models
-from django.utils import timezone
-
 
 # ============================================================
 # 4.1 — Local choices + constants
 # ============================================================
 
+
 class CustomizationStatusChoices(models.TextChoices):
     """Lifecycle of a 4-axis customization request."""
+
     DRAFT = "draft", "Brouillon"
     QUOTE = "quote", "Devis demandé"
     ORDER = "order", "Commande"
@@ -15,6 +15,7 @@ class CustomizationStatusChoices(models.TextChoices):
 
 class B2BAvailabilityChoices(models.TextChoices):
     """Pro-catalogue badge for a SKU."""
+
     ACTIVE = "active", "Actif"
     NEW = "new", "Nouveauté"
     COMING_SOON = "coming_soon", "Bientôt"
@@ -23,15 +24,20 @@ class B2BAvailabilityChoices(models.TextChoices):
 # Default minimum order quantity when a SKU has no explicit B2B MOQ.
 DEFAULT_B2B_MOQ = 24
 
+
 class B2BRequestStatusChoices(models.TextChoices):
     """Lifecycle of a B2B lead, managed from the backoffice."""
+
     NEW = "new", "Nouveau"
     IN_PROGRESS = "in_progress", "En cours"
     CONVERTED = "converted", "Converti"
     REFUSED = "refused", "Refusé"
+
+
 # ============================================================
 # Existing model — B2BRequest (completed with consent fields)
 # ============================================================
+
 
 class B2BRequest(models.Model):
     """
@@ -45,7 +51,7 @@ class B2BRequest(models.Model):
     # --- Company & contact -------------------------------------------------
     company_name = models.CharField(max_length=120)
     contact_name = models.CharField(max_length=120, blank=True, default="")
-    contact_email = models.EmailField()                     # was: "email"
+    contact_email = models.EmailField()  # was: "email"
     contact_phone = models.CharField(max_length=40, blank=True, default="")
 
     # --- Qualification of the lead ----------------------------------------
@@ -79,9 +85,11 @@ class B2BRequest(models.Model):
     def __str__(self):
         return f"B2BRequest{self.contact_email} ({self.company_name})"
 
+
 # ============================================================
 # 4.1 — New models
 # ============================================================
+
 
 class B2BProductInfo(models.Model):
     """
@@ -106,7 +114,10 @@ class B2BProductInfo(models.Model):
         help_text="Minimum order quantity for B2B",
     )
     b2b_unit_price = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True,
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
         help_text="Pro unit price in CHF; falls back to the SKU price if empty",
     )
 
@@ -119,7 +130,9 @@ class B2BProductInfo(models.Model):
     @property
     def effective_price(self):
         """Pro price if set, otherwise the standard SKU price."""
-        return self.b2b_unit_price if self.b2b_unit_price is not None else self.sku.price
+        return (
+            self.b2b_unit_price if self.b2b_unit_price is not None else self.sku.price
+        )
 
 
 class CustomizationRequest(models.Model):

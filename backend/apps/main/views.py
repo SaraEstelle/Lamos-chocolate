@@ -23,7 +23,7 @@ from apps.shop.selectors import get_active_products, get_all_categories
 @require_http_methods(["GET"])
 def home_view(request):
     """Landing page: hero + a few featured products."""
-    featured = get_active_products()[:3]      # selector already eager-loads images
+    featured = get_active_products()[:3]  # selector already eager-loads images
     categories = get_all_categories()
     context = {
         "featured": featured,
@@ -62,6 +62,7 @@ def contact_view(request):
     else:
         form = ContactForm()
     return render(request, "main/contact.html", {"form": form})
+
 
 def page_not_found(request, exception):
     return render(request, "errors/404.html", status=404)

@@ -25,13 +25,13 @@ from django.urls import path
 from . import views
 
 # Nom de cette app
-app_name = 'checkout'
+app_name = "checkout"
 
 # Routes du paiement
 urlpatterns = [
-    path('', views.checkout_view, name='checkout'),
-    path('create-session/', views.create_checkout_session_view, name='create_session'),
-    path('success/', views.success_view, name='success'),
-    path('cancel/', views.cancel_view, name='cancel'),
+    path("", views.checkout_view, name="checkout"),
+    path("create-session/", views.create_checkout_session_view, name="create_session"),
+    path("success/", views.success_view, name="success"),
+    path("cancel/", views.cancel_view, name="cancel"),
     # Webhook Stripe : routé hors i18n dans config/urls.py (sans CSRF)
 ]

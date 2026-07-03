@@ -16,21 +16,28 @@ Security:
 """
 
 import logging
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.conf import settings
-from apps.accounts.models import Customer, PasswordResetToken
-from apps.accounts.tokens import create_reset_token
-
 import uuid as _uuid
+
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db import transaction
+from django.template.loader import render_to_string
+
+from apps.accounts.models import Customer, PasswordResetToken
 
 # Logger for failed attempts
-logger = logging.getLogger('apps.accounts')
+logger = logging.getLogger("apps.accounts")
 
 
-def create_customer(email: str, password: str, first_name: str, last_name: str,
-                    phone: str = "", preferred_language: str = "fr", **kwargs) -> Customer:
+def create_customer(
+    email: str,
+    password: str,
+    first_name: str,
+    last_name: str,
+    phone: str = "",
+    preferred_language: str = "fr",
+    **kwargs,
+) -> Customer:
     """
     Create a new customer with validation.
 
@@ -75,7 +82,7 @@ def create_customer(email: str, password: str, first_name: str, last_name: str,
         last_name=last_name,
         phone="",
         preferred_language=preferred_language,
-        is_active=True  # Customer is active immediately
+        is_active=True,  # Customer is active immediately
     )
 
     logger.info(f"New customer created:{email}")
@@ -118,12 +125,12 @@ def send_welcome_email(customer: Customer) -> bool:
 
         # Render HTML template
         html_message = render_to_string(
-            'emails/welcome.html',
+            "emails/welcome.html",
             {
-                'customer': customer,
-                'login_url': f"{settings.SITE_URL}/en/accounts/login/",
-                'company_name': 'Lamos Chocolate'
-            }
+                "customer": customer,
+                "login_url": f"{settings.SITE_URL}/en/accounts/login/",
+                "company_name": "Lamos Chocolate",
+            },
         )
 
         # Send the email
@@ -133,7 +140,7 @@ def send_welcome_email(customer: Customer) -> bool:
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[customer.email],
             html_message=html_message,
-            fail_silently=False
+            fail_silently=False,
         )
 
         logger.info(f"Welcome email sent to{customer.email}")
@@ -168,17 +175,19 @@ def send_password_reset_email(customer: Customer, token: PasswordResetToken) -> 
     """
     try:
         # Build reset link
-        reset_url = f"{settings.SITE_URL}/en/accounts/password-reset-confirm/{token.token}/"
+        reset_url = (
+            f"{settings.SITE_URL}/en/accounts/password-reset-confirm/{token.token}/"
+        )
 
         # Render template
         html_message = render_to_string(
-            'emails/reset_password.html',
+            "emails/reset_password.html",
             {
-                'customer': customer,
-                'reset_url': reset_url,
-                'expires_in_hours': 1,
-                'company_name': 'Lamos Chocolate'
-            }
+                "customer": customer,
+                "reset_url": reset_url,
+                "expires_in_hours": 1,
+                "company_name": "Lamos Chocolate",
+            },
         )
 
         # Send the email
@@ -188,7 +197,7 @@ def send_password_reset_email(customer: Customer, token: PasswordResetToken) -> 
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[customer.email],
             html_message=html_message,
-            fail_silently=False
+            fail_silently=False,
         )
 
         logger.info(f"Password reset email sent to{customer.email}")
@@ -248,6 +257,7 @@ def authenticate_customer(email: str, password: str) -> Customer | None:
         logger.error(f"Error during authentication:{str(e)}")
         return None
 
+
 @transaction.atomic
 def anonymize_customer(customer) -> None:
     """
@@ -268,6 +278,7 @@ def anonymize_customer(customer) -> None:
 
     # Anonymize order PII while keeping totals/invoice numbers for legal retention.
     from apps.checkout.models import Order
+
     for order in Order.objects.filter(customer=customer):
         # adapt field names to your Order/Address schema
         if hasattr(order, "shipping_full_name"):

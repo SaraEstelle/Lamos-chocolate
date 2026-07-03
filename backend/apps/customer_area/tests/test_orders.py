@@ -17,6 +17,7 @@ from apps.checkout.models import Order
 @pytest.fixture
 def customer_factory(db):
     """Create a customer with a known password."""
+
     def _make(email="c1@test.com", password="StrongP@ss123!", **kwargs):
         return Customer.objects.create_user(
             email=email,
@@ -25,12 +26,14 @@ def customer_factory(db):
             last_name=kwargs.pop("last_name", "User"),
             **kwargs,
         )
+
     return _make
 
 
 @pytest.fixture
 def order_factory(db):
     """Create an order for a given customer."""
+
     def _make(customer, **kwargs):
         return Order.objects.create(
             customer=customer,
@@ -40,6 +43,7 @@ def order_factory(db):
             status=kwargs.pop("status", "pending"),
             **kwargs,
         )
+
     return _make
 
 
@@ -91,9 +95,7 @@ class TestOrderDetailSecurity:
         bob_order = order_factory(bob)
 
         client.force_login(alice)
-        resp = client.get(
-            reverse("customer_area:order_detail", args=[bob_order.id])
-        )
+        resp = client.get(reverse("customer_area:order_detail", args=[bob_order.id]))
         # Alice must be redirected away (cannot see Bob's order)
         assert resp.status_code == 302
         assert reverse("customer_area:orders") in resp.url
@@ -103,9 +105,7 @@ class TestOrderDetailSecurity:
         order = order_factory(alice)
 
         client.force_login(alice)
-        resp = client.get(
-            reverse("customer_area:order_detail", args=[order.id])
-        )
+        resp = client.get(reverse("customer_area:order_detail", args=[order.id]))
         assert resp.status_code == 200
         assert order.order_number.encode() in resp.content
 
@@ -116,12 +116,15 @@ class TestProfile:
         customer = customer_factory()
         client.force_login(customer)
 
-        resp = client.post(reverse("customer_area:profile"), data={
-            "first_name": "Updated",
-            "last_name": "Name",
-            "phone": "+41 79 000 00 00",
-            "preferred_language": "en",
-        })
+        resp = client.post(
+            reverse("customer_area:profile"),
+            data={
+                "first_name": "Updated",
+                "last_name": "Name",
+                "phone": "+41 79 000 00 00",
+                "preferred_language": "en",
+            },
+        )
         assert resp.status_code == 302
         customer.refresh_from_db()
         assert customer.first_name == "Updated"

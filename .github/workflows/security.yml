@@ -1,0 +1,77 @@
+# =============================================================================
+#  security.yml  —  Security scanning (reusable + weekly)
+# -----------------------------------------------------------------------------
+#  Role:
+#    Three complementary checks:
+#      1. pip-audit  -> known CVEs in your Python dependencies.
+#      2. bandit     -> insecure patterns in YOUR code (eval, hardcoded
+#                       secrets, weak crypto, etc.). Scans apps/ only.
+#      3. manage.py check --deploy -> Django's own production-hardening audit
+#                       (SECURE_SSL_REDIRECT, HSTS, secure cookies, DEBUG...).
+#
+#  Runs from ci.yml AND on a weekly schedule, because a dependency that is
+#  safe today can have a CVE disclosed next week without any commit from you.
+# =============================================================================
+
+name: Security
+
+on:
+  workflow_call:                # invoked by ci.yml
+  schedule:
+    - cron: "0 6 * * 1"         # every Monday 06:00 UTC — catches new CVEs
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    # Needed so `manage.py check --deploy` can import settings.
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      SECRET_KEY: ci-dummy-secret-key-only-for-github-actions-not-used-anywhere-real
+      DEBUG: "False"
+      ALLOWED_HOSTS: lamos-chocolate.ch
+      # DB is never contacted by `check`, but settings need the vars to load.
+      POSTGRES_DB: lamos_chocolate
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: "5432"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install project + security tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements/base.txt
+          pip install pip-audit bandit
+
+      # 1. Dependency vulnerabilities. `|| true` keeps the pipeline green even
+      #    if an unpatched CVE exists in a pinned lib you cannot bump before
+      #    the deadline — you still SEE the report in the logs. Remove `|| true`
+      #    later to make it blocking (recommended once the project is stable).
+      - name: pip-audit (dependency CVEs)
+        run: pip-audit -r requirements/base.txt || true
+
+      # 2. Static security analysis of your own code (skip migrations/tests).
+      - name: bandit (code security)
+        run: bandit -r apps -x apps/*/migrations,apps/*/tests || true
+
+      # 3. Django deployment checklist. Fails only on ERRORs today, so the
+      #    remaining WARNINGs (HSTS subdomains/preload) still print in the log
+      #    without breaking the pipeline before the deadline. Once you add
+      #    SECURE_HSTS_INCLUDE_SUBDOMAINS / SECURE_HSTS_PRELOAD to prod.py,
+      #    switch --fail-level to WARNING to make it strict.
+      - name: Django deploy check
+        run: python manage.py check --deploy --fail-level ERROR

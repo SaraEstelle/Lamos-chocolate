@@ -13,38 +13,28 @@ Views:
 - profile_view         : view / edit personal information
 """
 
+import json
+
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
-from django.shortcuts import get_object_or_404
-from django.core.paginator import Paginator
 
-from apps.accounts.forms import ProfileForm
-from apps.customer_area.selectors import (
-    get_customer_dashboard_stats,
-    get_customer_order_or_none,
-    get_customer_orders,
-)
-
+from apps.accounts.forms import PasswordChangeForm, ProfileForm
+from apps.checkout.models import Order  # import classique recommandé
 from apps.customer_area.forms import AddressForm
 from apps.customer_area.models import CustomerAddress
 from apps.customer_area.selectors import (
     get_customer_addresses,
+    get_customer_dashboard_stats,
+    get_customer_order_or_none,
     get_filtered_customer_orders,
 )
-from django.contrib.auth import update_session_auth_hash
-from apps.accounts.forms import PasswordChangeForm
-from apps.checkout.models import Order
 
-import json
-
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.views.decorators.http import require_http_methods
-
-from apps.checkout.models import Order  # import classique recommandé
 
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
@@ -134,9 +124,7 @@ def address_create_view(request):
 @require_http_methods(["GET", "POST"])
 def address_edit_view(request, address_id):
     """Edit an existing address (scoped to the customer)."""
-    address = get_object_or_404(
-        CustomerAddress, id=address_id, customer=request.user
-    )
+    address = get_object_or_404(CustomerAddress, id=address_id, customer=request.user)
     if request.method == "POST":
         form = AddressForm(data=request.POST, instance=address)
         if form.is_valid():
@@ -152,12 +140,11 @@ def address_edit_view(request, address_id):
 @require_http_methods(["POST"])
 def address_delete_view(request, address_id):
     """Delete an address (scoped to the customer)."""
-    address = get_object_or_404(
-        CustomerAddress, id=address_id, customer=request.user
-    )
+    address = get_object_or_404(CustomerAddress, id=address_id, customer=request.user)
     address.delete()
     messages.success(request, _("Address deleted."))
     return redirect("customer_area:addresses")
+
 
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET", "POST"])
@@ -175,14 +162,16 @@ def password_change_view(request):
         form = PasswordChangeForm(user=request.user)
     return render(request, "customer_area/password_change.html", {"form": form})
 
+
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
 def invoices_view(request):
     """List the customer's billable orders (paid)."""
-    orders = (Order.objects
-              .filter(customer=request.user, status__in=["paid", "shipped", "delivered"])
-              .order_by("-created_at"))
+    orders = Order.objects.filter(
+        customer=request.user, status__in=["paid", "shipped", "delivered"]
+    ).order_by("-created_at")
     return render(request, "customer_area/invoices.html", {"orders": orders})
+
 
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
@@ -191,6 +180,7 @@ def invoice_detail_view(request, order_id):
     order = get_object_or_404(Order, id=order_id, customer=request.user)
     return render(request, "customer_area/invoice_detail.html", {"order": order})
 
+
 @login_required(login_url="accounts:login")
 @require_http_methods(["GET"])
 def data_export_view(request):
@@ -198,15 +188,20 @@ def data_export_view(request):
     u = request.user
     data = {
         "account": {
-            "email": u.email, "first_name": u.first_name, "last_name": u.last_name,
-            "phone": u.phone, "npa": u.npa, "canton": u.canton,
+            "email": u.email,
+            "first_name": u.first_name,
+            "last_name": u.last_name,
+            "phone": u.phone,
+            "npa": u.npa,
+            "canton": u.canton,
             "preferred_language": u.preferred_language,
             "created_at": u.created_at.isoformat(),
         },
         "consents": list(u.consent_logs.values("analytics", "marketing", "created_at")),
         "orders": list(
-            __import__("apps.checkout.models", fromlist=["Order"]).Order.objects
-            .filter(customer=u).values("id", "order_number", "status", "created_at")
+            __import__("apps.checkout.models", fromlist=["Order"])
+            .Order.objects.filter(customer=u)
+            .values("id", "order_number", "status", "created_at")
         ),
         "addresses": list(u.addresses.values()) if hasattr(u, "addresses") else [],
     }

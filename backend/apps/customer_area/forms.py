@@ -26,8 +26,15 @@ class AddressForm(forms.ModelForm):
     class Meta:
         model = CustomerAddress
         fields = (
-            "label", "full_name", "line1", "line2",
-            "city", "postal_code", "canton", "country", "is_default",
+            "label",
+            "full_name",
+            "line1",
+            "line2",
+            "city",
+            "postal_code",
+            "canton",
+            "country",
+            "is_default",
         )
         widgets = {
             "label": forms.TextInput(attrs={"class": "form-control"}),
