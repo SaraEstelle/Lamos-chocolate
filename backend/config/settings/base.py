@@ -144,8 +144,8 @@ TIME_ZONE = config("TIME_ZONE", default="Europe/Paris")
 LANGUAGES = [
     ("fr", "Français"),
     ("en", "English"),
-    ("de-CH", "Deutsch (Schweiz)"),
-    ("it-CH", "Italiano (Svizzera)"),
+    ("de-ch", "Deutsch (Schweiz)"),
+    ("it-ch", "Italiano (Svizzera)"),
 ]
 
 LOCALE_PATHS = [BASE_DIR / "locale"]
