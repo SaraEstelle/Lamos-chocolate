@@ -28,6 +28,7 @@ def localized(obj: object, field_name: str) -> str:
     suffix = "en" if lang == "en" else "fr"
     return getattr(obj, f"{field_name}_{suffix}", "")
 
+
 @register.simple_tag(takes_context=True)
 def switch_language_url(context, target_lang):
     """Return the CURRENT page's URL translated into ``target_lang``.
