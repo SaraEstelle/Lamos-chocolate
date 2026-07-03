@@ -104,6 +104,8 @@ urlpatterns = [
     # POST vers /i18n/setlang/ avec next=URL_retour
     # =========================================================================
     path("i18n/", include("django.conf.urls.i18n")),
+
+    path("consent/", include("apps.common.urls_consent")),
 ]
 
 # ============================================================================
