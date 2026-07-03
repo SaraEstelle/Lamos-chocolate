@@ -38,7 +38,7 @@ class Order(models.Model):
     currency = models.CharField(
         max_length=3,
         choices=CurrencyChoices.choices,
-        default=CurrencyChoices.EUR,
+        default=CurrencyChoices.CHF,
     )
     stripe_session_id = models.CharField(max_length=255, blank=True, default="")
     shipping_first_name = models.CharField(max_length=100, blank=True, default="")
@@ -136,7 +136,7 @@ class Payment(models.Model):
     currency = models.CharField(
         max_length=3,
         choices=CurrencyChoices.choices,
-        default=CurrencyChoices.EUR,
+        default=CurrencyChoices.CHF,
     )
     status = models.CharField(
         max_length=20,

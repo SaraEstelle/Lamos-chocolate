@@ -33,7 +33,7 @@ def create_paid_order(
     customer,
     items,
     shipping=None,
-    currency=CurrencyChoices.EUR,
+    currency=CurrencyChoices.CHF,
     language=LanguageChoices.FR,
     stripe_session_id,
     stripe_payment_intent="",

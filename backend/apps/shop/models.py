@@ -104,7 +104,7 @@ class SKU(models.Model):
     currency = models.CharField(
         max_length=3,
         choices=CurrencyChoices.choices,
-        default=CurrencyChoices.EUR,
+        default=CurrencyChoices.CHF,
     )
     is_active = models.BooleanField(default=True)
     production_delay_days = models.PositiveIntegerField(default=7)
