@@ -1,0 +1,49 @@
+# =============================================================================
+#  ci.yml  —  Main CI pipeline (orchestrator)
+# -----------------------------------------------------------------------------
+#  Role:
+#    This is the ONE pipeline that runs on every push and every pull request.
+#    It does not contain the logic itself: it "calls" three reusable workflows
+#    (lint.yml, tests.yml, security.yml) in a controlled order.
+#    Think of it as the conductor; the other files are the musicians.
+#
+#  Why an orchestrator?
+#    - No duplicated runs: lint/tests/security are triggered ONLY from here,
+#      so you never pay twice for the same commit.
+#    - One place to read the whole pipeline status on a Pull Request.
+#
+#  Reusable workflow reference syntax:
+#    jobs.<id>.uses: ./.github/workflows/<file>.yml
+#    The path MUST start with "./" and match the filename exactly.
+# =============================================================================
+
+name: CI
+
+# When does this pipeline run?
+on:
+  push:
+    branches: [develop, main]     # every commit landing on the two long-lived branches
+  pull_request:
+    branches: [develop, main]     # every PR targeting them (the important one for reviews)
+
+# Cancel an older run if you push again quickly on the same branch/PR.
+# Saves CI minutes and avoids confusing "two runs at once".
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---- 1. Code style / linting ---------------------------------------------
+  lint:
+    name: Lint (black, isort, flake8)
+    uses: ./.github/workflows/lint.yml
+
+  # ---- 2. Automated tests + coverage ---------------------------------------
+  tests:
+    name: Tests (pytest + PostgreSQL)
+    uses: ./.github/workflows/tests.yml
+
+  # ---- 3. Security scanning -------------------------------------------------
+  security:
+    name: Security (pip-audit, bandit, deploy check)
+    uses: ./.github/workflows/security.yml
