@@ -1,5 +1,5 @@
 {% extends "cockpit/base.html" %}
-{% load i18n %}
+{% load i18n l10n %}
 
 {% block heading %}{% trans "Synthèse" %}{% endblock %}
 
@@ -10,13 +10,13 @@
         <div class="label">{% trans "CA du jour" %}</div>
         <div class="value">{{ pulse.revenue_today|floatformat:0 }} <small>CHF</small></div>
         <div class="target">{% trans "objectif" %} {{ pulse.revenue_today_target }} · {{ pulse.revenue_today_pct }}%</div>
-        <div class="bar"><span style="width: {% if pulse.revenue_today_pct > 100 %}100{% else %}{{ pulse.revenue_today_pct }}{% endif %}%"></span></div>
+        <div class="bar"><span style="width: {% if pulse.revenue_today_pct > 100 %}100{% else %}{{ pulse.revenue_today_pct|unlocalize }}{% endif %}%"></span></div>
       </div>
       <div class="kpi">
         <div class="label">{% trans "CA du mois (MTD)" %}</div>
         <div class="value">{{ pulse.revenue_mtd|floatformat:0 }} <small>CHF</small></div>
         <div class="target">{% trans "objectif" %} {{ pulse.revenue_mtd_target }} · {{ pulse.revenue_mtd_pct }}%</div>
-        <div class="bar"><span style="width: {% if pulse.revenue_mtd_pct > 100 %}100{% else %}{{ pulse.revenue_mtd_pct }}{% endif %}%"></span></div>
+        <div class="bar"><span style="width: {% if pulse.revenue_mtd_pct > 100 %}100{% else %}{{ pulse.revenue_mtd_pct|unlocalize }}{% endif %}%"></span></div>
       </div>
       <div class="kpi">
         <div class="label">{% trans "Commandes aujourd'hui" %}</div>
@@ -27,7 +27,7 @@
         <div class="label">{% trans "Unités expédiées (MTD)" %}</div>
         <div class="value">{{ pulse.units_mtd }}</div>
         <div class="target">{% trans "capacité" %} {{ pulse.capacity_units }} · {{ pulse.units_mtd_pct }}%</div>
-        <div class="bar"><span style="width: {% if pulse.units_mtd_pct > 100 %}100{% else %}{{ pulse.units_mtd_pct }}{% endif %}%"></span></div>
+        <div class="bar"><span style="width: {% if pulse.units_mtd_pct > 100 %}100{% else %}{{ pulse.units_mtd_pct|unlocalize }}{% endif %}%"></span></div>
       </div>
     </div>
 
