@@ -35,8 +35,16 @@ DEMO_DOMAIN = "@demo.lamos"
 
 # Canton distribution (weighted towards the French-speaking heartland).
 CANTON_WEIGHTS = [
-    ("VD", 28), ("GE", 22), ("ZH", 14), ("BE", 9), ("VS", 7),
-    ("FR", 6), ("NE", 5), ("TI", 4), ("JU", 3), ("XX", 2),
+    ("VD", 28),
+    ("GE", 22),
+    ("ZH", 14),
+    ("BE", 9),
+    ("VS", 7),
+    ("FR", 6),
+    ("NE", 5),
+    ("TI", 4),
+    ("JU", 3),
+    ("XX", 2),
 ]
 
 # Representative locality + NPA (postal code) per canton, used to build a
@@ -56,8 +64,12 @@ CANTON_LOCALITIES = {
 
 # Order status mix (most orders are realised; a few pending/cancelled).
 STATUS_WEIGHTS = [
-    ("delivered", 40), ("shipped", 22), ("processing", 12),
-    ("paid", 14), ("pending", 8), ("cancelled", 4),
+    ("delivered", 40),
+    ("shipped", 22),
+    ("processing", 12),
+    ("paid", 14),
+    ("pending", 8),
+    ("cancelled", 4),
 ]
 
 # Statuses that reach a completed purchase (mirrors selectors.PAID_STATUSES).
@@ -66,8 +78,30 @@ REALISED_STATUSES = {"delivered", "shipped", "processing", "paid"}
 # Hour-of-day distribution for orders/sessions: low overnight, lunch peak
 # (12-13h) and a strong evening peak (19-21h). Index = hour (0-23).
 HOUR_WEIGHTS = [
-    1, 1, 1, 1, 1, 1, 2, 4, 7, 9, 11, 13,        # 00-11
-    16, 15, 11, 10, 11, 13, 17, 22, 21, 15, 8, 4,  # 12-23
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    2,
+    4,
+    7,
+    9,
+    11,
+    13,  # 00-11
+    16,
+    15,
+    11,
+    10,
+    11,
+    13,
+    17,
+    22,
+    21,
+    15,
+    8,
+    4,  # 12-23
 ]
 _HOURS = list(range(24))
 
@@ -83,7 +117,9 @@ def _stamp(day):
     """Return `day` with a realistic random time-of-day (peak hours weighted)."""
     hour = random.choices(_HOURS, weights=HOUR_WEIGHTS, k=1)[0]
     return day.replace(
-        hour=hour, minute=random.randint(0, 59), second=random.randint(0, 59),
+        hour=hour,
+        minute=random.randint(0, 59),
+        second=random.randint(0, 59),
     )
 
 
@@ -91,10 +127,14 @@ class Command(BaseCommand):
     help = "Seed demo customers and orders for the executive cockpit."
 
     def add_arguments(self, parser):
-        parser.add_argument("--days", type=int, default=90,
-                            help="Spread orders over the last N days.")
-        parser.add_argument("--clear", action="store_true",
-                            help="Only remove existing demo data, then exit.")
+        parser.add_argument(
+            "--days", type=int, default=90, help="Spread orders over the last N days."
+        )
+        parser.add_argument(
+            "--clear",
+            action="store_true",
+            help="Only remove existing demo data, then exit.",
+        )
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -112,19 +152,24 @@ class Command(BaseCommand):
             return
 
         customers = self._create_customers()
-        b2b_customers = [c for c in customers if c.customer_type != CustomerTypeChoices.B2C]
+        b2b_customers = [
+            c for c in customers if c.customer_type != CustomerTypeChoices.B2C
+        ]
 
         order_count, item_count = self._create_orders(
             customers, b2b_customers, skus, options["days"]
         )
         event_count = Event.objects.filter(
-            customer__email__endswith=DEMO_DOMAIN).count()
+            customer__email__endswith=DEMO_DOMAIN
+        ).count()
 
-        self.stdout.write(self.style.SUCCESS(
-            f"Seeded {len(customers)} customers, {order_count} orders, "
-            f"{item_count} order items, {event_count} events "
-            f"over {options['days']} days."
-        ))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Seeded {len(customers)} customers, {order_count} orders, "
+                f"{item_count} order items, {event_count} events "
+                f"over {options['days']} days."
+            )
+        )
 
     # ------------------------------------------------------------------ #
 
@@ -213,7 +258,9 @@ class Command(BaseCommand):
         customer.npa = npa
 
     def _create_orders(self, customers, b2b_customers, skus, days):
-        b2c_customers = [c for c in customers if c.customer_type == CustomerTypeChoices.B2C]
+        b2c_customers = [
+            c for c in customers if c.customer_type == CustomerTypeChoices.B2C
+        ]
         products = list({s.product_id: s.product for s in skus}.values())
         now = timezone.now()
         order_count = 0
@@ -257,7 +304,10 @@ class Command(BaseCommand):
                 for sku in chosen:
                     qty = random.randint(*qty_range)
                     item = OrderItem.objects.create(
-                        order=order, sku=sku, quantity=qty, unit_price=sku.price,
+                        order=order,
+                        sku=sku,
+                        quantity=qty,
+                        unit_price=sku.price,
                     )
                     total += item.subtotal
                     item_count += 1
@@ -266,7 +316,9 @@ class Command(BaseCommand):
                 ts = _stamp(day)
                 # auto_now_add ignores assignment on create → backdate via update().
                 Order.objects.filter(pk=order.pk).update(
-                    total_amount=total, created_at=ts, updated_at=ts,
+                    total_amount=total,
+                    created_at=ts,
+                    updated_at=ts,
                 )
                 order_count += 1
 
@@ -274,48 +326,94 @@ class Command(BaseCommand):
                 # purchased products (plus a little extra), added to cart, began
                 # checkout, and — for realised statuses — completed the purchase.
                 viewed = {s.product for s in chosen}
-                for p in random.sample(products, min(random.randint(0, 2), len(products))):
+                for p in random.sample(
+                    products, min(random.randint(0, 2), len(products))
+                ):
                     viewed.add(p)
                 for p in viewed:
-                    self._add_event(events, EventTypeChoices.PRODUCT_VIEW, customer,
-                                    ts, channel, product=p)
+                    self._add_event(
+                        events,
+                        EventTypeChoices.PRODUCT_VIEW,
+                        customer,
+                        ts,
+                        channel,
+                        product=p,
+                    )
                 for s in chosen:
-                    self._add_event(events, EventTypeChoices.ADD_TO_CART, customer,
-                                    ts, channel, product=s.product)
-                self._add_event(events, EventTypeChoices.BEGIN_CHECKOUT, customer,
-                                ts, channel)
+                    self._add_event(
+                        events,
+                        EventTypeChoices.ADD_TO_CART,
+                        customer,
+                        ts,
+                        channel,
+                        product=s.product,
+                    )
+                self._add_event(
+                    events, EventTypeChoices.BEGIN_CHECKOUT, customer, ts, channel
+                )
                 if status in REALISED_STATUSES:
-                    self._add_event(events, EventTypeChoices.PURCHASE, customer,
-                                    ts, channel, value=total)
+                    self._add_event(
+                        events,
+                        EventTypeChoices.PURCHASE,
+                        customer,
+                        ts,
+                        channel,
+                        value=total,
+                    )
 
             # Abandoned sessions (no order): browsers that drop off, so the
             # funnel narrows realistically above the purchase line.
             for _ in range(random.randint(3, 8)):
                 cust = random.choice(b2c_customers)
                 ts = _stamp(day)
-                browse = random.sample(products, random.randint(1, min(4, len(products))))
+                browse = random.sample(
+                    products, random.randint(1, min(4, len(products)))
+                )
                 for p in browse:
-                    self._add_event(events, EventTypeChoices.PRODUCT_VIEW, cust,
-                                    ts, ChannelChoices.B2C, product=p)
+                    self._add_event(
+                        events,
+                        EventTypeChoices.PRODUCT_VIEW,
+                        cust,
+                        ts,
+                        ChannelChoices.B2C,
+                        product=p,
+                    )
                 if random.random() < 0.45:
-                    self._add_event(events, EventTypeChoices.ADD_TO_CART, cust,
-                                    ts, ChannelChoices.B2C, product=random.choice(browse))
+                    self._add_event(
+                        events,
+                        EventTypeChoices.ADD_TO_CART,
+                        cust,
+                        ts,
+                        ChannelChoices.B2C,
+                        product=random.choice(browse),
+                    )
                     if random.random() < 0.30:
-                        self._add_event(events, EventTypeChoices.BEGIN_CHECKOUT, cust,
-                                        ts, ChannelChoices.B2C)
+                        self._add_event(
+                            events,
+                            EventTypeChoices.BEGIN_CHECKOUT,
+                            cust,
+                            ts,
+                            ChannelChoices.B2C,
+                        )
 
             # Bounce sessions: a logged-in visit with no product view, so the
             # 'Utilisateurs' funnel stage sits above 'Visite page'.
             for _ in range(random.randint(2, 5)):
                 cust = random.choice(b2c_customers)
-                self._add_event(events, EventTypeChoices.LOGIN, cust,
-                                _stamp(day), ChannelChoices.B2C)
+                self._add_event(
+                    events,
+                    EventTypeChoices.LOGIN,
+                    cust,
+                    _stamp(day),
+                    ChannelChoices.B2C,
+                )
 
         self._persist_events(events)
         return order_count, item_count
 
-    def _add_event(self, events, event_type, customer, day, channel,
-                   product=None, value=None):
+    def _add_event(
+        self, events, event_type, customer, day, channel, product=None, value=None
+    ):
         """Build an Event (unsaved) and remember its intended created_at."""
         e = Event(
             event_type=event_type,

@@ -101,14 +101,18 @@ def pilotage_view(request):
     if request.method == "POST":
         obj = CockpitObjective.load()
         obj.daily_revenue_chf = _parse_int(
-            request.POST.get("daily_revenue_chf"), obj.daily_revenue_chf)
+            request.POST.get("daily_revenue_chf"), obj.daily_revenue_chf
+        )
         obj.monthly_revenue_chf = _parse_int(
-            request.POST.get("monthly_revenue_chf"), obj.monthly_revenue_chf)
+            request.POST.get("monthly_revenue_chf"), obj.monthly_revenue_chf
+        )
         obj.monthly_capacity_units = _parse_int(
-            request.POST.get("monthly_capacity_units"), obj.monthly_capacity_units)
+            request.POST.get("monthly_capacity_units"), obj.monthly_capacity_units
+        )
         try:
             obj.target_margin_pct = max(
-                min(float(request.POST.get("target_margin_pct")), 100), 0)
+                min(float(request.POST.get("target_margin_pct")), 100), 0
+            )
         except (TypeError, ValueError):
             pass
         obj.updated_by = request.user
@@ -118,7 +122,7 @@ def pilotage_view(request):
         for key, value in request.POST.items():
             if not key.startswith("target_"):
                 continue
-            suffix = key[len("target_"):]
+            suffix = key[len("target_") :]
             if not suffix.isdigit():
                 continue
             ProductTarget.objects.update_or_create(
@@ -131,7 +135,7 @@ def pilotage_view(request):
         for key, value in request.POST.items():
             if not key.startswith("canton_"):
                 continue
-            code = key[len("canton_"):]
+            code = key[len("canton_") :]
             if code not in valid_cantons:
                 continue
             CantonTarget.objects.update_or_create(

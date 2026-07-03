@@ -13,8 +13,12 @@ from .models import CantonTarget, CockpitObjective, ProductTarget
 @admin.register(CockpitObjective)
 class CockpitObjectiveAdmin(admin.ModelAdmin):
     list_display = (
-        "__str__", "daily_revenue_chf", "monthly_revenue_chf",
-        "monthly_capacity_units", "target_margin_pct", "updated_at",
+        "__str__",
+        "daily_revenue_chf",
+        "monthly_revenue_chf",
+        "monthly_capacity_units",
+        "target_margin_pct",
+        "updated_at",
     )
 
 

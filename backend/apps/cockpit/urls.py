@@ -14,7 +14,9 @@ urlpatterns = [
     path("", views.cockpit_view, name="dashboard"),
     path("heatmap/", views.heatmap_view, name="heatmap"),
     path("products/", views.products_view, name="products"),
-    path("products/<int:product_id>/", views.product_detail_view, name="product_detail"),
+    path(
+        "products/<int:product_id>/", views.product_detail_view, name="product_detail"
+    ),
     path("inventory/", views.inventory_view, name="inventory"),
     path("pilotage/", views.pilotage_view, name="pilotage"),
     path("etude/", views.etude_view, name="etude"),

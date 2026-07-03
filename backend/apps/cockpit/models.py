@@ -25,13 +25,18 @@ class CockpitObjective(models.Model):
     monthly_revenue_chf = models.PositiveIntegerField(default=80000)
     monthly_capacity_units = models.PositiveIntegerField(default=50000)
     target_margin_pct = models.DecimalField(
-        max_digits=5, decimal_places=2, default=40,
+        max_digits=5,
+        decimal_places=2,
+        default=40,
         help_text="Target gross margin, in percent.",
     )
     updated_at = models.DateTimeField(auto_now=True)
     updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True,
-        on_delete=models.SET_NULL, related_name="+",
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
     )
 
     class Meta:
@@ -57,7 +62,9 @@ class ProductTarget(models.Model):
     """Per-product monthly sales objective, in units."""
 
     product = models.OneToOneField(
-        Product, on_delete=models.CASCADE, related_name="cockpit_target",
+        Product,
+        on_delete=models.CASCADE,
+        related_name="cockpit_target",
     )
     monthly_units = models.PositiveIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,7 +81,9 @@ class CantonTarget(models.Model):
     """Per-canton monthly revenue objective, in CHF (drives the heatmap goals)."""
 
     canton = models.CharField(
-        max_length=2, choices=SwissCantonChoices.choices, unique=True,
+        max_length=2,
+        choices=SwissCantonChoices.choices,
+        unique=True,
     )
     monthly_revenue_chf = models.PositiveIntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)

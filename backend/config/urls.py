@@ -94,7 +94,6 @@ urlpatterns = [
     # Réservé au staff ; distinct du backoffice OPS et du site public.
     # =========================================================================
     path("cockpit/", include("apps.cockpit.urls", namespace="cockpit")),
-
     # =========================================================================
     # Sélecteur de langue — formulaire Django pour changer la langue
     # POST vers /i18n/setlang/ avec next=URL_retour
