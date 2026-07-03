@@ -325,3 +325,27 @@ class B2BAccount(models.Model):
 
     def __str__(self):
         return f"{self.company_name} ({self.get_segment_display()})"
+
+class ConsentLog(models.Model):
+    """
+    Immutable, timestamped record of a consent decision (nLPD/GDPR proof).
+    Works for both anonymous visitors (consent_id cookie) and logged-in users.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer = models.ForeignKey(
+        "accounts.Customer", null=True, blank=True,
+        on_delete=models.SET_NULL, related_name="consent_logs",
+    )
+    consent_id = models.CharField(max_length=64, db_index=True,
+        help_text="Anonymous consent identifier stored in the cookie")
+    necessary = models.BooleanField(default=True)   # always true (informational)
+    analytics = models.BooleanField(default=False)
+    marketing = models.BooleanField(default=False)
+    policy_version = models.CharField(max_length=20, default="1.0")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=300, blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "consent_logs"
+        ordering = ["-created_at"]
