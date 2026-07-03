@@ -6,25 +6,30 @@
 
 {% block content %}
 
-<!-- ═══ HERO ═══ -->
-<section class="hero">
-  <p class="hero-eyebrow reveal">Dubai · Switzerland · Since 2021</p>
-  <div class="hero-crown reveal delay-1">
-    <svg viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" fill="none" stroke="#b0892f" stroke-width="2" stroke-linejoin="round"/>
-      <rect x="16" y="54" width="68" height="5" fill="#b0892f"/>
-      <circle cx="50" cy="8" r="4" fill="#b0892f"/><circle cx="12" cy="14" r="3.5" fill="#b0892f"/><circle cx="88" cy="14" r="3.5" fill="#b0892f"/>
-    </svg>
-  </div>
-  <h1 class="hero-title reveal delay-1">LAMO'S</h1>
-  <span class="hero-subtitle reveal delay-2">C · H · O · C · O · L · A · T · E</span>
-  <div class="hero-divider reveal delay-2"></div>
-  <p class="hero-tagline reveal delay-3">
-    {% trans "The spirit of Dubai, the nobility of Swiss chocolate. An artisan manufacture born at the crossroads of East and West." %}
-  </p>
-  <div class="hero-actions reveal delay-4">
-    <a href="{% url 'shop:catalog' %}" class="btn btn-gold btn-lg">{% trans "Discover our creations" %}</a>
-    <a href="{% url 'main:about' %}" class="btn btn-outline btn-lg">{% trans "Our story" %}</a>
+<!-- ═══ HERO (fond vidéo de production, auto-hébergé) ═══ -->
+<section class="hero hero--video">
+  {# Vidéo de fond : muted + autoplay + playsinline = lecture auto autorisée.   #}
+  {# preload="metadata" = on ne télécharge pas tout d'un coup. poster = fallback. #}
+  <video class="hero-video" autoplay muted loop playsinline preload="metadata"
+         poster="{% static 'images/hero-poster.webp' %}" aria-hidden="true" tabindex="-1">
+    <source src="{% static 'videos/production.webm' %}" type="video/webm">
+    <source src="{% static 'videos/production.mp4' %}"  type="video/mp4">
+  </video>
+
+  {# Voile dégradé : assombrit juste ce qu'il faut pour garder le texte lisible.  #}
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  {# Contenu au-dessus de la vidéo (plus de couronne ni de gros logo LAMO'S).     #}
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal">Dubai · Switzerland · Since 2021</p>
+    <div class="hero-divider reveal delay-1"></div>
+    <p class="hero-tagline reveal delay-2">
+      {% trans "The spirit of Dubai, the nobility of Swiss chocolate. An artisan manufacture born at the crossroads of East and West." %}
+    </p>
+    <div class="hero-actions reveal delay-3">
+      <a href="{% url 'shop:catalog' %}" class="btn btn-gold btn-lg">{% trans "Discover our creations" %}</a>
+      <a href="{% url 'main:about' %}" class="btn btn-outline-light btn-lg">{% trans "Our story" %}</a>
+    </div>
   </div>
 </section>
 
