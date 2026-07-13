@@ -55,50 +55,99 @@
         {% trans "No account yet?" %} <a class="auth-link" data-auth="register">{% trans "Create one" %}</a>
       </p>
     </div>
-
-    {# ══════════════ RIGHT COLUMN : SIGN UP ══════════════ #}
+{# ══════════════ RIGHT COLUMN : SIGN UP (B2C) ══════════════ #}
     <div class="auth-pane auth-pane--signup">
       <svg class="auth-crown" viewBox="0 0 100 80" fill="none">
-        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28" stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
+        <polygon points="50,8 68,28 88,14 82,52 18,52 12,14 32,28"
+                 stroke="#c9a84c" stroke-width="2.5" stroke-linejoin="round"/>
         <rect x="16" y="54" width="68" height="5" fill="#c9a84c"/>
       </svg>
       <h2 class="auth-title">{% trans "Join Lamos" %}</h2>
 
       <form method="post" novalidate>
         {% csrf_token %}
-        <input type="hidden" name="form_type" value="register">
-        {% if register_form.non_field_errors %}<p class="auth-error">{{ register_form.non_field_errors|striptags }}</p>{% endif %}
 
+        {# The view routes on this hidden value: "register" vs "login". #}
+        <input type="hidden" name="form_type" value="register">
+        
+        {% if register_form.errors %}
+          <div class="auth-error-box" role="alert" aria-live="polite">
+            {% for error in register_form.non_field_errors %}
+              <p class="auth-error">{{ error }}</p>
+            {% endfor %}
+            {% for field in register_form %}
+              {% for error in field.errors %}
+                <p class="auth-error">{{ field.label }} — {{ error }}</p>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {# --- First name + last name --- #}
         <div class="auth-row">
           <div class="auth-field">
-            <label>{{ register_form.first_name.label }}</label>{{ register_form.first_name }}
+            <label for="{{ register_form.first_name.id_for_label }}">
+              {{ register_form.first_name.label }}
+            </label>
+            {{ register_form.first_name }}
           </div>
           <div class="auth-field">
-            <label>{{ register_form.last_name.label }}</label>{{ register_form.last_name }}
+            <label for="{{ register_form.last_name.id_for_label }}">
+              {{ register_form.last_name.label }}
+            </label>
+            {{ register_form.last_name }}
           </div>
+        </div>
+
+        {# --- Email --- #}
+        <div class="auth-field">
+          <label for="{{ register_form.email.id_for_label }}">
+            {{ register_form.email.label }} *
+          </label>
+          {{ register_form.email }}
         </div>
 
         <div class="auth-field">
-          <label>{{ register_form.email.label }}</label>{{ register_form.email }}
-          {% if register_form.email.errors %}<p class="auth-error">{{ register_form.email.errors|striptags }}</p>{% endif %}
+          <label for="{{ register_form.preferred_language.id_for_label }}">
+            {{ register_form.preferred_language.label }} *
+          </label>
+          {{ register_form.preferred_language }}
         </div>
 
+        {# --- Password --- #}
         <div class="auth-field password-wrap">
-          <label>{{ register_form.password.label }}</label>{{ register_form.password }}
-          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
-          {% if register_form.password.errors %}<p class="auth-error">{{ register_form.password.errors|striptags }}</p>{% endif %}
+          <label for="{{ register_form.password.id_for_label }}">
+            {{ register_form.password.label }} *
+          </label>
+          {{ register_form.password }}
+          <button type="button" class="password-toggle"
+                  aria-label="{% trans 'Show password' %}">👁</button>
         </div>
 
+        {# --- Password confirmation --- #}
         <div class="auth-field password-wrap">
-          <label>{{ register_form.password_confirm.label }}</label>{{ register_form.password_confirm }}
-          <button type="button" class="password-toggle" aria-label="{% trans 'Show password' %}">👁</button>
+          <label for="{{ register_form.password_confirm.id_for_label }}">
+            {{ register_form.password_confirm.label }} *
+          </label>
+          {{ register_form.password_confirm }}
+          <button type="button" class="password-toggle"
+                  aria-label="{% trans 'Show password' %}">👁</button>
         </div>
 
-        {# nLPD / RGPD consent — mandatory, read server-side as request.POST['gdpr']. #}
-        <label class="form-inline" style="display:flex;gap:.5rem;align-items:flex-start;font-size:.8rem;color:var(--a-text);text-transform:none;letter-spacing:0;margin:.5rem 0 .25rem;">
+        <p class="muted small" style="margin:-.4rem 0 .8rem;font-size:.75rem;">
+          {% trans "At least 12 characters, with upper- and lower-case, a digit and a special character." %}
+        </p>
+
+        {# nLPD / GDPR consent — mandatory. Read server-side as request.POST["gdpr"]. #}
+        <label class="form-inline"
+               style="display:flex;gap:.5rem;align-items:flex-start;font-size:.8rem;
+                      color:var(--a-text);text-transform:none;letter-spacing:0;
+                      margin:.5rem 0 .25rem;">
           <input type="checkbox" name="gdpr" required style="width:auto;margin-top:.2rem;">
           <span>{% trans "I accept the" %}
-            <a href="{% url 'main:privacy' %}" target="_blank" class="auth-link">{% trans "privacy policy" %}</a>
+            <a href="{% url 'main:privacy' %}" target="_blank" class="auth-link">
+              {% trans "privacy policy" %}
+            </a>
           </span>
         </label>
 
@@ -106,7 +155,8 @@
       </form>
 
       <p class="auth-switch-mobile">
-        {% trans "Already a member?" %} <a class="auth-link" data-auth="signin">{% trans "Sign in" %}</a>
+        {% trans "Already a member?" %}
+        <a class="auth-link" data-auth="signin">{% trans "Sign in" %}</a>
       </p>
     </div>
 

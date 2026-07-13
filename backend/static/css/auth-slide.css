@@ -268,3 +268,18 @@
   border-bottom: 1px solid var(--a-line);
   padding-bottom: .5rem;
 }
+
+/* ---------------------------------------------------------------------------
+   Error summary box on the auth card.
+   Groups every form error at the top of the pane so that a validation failure
+   can never be silent again (root cause of the B2C sign-up bug).
+   --------------------------------------------------------------------------- */
+.auth-card .auth-error-box {
+  border: 1px solid rgba(224, 115, 107, .45);
+  border-radius: 6px;
+  background: rgba(224, 115, 107, .07);
+  padding: .6rem .75rem;
+  margin-bottom: 1rem;
+}
+.auth-card .auth-error-box .auth-error { margin-top: 0; }
+.auth-card .auth-error-box .auth-error + .auth-error { margin-top: .3rem; }
