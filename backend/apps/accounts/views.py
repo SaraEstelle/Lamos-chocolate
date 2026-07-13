@@ -228,10 +228,9 @@ def access_view(request):
                         password=register_form.cleaned_data["password"],
                         first_name=register_form.cleaned_data["first_name"],
                         last_name=register_form.cleaned_data["last_name"],
-                        preferred_language=register_form.cleaned_data.get(
-                            "preferred_language", "fr"
-                        ),
-                    )
+                        preferred_language=register_form.cleaned_data.get("preferred_language")
+                        or "fr",
+                        )
                     # Store consent WITH a timestamp (Swiss nLPD proof of consent).
                     customer.consent_nlpd = True
                     customer.consent_nlpd_at = timezone.now()
