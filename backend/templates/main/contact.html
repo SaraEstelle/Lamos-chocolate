@@ -63,5 +63,85 @@
     </div>
   </div>
 </section>
+<!-- ═══ ABOUT THE PROJECT (Holberton Portfolio) ═══ -->
+  <section class="section section--alt">
+    <div class="container" style="max-width:760px;">
 
+      <div class="reveal" style="text-align:center;">
+        <span class="gold-line" style="margin-inline:auto;"></span>
+        <span class="eyebrow">{% trans "About this project" %}</span>
+        <h2 class="h-display" style="margin-bottom:1.5rem;">
+          {% trans "Why we built Lamos Chocolate" %}
+        </h2>
+      </div>
+
+      <!-- The personal story. blocktrans keeps it translatable across the 4 locales. -->
+      <div class="reveal delay-1" style="font-size:1.02rem;line-height:1.85;color:var(--c-text-2);">
+        <p style="margin-bottom:1.1rem;">
+          {% blocktrans %}When the "Dubai chocolate" went viral, we kept coming back to the same
+          thought: here was a maison born from real craft — Swiss Carma chocolate, Belgian Callebaut
+          cream, Iranian Rafsanjan pistachios — and yet nothing online did it justice. A house that
+          moves people deserved a storefront that moves people too.{% endblocktrans %}
+        </p>
+        <p style="margin-bottom:1.1rem;">
+          {% blocktrans %}So we set ourselves a real challenge, not a school exercise: a chocolatier
+          does not have one client, but three — the individual who wants a bar tonight, the hotel
+          that needs four hundred engraved boxes for Christmas, and the owner who has to decide what
+          to produce and when. We wanted to serve all three from a single platform, with one stock
+          and one source of truth.{% endblocktrans %}
+        </p>
+        <p style="margin-bottom:0;">
+          {% blocktrans %}We built it in about a month, as two developers, learning the hard and
+          rewarding parts of e-commerce, payments and Swiss data protection along the way. It is the
+          project we are proudest of — and the one that taught us the most.{% endblocktrans %}
+        </p>
+      </div>
+
+      <!-- Holberton mention + link -->
+      <p class="reveal delay-2 muted" style="text-align:center;margin-top:2rem;font-size:.9rem;">
+        {% blocktrans %}Lamos Chocolate is a Portfolio Project developed at{% endblocktrans %}
+        <a href="https://www.holbertonschool.com/" target="_blank" rel="noopener"
+           style="color:var(--c-gold-3);">Holberton School</a>.
+      </p>
+
+      <!-- Team -->
+      <div class="reveal delay-2" style="text-align:center;margin-top:2.5rem;">
+        <span class="eyebrow">{% trans "The team" %}</span>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem;margin-top:1rem;">
+
+          <!-- Member 1 -->
+          <div>
+            <p style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem;">
+              Sara Rebati
+            </p>
+            <a href="https://github.com/SaraEstelle" target="_blank" rel="noopener"
+               style="color:var(--c-gold-3);margin-inline:.5rem;">GitHub</a>
+            <a href="[SARA_LINKEDIN_URL]" target="_blank" rel="noopener"
+               style="color:var(--c-gold-3);margin-inline:.5rem;">LinkedIn</a>
+          </div>
+
+          <!-- Member 2 -->
+          <div>
+            <p style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:.4rem;">
+              Valentin Planchon
+            </p>
+            <a href="https://github.com/ValentinCA28" target="_blank" rel="noopener"
+               style="color:var(--c-gold-3);margin-inline:.5rem;">GitHub</a>
+            <a href="[VALENTIN_LINKEDIN_URL]" target="_blank" rel="noopener"
+               style="color:var(--c-gold-3);margin-inline:.5rem;">LinkedIn</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Repository -->
+      <div class="reveal delay-3" style="text-align:center;margin-top:2.5rem;">
+        <a href="https://github.com/SaraEstelle/Lamos-chocolate" target="_blank" rel="noopener"
+           class="btn btn-outline">
+          {% trans "View the project on GitHub" %}
+        </a>
+      </div>
+
+    </div>
+  </section>
 {% endblock %}
