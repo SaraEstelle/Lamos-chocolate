@@ -34,7 +34,7 @@
       {{ form.wants_marketing }} {{ form.wants_marketing.label }}
     </label>
 
-    {{ form.website }}  {# honeypot — kept hidden by the widget #}
+    {{ form.website.as_hidden }}  {# honeypot — kept hidden by the widget #}
 
     <button type="submit" class="btn btn-gold btn-lg">{% trans "Send request" %}</button>
   </form>
