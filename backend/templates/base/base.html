@@ -7,12 +7,12 @@
   <meta name="description" content="{% block meta_description %}{% trans 'Lamos Chocolate — Swiss artisan chocolate, the spirit of Dubai.' %}{% endblock %}">
   <title>{% block title %}Lamos Chocolate{% endblock %}</title>
 
-  <!-- Fonts (kept) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Cinzel:wght@400;500;600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
-  <!-- Design system (Bootstrap fully removed) -->
+  <!-- Design system   -->
   <link rel="stylesheet" href="{% static 'css/design-system.css' %}">
   <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">   {# global responsive #}
@@ -31,7 +31,6 @@
 
   {% include "base/cookie_banner.html" %}
 
-  <!-- No Bootstrap JS anymore -->
   <script src="{% static 'js/main.js' %}" defer></script>
   {% block extra_scripts %}{% endblock %}
 
