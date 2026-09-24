@@ -27,7 +27,7 @@
 
     <div class="nav-actions">
       {# ================================================================= #}
-      {# Language switcher — native <details>, no JS, no Bootstrap.        #}
+      {# Language switcher — native <details>.        #}
       {# Reads settings.LANGUAGES via the i18n context processor and posts #}
       {# to Django's set_language view. `next` keeps the visitor on the    #}
       {# same page (Django rewrites the language prefix for us).           #}
@@ -43,7 +43,6 @@
             <li>
                 <form action="{% url 'set_language' %}" method="post">
                 {% csrf_token %}
-                {# Pre-computed at render time -> already the correct URL for `code`. #}
                 {% switch_language_url code as target_url %}
                 <input type="hidden" name="next" value="{{ target_url }}">
                 <input type="hidden" name="language" value="{{ code }}">
